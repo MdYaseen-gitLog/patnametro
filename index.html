@@ -2,1055 +2,1058 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <title>Metro Map Booking</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
-  <link rel="stylesheet" href="styles.css">
-  <style>
-    #map { height: 60vh; }
-    @media (max-width: 768px) {
-      #map { height: 300px; }
-    }
+    <meta charset="UTF-8">
+    <title>Metro Map Booking</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        #map {
+            height: 60vh;
+        }
 
-    .side-info {
-      max-width: 300px;
-    }
+        @media (max-width: 768px) {
+            #map {
+                height: 300px;
+            }
+        }
 
-    label {
-      font-weight: bold;
-    }
+        .side-info {
+            max-width: 300px;
+        }
 
-    .station-marker {
-      font-size: 10px;
-      font-weight: bold;
-    }
+        label {
+            font-weight: bold;
+        }
 
-    .text-tooltip {
-      transition: font-size 0.2s;
-      font-size: 4px;
-      /* default size */
-      background: none !important;
-      border: none !important;
-      box-shadow: none !important;
-      color: black;
-      opacity: 0.6;
-    }
+        .station-marker {
+            font-size: 10px;
+            font-weight: bold;
+        }
 
-    .station-label {
+        .text-tooltip {
+            transition: font-size 0.2s;
+            font-size: 4px;
+            /* default size */
+            background: none !important;
+            border: none !important;
+            box-shadow: none !important;
+            color: black;
+            opacity: 0.6;
+        }
 
-      transition: font-size 0.5s;
+        .station-label {
 
-    }
+            transition: font-size 0.5s;
 
-    .label {
-      font-size: 10px;
-      background-color: transparent;
-      color: red;
-      border: 0px solid black;
-      padding: 4px;
-      border-radius: 16px;
-      margin: 0px;
-      opacity: 0.1;
-    }
+        }
 
-    .src_dest_label {
-      font-size: 18px;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      font-weight: 700;
-      color: blueviolet;
-      background: none !important;
-      border: none !important;
-      box-shadow: none !important;
-    }
+        .label {
+            font-size: 10px;
+            background-color: transparent;
+            color: red;
+            border: 0px solid black;
+            padding: 4px;
+            border-radius: 16px;
+            margin: 0px;
+            opacity: 0.1;
+        }
 
-    #btnSwap {
-      background-color: transparent;
+        .src_dest_label {
+            font-size: 18px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-weight: 700;
+            color: blueviolet;
+            background: none !important;
+            border: none !important;
+            box-shadow: none !important;
+        }
 
-    }
+        #btnSwap {
+            background-color: transparent;
 
-    #btnSwap:hover {
-      background-color: gainsboro;
-      transition: 1s;
+        }
 
-    }
+        #btnSwap:hover {
+            background-color: gainsboro;
+            transition: 1s;
 
-    .pulsing-marker {
-      width: 20px;
-      height: 20px;
-      background: rgba(0, 123, 255, 0.5);
-      border: 2px solid #007bff;
-      border-radius: 50%;
-      animation: pulse 1.5s ease-out infinite;
-      position: absolute;
-      transform: translate(-50%, -50%);
-    }
+        }
 
-    @keyframes pulse {
-      0% {
-        transform: scale(0.8);
-        opacity: 1;
-      }
+        .pulsing-marker {
+            width: 20px;
+            height: 20px;
+            background: rgba(0, 123, 255, 0.5);
+            border: 2px solid #007bff;
+            border-radius: 50%;
+            animation: pulse 1.5s ease-out infinite;
+            position: absolute;
+            transform: translate(-50%, -50%);
+        }
 
-      100% {
-        transform: scale(2.5);
-        opacity: 0;
-      }
-    }
-  </style>
+        @keyframes pulse {
+            0% {
+                transform: scale(0.8);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(2.5);
+                opacity: 0;
+            }
+        }
+    </style>
 </head>
 
 <body>
-  <!-- <div id="splash">
+    <!-- <div id="splash">
     <div id="countdown"></div>
     <p>Loading Map, please wait...</p>
   </div>
   <div id="main-content">
 This is main content.
   </div> -->
-  <!-- <script src="script.js"></script> -->
-  <div class="container-fluid p-3">
-    <div class="row mb-3">
-      <div class="col-md-3">
-        <form id="stationForm">
-          <div class="mb-2">
-            <label>Source Station</label>
-            <select class="form-select" id="sourceStation" required></select>
-          </div>
-          <div class="mb-2" align="center">
-            <button type="button" class="btn btn-secondary" id="btnSwap" onclick="swapDefaults()"><img
-                src="data/icons/swap-icon.png" alt="patna-metro" width="20"></button>
-          </div>
-          <div class="mb-2">
-            <label>Destination Station</label>
-            <select class="form-select" id="destStation" required></select>
-          </div>
-          <button type="submit" class="btn btn-primary w-100">Show Journey</button>
-        </form>
-        <div class="mt-3 border p-2 side-info">
-          <h5>Journey Info</h5>
-          <p><span> <input type="checkbox" id="enableLocation" />Enable Location</span><br>
-            <strong>Nearest Metro Station:</strong><br><span id="nearestStation"></span>
-          </p>
-          <p><strong>From:</strong> <span id="infoSource"></span></p>
-          <p><strong>To:</strong> <span id="infoDest"></span></p>
-          <p><strong>Distance:</strong> <span id="infoDistance">0</span> km</p>
-          <p><strong>Travel Time:</strong> <span id="infoTime">0</span> mins</p>
-          <p><strong>Fare:</strong> ₹<span id="infoFare">0</span><span><a href="#" class=""> Book Now</a></span></p>
-          <p><strong>Towards:</strong> <span id="infoTowards"></span></p>
-          <p><strong>Connecting Journey:</strong><br><span id="infoConnection"></span></p>
-          <div class="text-center mt-4">
-            <a href="metromap.html" class="btn btn-outline-info">Open Patna Metro Route Map</a><br>
-            <a href="about.html" class="btn btn-outline-info">   Station Details           </a>
-          </div>
+    <!-- <script src="script.js"></script> -->
+    <div class="container-fluid p-3">
+        <div class="row mb-3">
+
+            <div class="col-md-9">
+                <div id="map"></div>
+                <p><img src="data/icons/pmrc_icon.png" alt="Station Icon" width="14px"><strong> Stations on Route
+                    </strong><strong id="stnCount">0</strong><br><span id="infoStations"></span></p>
+            </div>
+
+            
+            <div class="col-md-3">
+                <form id="stationForm">
+                    <div class="mb-2">
+                        <label>Source Station</label>
+                        <select class="form-select" id="sourceStation" required></select>
+                    </div>
+                    <div class="mb-2" align="center">
+                        <button type="button" class="btn btn-secondary" id="btnSwap" onclick="swapDefaults()"><img
+                                src="data/icons/swap-icon.png" alt="patna-metro" width="20"></button>
+                    </div>
+                    <div class="mb-2">
+                        <label>Destination Station</label>
+                        <select class="form-select" id="destStation" required></select>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Show Journey</button>
+                </form>
+                <div class="mt-3 border p-2 side-info">
+                    <h5>Journey Info</h5>
+                    <p><span> <input type="checkbox" id="enableLocation" />Enable Location</span><br>
+                        <strong>Nearest Metro Station:</strong><br><span id="nearestStation"></span>
+                    </p>
+                    <p><strong>From:</strong> <span id="infoSource"></span></p>
+                    <p><strong>To:</strong> <span id="infoDest"></span></p>
+                    <p><strong>Distance:</strong> <span id="infoDistance">0</span> km</p>
+                    <p><strong>Travel Time:</strong> <span id="infoTime">0</span> mins</p>
+                    <p><strong>Fare:</strong> ₹<span id="infoFare">0</span><span><a href="#" class=""> Book
+                                Now</a></span></p>
+                    <p><strong>Towards:</strong> <span id="infoTowards"></span></p>
+                    <p><strong>Connecting Journey:</strong><br><span id="infoConnection"></span></p>
+                    <div class="text-center mt-4">
+                        <a href="metromap.html" class="btn btn-outline-info">Open Patna Metro Route Map</a><br>
+                        <a href="about.html" class="btn btn-outline-info"> Station Details </a>
+                    </div>
+
+
+                </div>
+            </div>
 
 
         </div>
-      </div>
-      <div class="col-md-9">
-        <div id="map"></div>
-        <p><img src="data/icons/pmrc_icon.png" alt="Station Icon" width="14px"><strong> Stations on Route
-          </strong><strong id="stnCount">0</strong><br><span id="infoStations"></span></p>
-      </div>
-      <div class="row mb-3">
-
-        <div class="col-md-8">
-          Patna Metro Rail Corporation.Patna Metro Rail Corporation.Patna Metro Rail Corporation.Patna Metro Rail.Patna
-          Metro Rail Corporation.Patna Metro Rail
-          Corporation.
-        </div>
-      </div>
     </div>
-  </div>
 
-  <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6.5.0/turf.min.js"></script>
-  <script>
-    let stations = [], tracks = [], stationMap = {}, lineEnds = {}, connectingNames = ["Khemni Chak Station", "Patna Junction Station"];
-
-    function setLabelSize() {
-      const zoom = map.getZoom();
-      const labels = document.querySelectorAll(".station-label");
-
-      let fontSize;
-      if (zoom >= 15) {
-        fontSize = "10px";
-      } else if (zoom >= 13) {
-        fontSize = "8px";
-      } else if (zoom >= 12) {
-        fontSize = "6px";
-      }
-      else if (zoom >= 11) {
-        fontSize = "5px";
-      } else {
-        fontSize = "4px"; // effectively hides the tooltip
-      }
-
-      labels.forEach(label => {
-        label.style.fontSize = fontSize;
-      });
-    }
-
-    let map = L.map('map').setView([25.61, 85.14], 12);
-    map.setMaxZoom(18);
-
-    // map.scrollWheelZoom.disable();
-    map.doubleClickZoom.disable();
-    map.boxZoom.disable();
-    map.keyboard.disable();
-    //map.touchZoom.disable();
-
-    //L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-
-    const stationSelects = ["sourceStation", "destStation"];
-
-    fetch('data/metro_track.geojson')
-      .then(response => response.json())
-      .then(data => {
-        const geojsonLayer = L.geoJSON(data);
-        const bounds = geojsonLayer.getBounds();
-        // Fit map to bounds with padding (in pixels)
-        map.fitBounds(bounds, {
-          padding: [10, 10]  // Adjust padding to your needs
-        });
-        // Optional: Lock map to this padded bounds
-        map.setMaxBounds(bounds.pad(0.15)); // Adds ~25% buffer on all sides
-        map.setMinZoom(map.getZoom());
-      });
-
-    Promise.all([
-      fetch('data/Stations.geojson').then(r => r.json()),
-      fetch('data/metro_track.geojson').then(r => r.json())
-    ]).then(([stationData, trackData]) => {
-      stations = stationData.features;
-      tracks = trackData.features;
-
-
-      stations.forEach(s => {
-        const { station_name, station_color, STN_ID } = s.properties;
-        const key = `${station_color}_${STN_ID}`;
-        stationMap[key] = s;
-        if (!lineEnds[station_color] || lineEnds[station_color] < STN_ID)
-          lineEnds[station_color] = STN_ID;
-
-        const option = `<option value="${key}" style="background-color:${station_color.toLowerCase()}; color:white">${station_name} (${station_color})</option>`;
-        stationSelects.forEach(id => document.getElementById(id).innerHTML += option);
-      });
-    });
-
-    // Custom icon for points
-    const customIcon = L.icon({
-      iconUrl: 'data/icons/pmrc_icon.png',
-      iconSize: [16, 16],
-
-      popupAnchor: [0, 0],
-
-    });
-
-    // Style function for polygons/lines
-    function style(feature) {
-      return {
-        color: '#ff6600',
-        weight: 2,
-        fillOpacity: 0.1
-
-      };
-    }
-
-    const redIcon = L.icon({
-      iconUrl: 'data/icons/redStn.png',
-      iconSize: [16, 16],     // Adjust size as needed
-      popupAnchor: [0, 0]
-    });
-
-    const blueIcon = L.icon({
-      iconUrl: 'data/icons/blueStn.png',
-      iconSize: [16, 16],
-      popupAnchor: [0, 0]
-    });
-
-    const conStnIcon = L.icon({
-      iconUrl: 'data/icons/connStn1.png',
-      iconSize: [20, 20],
-      popupAnchor: [0, 0]
-    });
-
-
-    let stationMarkers = [];
-
-    function drawStationsOnRoute(segments, fromKey, toKey) {
-
-      // Remove previously added station markers
-      stationMarkers.forEach(marker => map.removeLayer(marker));
-      stationMarkers = [];
-
-      const added = new Set();
-      let stationGroups = {};
-
-      segments.forEach(segment => {
-        const color = segment.properties.Color;
-        const routeId = segment.properties.ROUTE_ID;
-        const stn1 = routeId - 1;
-        const stn2 = routeId;
-        [stn1, stn2].forEach(stnID => {
-          const key = `${color}_${stnID}`;
-          if (stationMap[key] && !added.has(key)) {
-            added.add(key);
-            if (!stationGroups[color]) stationGroups[color] = [];
-            stationGroups[color].push({
-              name: stationMap[key].properties.station_name,
-              id: stnID,
-              color: color,
-              key: key,
-              coords: stationMap[key].geometry.coordinates.slice().reverse()
-            });
-          }
-        });
-      });
-
-      const routeKeys = [fromKey, toKey];
-      const routeColors = Object.keys(stationGroups);
-      let fullRoute = [];
-
-      routeColors.forEach(color => {
-        const group = stationGroups[color];
-        let stnFrom = group.find(g => g.key === fromKey) || group.find(g => g.key === toKey);
-        let stnTo = group.find(g => g.key === toKey) || group.find(g => g.key === fromKey);
-        if (stnFrom && stnTo) {
-          const direction = stnFrom.id <= stnTo.id ? 1 : -1;
-          group.sort((a, b) => direction * (a.id - b.id));
-        }
-        fullRoute = fullRoute.concat(group);
-      });
-
-      const seenNames = new Set();
-      fullRoute = fullRoute.filter(s => {
-        if (seenNames.has(s.name)) return false;
-        seenNames.add(s.name);
-        return true;
-      });
-
-      fullRoute.forEach(st => {
-        const isConnecting = connectingNames.includes(st.name);
-        //const icon = st.color.toLowerCase() === 'red' ? redIcon : blueIcon;
-
-
-        const icon = isConnecting
-          ? conStnIcon
-          : st.color.toLowerCase() === 'red'
-            ? redIcon
-            : blueIcon;
-
-        const marker = L.marker(st.coords, {
-          icon: icon
-        }).addTo(map);
-
-        // marker.bindTooltip(st.name, {
-        //   className: 'station-label',
-        //   offset: [0, -10],
-        //   permanent: true,
-        //   direction: 'top'
-        // });
-
-        // Store the marker for future removal
-        stationMarkers.push(marker);
-
-
-        /* L.circleMarker(st.coords, {
-           radius: 7,
-           color: color,
-           fillColor: color,
-           fillOpacity: isConnecting ? 1 : 0.3
-         }).addTo(map).bindTooltip(st.name, {
-           className: 'station-label',
-           offset: [0, -10],  // moves tooltip 10px to the right//Yaseen
-           permanent: true,
-           direction: 'top'
-         });*/
-
-        // L.marker(st.coords, {
-        //   icon: "stnRed.png",
-        // }).addTo(map).bindTooltip(st.name, {
-        //   className: 'station-label',
-        //   offset: [0, -10],  // moves tooltip 10px to the right//Yaseen
-        //   permanent: true,
-        //   direction: 'top'
-        // });
-
-
-      });
-
-
-      // Adjust tooltip font size based on zoom
-      map.on("zoomend", function () {
-        setLabelSize();
-      });
-      const stationNames = fullRoute.map(s => s.name);
-      const stnCnt = stationNames.length;//
-      document.getElementById("stnCount").textContent = "(" + stnCnt + ")";
-    
-      document.getElementById("infoStations").textContent = stationNames.join(" → ");
-    }
-
-    function getRouteSegment(startID, endID, color) {
-      const ids = [startID, endID].sort((a, b) => a - b);
-      return tracks.filter(t => {
-        return t.properties.Color === color &&
-          t.properties.ROUTE_ID >= ids[0] + 1 && t.properties.ROUTE_ID <= ids[1];
-      });
-    }
-
-    const fromIcon = L.icon({
-      iconUrl: 'data/icons/stnFrom.png',
-      iconSize: [48, 48],     // Adjust size as needed
-      // iconAnchor: [0, 0],
-      popupAnchor: [0, 0]
-    });
-
-    const toIcon = L.icon({
-      iconUrl: 'data/icons/stnTo.png',
-      iconSize: [48, 48],
-      // iconAnchor: [0, 0],
-      popupAnchor: [0, 0]
-    });
-
-
-    let fromtoStationMarker = [];
-    function highlightStation(station, color, prefText) {
-
-      const coords = station.geometry.coordinates.slice().reverse();
-      const icon = prefText.includes("From") ? fromIcon : toIcon;
-
-
-
-      const marker = L.marker(coords, {
-        icon: icon
-      }).addTo(map);
-
-      fromtoStationMarker.push(marker);
-
-
-
-
-      // const coords = station.geometry.coordinates.slice().reverse();
-      // L.circleMarker(coords, { color, radius: 10, fillOpacity: 0.7 }).addTo(map)
-      //   .bindTooltip(prefText + station.properties.station_name, {
-      //     permanent: true,
-      //     direction: 'top',
-      //     opacity: 1,
-      //     offset: [0, -10], // Move tooltip higher above icon
-      //     className: 'src_dest_label'
-      //   });
-    }
-
-    function calcFare(dist) {
-      if (dist <= 2) return 10;
-      if (dist <= 5) return 20;
-      if (dist <= 12) return 30;
-      if (dist <= 21) return 40;
-      if (dist <= 32) return 50;
-      return 60;
-    }
-
-    function getTowardsStation(station) {
-      const { STN_ID, station_color } = station.properties;
-      const towardsID = lineEnds[station_color];
-      const endStation = stations.find(s => s.properties.station_color === station_color && s.properties.STN_ID === towardsID);
-      return endStation ? endStation.properties.station_name : '';
-    }
-
-    function drawRouteBetween(fromKey, toKey) {
-      map.eachLayer(layer => {
-        if (layer instanceof L.Polyline || layer instanceof L.CircleMarker) map.removeLayer(layer);
-      });
-      //L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-
-      const from = stationMap[fromKey];
-      const to = stationMap[toKey];
-      if (!from || !to) return;
-
-      const fromColor = from.properties.station_color;
-      const toColor = to.properties.station_color;
-      const fromID = from.properties.STN_ID;
-      const toID = to.properties.STN_ID;
-
-      let totalLen = 0, totalTime = 0, seg1 = [], seg2 = [], combinedSeg = [], connectionText = "";
-
-      if (fromColor === toColor) {
-        seg1 = getRouteSegment(fromID, toID, fromColor);
-        combinedSeg = seg1;
-      } else {
-        let bestConn = null;
-        let minLen = Infinity;
-
-        for (const name of connectingNames) {
-          const fromConn = stations.find(s => s.properties.station_name === name && s.properties.station_color === fromColor);
-          const toConn = stations.find(s => s.properties.station_name === name && s.properties.station_color === toColor);
-          if (!fromConn || !toConn) continue;
-          const route1 = getRouteSegment(fromID, fromConn.properties.STN_ID, fromColor);
-          const route2 = getRouteSegment(toConn.properties.STN_ID, toID, toColor);
-          const len1 = route1.reduce((sum, f) => sum + f.properties.Len, 0);
-          const len2 = route2.reduce((sum, f) => sum + f.properties.Len, 0);
-          //const sortStation = fromConn.concat(toConn);
-
-          const total = len1 + len2;
-          if (total < minLen) {
-            minLen = total;
-
-            bestConn = { route1, route2, fromConn, toConn };
-          }
-
-        }
-
-        if (bestConn) {
-        
-          const FromConnStnID = bestConn.fromConn.properties.STN_ID;// Route1 Connecting Station STN_ID
-          const ToConnStnID = bestConn.toConn.properties.STN_ID;//Route2 Connecting Station STN_ID
-         
-          const srcColor = bestConn.fromConn.properties.station_color;//Route1 Connecting Station Color
-          const destColor = bestConn.toConn.properties.station_color;//Route2 Connecting Station Color
-         
-        
-          // Loop over route1 and log each STN_ID
-          const fromStnID = from.properties.STN_ID;
-          const toStnID = to.properties.STN_ID;
-
-
-          // const [list1, list2] = Promise.all([
-          //    getStationsBetween('data/Stations.geojson', fromStnID, FromConnStnID, srcColor),
-          //   getStationsBetween('data/Stations.geojson', (toStnID), (ToConnStnID), destColor)
-          // ]);
-
-
-
-          getStationsBetween('data/Stations.geojson', fromStnID, FromConnStnID, srcColor, srcColor)
-            .then(filteredStations => {
-              // Return the filtered list of stations to be used elsewhere or logged
-       
-
-            });
-
-
-        }
-        if (bestConn && bestConn.route1 && bestConn.route2) {
-          seg1 = bestConn.route1;
-          seg2 = bestConn.route2;
-          combinedSeg = [...seg1, ...seg2];
-          connectionText = `Change at ${bestConn.fromConn.properties.station_name} from ${fromColor} Line to ${toColor} Line`;
-        } else {
-          alert("No valid connecting route found between these stations.");
-          return;
-        }
-      }
-
-      combinedSeg.forEach(f => {
-        totalLen += f.properties.Len;
-        totalTime += f.properties.trav_time;
-        const selStnLayer = L.geoJSON(f, {
-          style: { color: f.properties.Color.toLowerCase(), weight: 5 }
-        }).addTo(map);
-
-        // const bounds = selStnLayer.getBounds();
-        // map.fitBounds(bounds, {
-        //   padding: [10,10]  // Adjust padding to your needs
-        // });
-
-      });
-
-      drawStationsOnRoute(combinedSeg, fromKey, toKey);
-
-
-      if (fromtoStationMarker) {
-        fromtoStationMarker.forEach(marker => map.removeLayer(marker));
-        fromtoStationMarker = [];
-        highlightStation(from, 'green', "From : ");
-        highlightStation(to, 'red', "To : ");
-      }
-
-
-
-
-
-      const fare = calcFare(totalLen);
-      document.getElementById("infoSource").textContent = from.properties.station_name;
-      document.getElementById("infoDest").textContent = to.properties.station_name;
-      document.getElementById("infoDistance").textContent = totalLen.toFixed(2);
-      document.getElementById("infoTime").textContent = totalTime;
-      document.getElementById("infoFare").textContent = fare;
-      document.getElementById("infoTowards").textContent = getTowardsStation(from);
-      document.getElementById("infoConnection").textContent = connectionText || "Direct Route";
-    }
-
-    map.on('zoomend', () => {
-      const zoom = map.getZoom();
-
-      // Adjust font size based on zoom level
-      const scale = Math.min(Math.max(zoom - 10 + 1, 0.8), 2);  // clamp scale between 0.8 and 2
-      const fontSize = `${scale * 4}px`; // 12px is base size
-
-      document.querySelectorAll('.text-tooltip').forEach(el => {
-        el.style.fontSize = fontSize;
-      });
-    });
-
-
-    stationForm.addEventListener("submit", e => {
-      e.preventDefault();
-      const from = document.getElementById("sourceStation").value;
-      const to = document.getElementById("destStation").value;
-
-      //  addTrackToMap();//top of the selected route line
-      drawRouteBetween(from, to);
-
-      addRaster();
-
-      //addFeatureLayer();
-    });
-  </script>
-
-
-  <script>
-    // Function to handle geolocation , for finding Nearest Railway Station.
-    var marker, circle;
-
-    function onLocationFound(e) {
-
-      let stationsGeoJsonUrl = 'data/Stations.geojson'; // Make sure the file is accessible
-      let stationsLayer;
-
-
-
-      // Load station GeoJSON
-      fetch(stationsGeoJsonUrl)
-        .then(response => response.json())
-        .then(data => {
-          stationsLayer = L.geoJSON(data, {
-            onEachFeature: (feature, layer) => {
-              const props = feature.properties;
-              layer.bindPopup(`<strong>${props.station_name}</strong>`);
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6.5.0/turf.min.js"></script>
+    <script>
+        let stations = [], tracks = [], stationMap = {}, lineEnds = {}, connectingNames = ["Khemni Chak Station", "Patna Junction Station"];
+
+        function setLabelSize() {
+            const zoom = map.getZoom();
+            const labels = document.querySelectorAll(".station-label");
+
+            let fontSize;
+            if (zoom >= 15) {
+                fontSize = "10px";
+            } else if (zoom >= 13) {
+                fontSize = "8px";
+            } else if (zoom >= 12) {
+                fontSize = "6px";
             }
-          });
+            else if (zoom >= 11) {
+                fontSize = "5px";
+            } else {
+                fontSize = "4px"; // effectively hides the tooltip
+            }
 
-          // Get current location
-          if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(position => {
-              const userLat = position.coords.latitude;
-              const userLng = position.coords.longitude;
-              const userLatLng = [userLat, userLng];
-
-              if (marker) {
-                map.removeLayer(marker);
-                map.removeLayer(circle);
-              }
-
-              circle = L.circle(userLatLng, {
-                radius: 5000,
-                color: 'gray',
-                fillOpacity: 0.1
-              }).addTo(map);
-
-              const pulsingIcon = L.divIcon({
-                className: '',
-                html: '<div class="pulsing-marker"></div>',
-                iconSize: [20, 20]
-              });
-
-              marker = L.marker(userLatLng, {
-                icon: pulsingIcon,
-                title: 'You are here'
-              }).addTo(map);
-
-
-              // Create Turf point for user location
-              const userPoint = turf.point([userLng, userLat]);
-
-              // Find nearest station
-              const nearest = turf.nearestPoint(userPoint, data);
-
-              // Measure distance (in kilometers)
-              const nearestCoords = nearest.geometry.coordinates;
-              const nearestPoint = turf.point(nearestCoords);
-              const distance = turf.distance(userPoint, nearestPoint, { units: 'kilometers' });
-
-              if (distance <= 5) {
-                highlightNearestStation(nearest, distance);
-              } else {
-                alert("No station found within 5 km of your location.");
-              }
-
-              map.setView(userLatLng, 14);
-            }, error => {
-              alert("Unable to retrieve your location.");
-              console.error(error);
+            labels.forEach(label => {
+                label.style.fontSize = fontSize;
             });
-          } else {
-            alert("Geolocation is not supported by your browser.");
-          }
+        }
+
+        let map = L.map('map').setView([25.61, 85.14], 12);
+        map.setMaxZoom(18);
+
+        // map.scrollWheelZoom.disable();
+        map.doubleClickZoom.disable();
+        map.boxZoom.disable();
+        map.keyboard.disable();
+        //map.touchZoom.disable();
+
+        //L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+        const stationSelects = ["sourceStation", "destStation"];
+
+        fetch('data/metro_track.geojson')
+            .then(response => response.json())
+            .then(data => {
+                const geojsonLayer = L.geoJSON(data);
+                const bounds = geojsonLayer.getBounds();
+                // Fit map to bounds with padding (in pixels)
+                map.fitBounds(bounds, {
+                    padding: [10, 10]  // Adjust padding to your needs
+                });
+                // Optional: Lock map to this padded bounds
+                map.setMaxBounds(bounds.pad(0.15)); // Adds ~25% buffer on all sides
+                map.setMinZoom(map.getZoom());
+            });
+
+        Promise.all([
+            fetch('data/Stations.geojson').then(r => r.json()),
+            fetch('data/metro_track.geojson').then(r => r.json())
+        ]).then(([stationData, trackData]) => {
+            stations = stationData.features;
+            tracks = trackData.features;
+
+
+            stations.forEach(s => {
+                const { station_name, station_color, STN_ID } = s.properties;
+                const key = `${station_color}_${STN_ID}`;
+                stationMap[key] = s;
+                if (!lineEnds[station_color] || lineEnds[station_color] < STN_ID)
+                    lineEnds[station_color] = STN_ID;
+
+                const option = `<option value="${key}" style="background-color:${station_color.toLowerCase()}; color:white">${station_name} (${station_color})</option>`;
+                stationSelects.forEach(id => document.getElementById(id).innerHTML += option);
+            });
         });
 
-      var nearestStationCircle;
-      function highlightNearestStation(feature, distance) {
-        const coords = feature.geometry.coordinates; // [lng, lat]
-        const props = feature.properties;
-        const color = props.station_color || 'red';
+        // Custom icon for points
+        const customIcon = L.icon({
+            iconUrl: 'data/icons/pmrc_icon.png',
+            iconSize: [16, 16],
 
-        if (nearestStationCircle) {
-          map.removeLayer(nearestStationCircle);
+            popupAnchor: [0, 0],
+
+        });
+
+        // Style function for polygons/lines
+        function style(feature) {
+            return {
+                color: '#ff6600',
+                weight: 2,
+                fillOpacity: 0.1
+
+            };
         }
-        nearestStationCircle = L.circleMarker([coords[1], coords[0]], {
-          radius: 10,
-          color: color,
-          fillColor: color,
-          fillOpacity: 0.1
-        }).addTo(map);
 
-        document.getElementById("nearestStation").style.color = "green";
-        document.getElementById("nearestStation").textContent = props.station_name + "(" + distance.toFixed(2) + 'km)';
-        selectOptionByText("sourceStation", props.station_name);
-        nearestStationCircle.bindPopup(`
+        const redIcon = L.icon({
+            iconUrl: 'data/icons/redStn.png',
+            iconSize: [16, 16],     // Adjust size as needed
+            popupAnchor: [0, 0]
+        });
+
+        const blueIcon = L.icon({
+            iconUrl: 'data/icons/blueStn.png',
+            iconSize: [16, 16],
+            popupAnchor: [0, 0]
+        });
+
+        const conStnIcon = L.icon({
+            iconUrl: 'data/icons/connStn1.png',
+            iconSize: [20, 20],
+            popupAnchor: [0, 0]
+        });
+
+
+        let stationMarkers = [];
+
+        function drawStationsOnRoute(segments, fromKey, toKey) {
+
+            // Remove previously added station markers
+            stationMarkers.forEach(marker => map.removeLayer(marker));
+            stationMarkers = [];
+
+            const added = new Set();
+            let stationGroups = {};
+
+            segments.forEach(segment => {
+                const color = segment.properties.Color;
+                const routeId = segment.properties.ROUTE_ID;
+                const stn1 = routeId - 1;
+                const stn2 = routeId;
+                [stn1, stn2].forEach(stnID => {
+                    const key = `${color}_${stnID}`;
+                    if (stationMap[key] && !added.has(key)) {
+                        added.add(key);
+                        if (!stationGroups[color]) stationGroups[color] = [];
+                        stationGroups[color].push({
+                            name: stationMap[key].properties.station_name,
+                            id: stnID,
+                            color: color,
+                            key: key,
+                            coords: stationMap[key].geometry.coordinates.slice().reverse()
+                        });
+                    }
+                });
+            });
+
+            const routeKeys = [fromKey, toKey];
+            const routeColors = Object.keys(stationGroups);
+            let fullRoute = [];
+
+            routeColors.forEach(color => {
+                const group = stationGroups[color];
+                let stnFrom = group.find(g => g.key === fromKey) || group.find(g => g.key === toKey);
+                let stnTo = group.find(g => g.key === toKey) || group.find(g => g.key === fromKey);
+                if (stnFrom && stnTo) {
+                    const direction = stnFrom.id <= stnTo.id ? 1 : -1;
+                    group.sort((a, b) => direction * (a.id - b.id));
+                }
+                fullRoute = fullRoute.concat(group);
+            });
+
+            const seenNames = new Set();
+            fullRoute = fullRoute.filter(s => {
+                if (seenNames.has(s.name)) return false;
+                seenNames.add(s.name);
+                return true;
+            });
+
+            fullRoute.forEach(st => {
+                const isConnecting = connectingNames.includes(st.name);
+                //const icon = st.color.toLowerCase() === 'red' ? redIcon : blueIcon;
+
+
+                const icon = isConnecting
+                    ? conStnIcon
+                    : st.color.toLowerCase() === 'red'
+                        ? redIcon
+                        : blueIcon;
+
+                const marker = L.marker(st.coords, {
+                    icon: icon
+                }).addTo(map);
+
+                // marker.bindTooltip(st.name, {
+                //   className: 'station-label',
+                //   offset: [0, -10],
+                //   permanent: true,
+                //   direction: 'top'
+                // });
+
+                // Store the marker for future removal
+                stationMarkers.push(marker);
+
+
+                /* L.circleMarker(st.coords, {
+                   radius: 7,
+                   color: color,
+                   fillColor: color,
+                   fillOpacity: isConnecting ? 1 : 0.3
+                 }).addTo(map).bindTooltip(st.name, {
+                   className: 'station-label',
+                   offset: [0, -10],  // moves tooltip 10px to the right//Yaseen
+                   permanent: true,
+                   direction: 'top'
+                 });*/
+
+                // L.marker(st.coords, {
+                //   icon: "stnRed.png",
+                // }).addTo(map).bindTooltip(st.name, {
+                //   className: 'station-label',
+                //   offset: [0, -10],  // moves tooltip 10px to the right//Yaseen
+                //   permanent: true,
+                //   direction: 'top'
+                // });
+
+
+            });
+
+
+            // Adjust tooltip font size based on zoom
+            map.on("zoomend", function () {
+                setLabelSize();
+            });
+            const stationNames = fullRoute.map(s => s.name);
+            const stnCnt = stationNames.length;//
+            document.getElementById("stnCount").textContent = "(" + stnCnt + ")";
+
+            document.getElementById("infoStations").textContent = stationNames.join(" → ");
+        }
+
+        function getRouteSegment(startID, endID, color) {
+            const ids = [startID, endID].sort((a, b) => a - b);
+            return tracks.filter(t => {
+                return t.properties.Color === color &&
+                    t.properties.ROUTE_ID >= ids[0] + 1 && t.properties.ROUTE_ID <= ids[1];
+            });
+        }
+
+        const fromIcon = L.icon({
+            iconUrl: 'data/icons/stnFrom.png',
+            iconSize: [48, 48],     // Adjust size as needed
+            // iconAnchor: [0, 0],
+            popupAnchor: [0, 0]
+        });
+
+        const toIcon = L.icon({
+            iconUrl: 'data/icons/stnTo.png',
+            iconSize: [48, 48],
+            // iconAnchor: [0, 0],
+            popupAnchor: [0, 0]
+        });
+
+
+        let fromtoStationMarker = [];
+        function highlightStation(station, color, prefText) {
+
+            const coords = station.geometry.coordinates.slice().reverse();
+            const icon = prefText.includes("From") ? fromIcon : toIcon;
+
+
+
+            const marker = L.marker(coords, {
+                icon: icon
+            }).addTo(map);
+
+            fromtoStationMarker.push(marker);
+
+
+
+
+            // const coords = station.geometry.coordinates.slice().reverse();
+            // L.circleMarker(coords, { color, radius: 10, fillOpacity: 0.7 }).addTo(map)
+            //   .bindTooltip(prefText + station.properties.station_name, {
+            //     permanent: true,
+            //     direction: 'top',
+            //     opacity: 1,
+            //     offset: [0, -10], // Move tooltip higher above icon
+            //     className: 'src_dest_label'
+            //   });
+        }
+
+        function calcFare(dist) {
+            if (dist <= 2) return 10;
+            if (dist <= 5) return 20;
+            if (dist <= 12) return 30;
+            if (dist <= 21) return 40;
+            if (dist <= 32) return 50;
+            return 60;
+        }
+
+        function getTowardsStation(station) {
+            const { STN_ID, station_color } = station.properties;
+            const towardsID = lineEnds[station_color];
+            const endStation = stations.find(s => s.properties.station_color === station_color && s.properties.STN_ID === towardsID);
+            return endStation ? endStation.properties.station_name : '';
+        }
+
+        function drawRouteBetween(fromKey, toKey) {
+            map.eachLayer(layer => {
+                if (layer instanceof L.Polyline || layer instanceof L.CircleMarker) map.removeLayer(layer);
+            });
+            //L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+            const from = stationMap[fromKey];
+            const to = stationMap[toKey];
+            if (!from || !to) return;
+
+            const fromColor = from.properties.station_color;
+            const toColor = to.properties.station_color;
+            const fromID = from.properties.STN_ID;
+            const toID = to.properties.STN_ID;
+
+            let totalLen = 0, totalTime = 0, seg1 = [], seg2 = [], combinedSeg = [], connectionText = "";
+
+            if (fromColor === toColor) {
+                seg1 = getRouteSegment(fromID, toID, fromColor);
+                combinedSeg = seg1;
+            } else {
+                let bestConn = null;
+                let minLen = Infinity;
+
+                for (const name of connectingNames) {
+                    const fromConn = stations.find(s => s.properties.station_name === name && s.properties.station_color === fromColor);
+                    const toConn = stations.find(s => s.properties.station_name === name && s.properties.station_color === toColor);
+                    if (!fromConn || !toConn) continue;
+                    const route1 = getRouteSegment(fromID, fromConn.properties.STN_ID, fromColor);
+                    const route2 = getRouteSegment(toConn.properties.STN_ID, toID, toColor);
+                    const len1 = route1.reduce((sum, f) => sum + f.properties.Len, 0);
+                    const len2 = route2.reduce((sum, f) => sum + f.properties.Len, 0);
+                    //const sortStation = fromConn.concat(toConn);
+
+                    const total = len1 + len2;
+                    if (total < minLen) {
+                        minLen = total;
+
+                        bestConn = { route1, route2, fromConn, toConn };
+                    }
+
+                }
+
+                if (bestConn) {
+
+                    const FromConnStnID = bestConn.fromConn.properties.STN_ID;// Route1 Connecting Station STN_ID
+                    const ToConnStnID = bestConn.toConn.properties.STN_ID;//Route2 Connecting Station STN_ID
+
+                    const srcColor = bestConn.fromConn.properties.station_color;//Route1 Connecting Station Color
+                    const destColor = bestConn.toConn.properties.station_color;//Route2 Connecting Station Color
+
+
+                    // Loop over route1 and log each STN_ID
+                    const fromStnID = from.properties.STN_ID;
+                    const toStnID = to.properties.STN_ID;
+
+
+                    // const [list1, list2] = Promise.all([
+                    //    getStationsBetween('data/Stations.geojson', fromStnID, FromConnStnID, srcColor),
+                    //   getStationsBetween('data/Stations.geojson', (toStnID), (ToConnStnID), destColor)
+                    // ]);
+
+
+
+                    getStationsBetween('data/Stations.geojson', fromStnID, FromConnStnID, srcColor, srcColor)
+                        .then(filteredStations => {
+                            // Return the filtered list of stations to be used elsewhere or logged
+
+
+                        });
+
+
+                }
+                if (bestConn && bestConn.route1 && bestConn.route2) {
+                    seg1 = bestConn.route1;
+                    seg2 = bestConn.route2;
+                    combinedSeg = [...seg1, ...seg2];
+                    connectionText = `Change at ${bestConn.fromConn.properties.station_name} from ${fromColor} Line to ${toColor} Line`;
+                } else {
+                    alert("No valid connecting route found between these stations.");
+                    return;
+                }
+            }
+
+            combinedSeg.forEach(f => {
+                totalLen += f.properties.Len;
+                totalTime += f.properties.trav_time;
+                const selStnLayer = L.geoJSON(f, {
+                    style: { color: f.properties.Color.toLowerCase(), weight: 5 }
+                }).addTo(map);
+
+                // const bounds = selStnLayer.getBounds();
+                // map.fitBounds(bounds, {
+                //   padding: [10,10]  // Adjust padding to your needs
+                // });
+
+            });
+
+            drawStationsOnRoute(combinedSeg, fromKey, toKey);
+
+
+            if (fromtoStationMarker) {
+                fromtoStationMarker.forEach(marker => map.removeLayer(marker));
+                fromtoStationMarker = [];
+                highlightStation(from, 'green', "From : ");
+                highlightStation(to, 'red', "To : ");
+            }
+
+
+
+
+
+            const fare = calcFare(totalLen);
+            document.getElementById("infoSource").textContent = from.properties.station_name;
+            document.getElementById("infoDest").textContent = to.properties.station_name;
+            document.getElementById("infoDistance").textContent = totalLen.toFixed(2);
+            document.getElementById("infoTime").textContent = totalTime;
+            document.getElementById("infoFare").textContent = fare;
+            document.getElementById("infoTowards").textContent = getTowardsStation(from);
+            document.getElementById("infoConnection").textContent = connectionText || "Direct Route";
+        }
+
+        map.on('zoomend', () => {
+            const zoom = map.getZoom();
+
+            // Adjust font size based on zoom level
+            const scale = Math.min(Math.max(zoom - 10 + 1, 0.8), 2);  // clamp scale between 0.8 and 2
+            const fontSize = `${scale * 4}px`; // 12px is base size
+
+            document.querySelectorAll('.text-tooltip').forEach(el => {
+                el.style.fontSize = fontSize;
+            });
+        });
+
+
+        stationForm.addEventListener("submit", e => {
+            e.preventDefault();
+            const from = document.getElementById("sourceStation").value;
+            const to = document.getElementById("destStation").value;
+
+            //  addTrackToMap();//top of the selected route line
+            drawRouteBetween(from, to);
+
+            addRaster();
+
+            //addFeatureLayer();
+        });
+    </script>
+
+
+    <script>
+        // Function to handle geolocation , for finding Nearest Railway Station.
+        var marker, circle;
+
+        function onLocationFound(e) {
+
+            let stationsGeoJsonUrl = 'data/Stations.geojson'; // Make sure the file is accessible
+            let stationsLayer;
+
+
+
+            // Load station GeoJSON
+            fetch(stationsGeoJsonUrl)
+                .then(response => response.json())
+                .then(data => {
+                    stationsLayer = L.geoJSON(data, {
+                        onEachFeature: (feature, layer) => {
+                            const props = feature.properties;
+                            layer.bindPopup(`<strong>${props.station_name}</strong>`);
+                        }
+                    });
+
+                    // Get current location
+                    if (navigator.geolocation) {
+                        navigator.geolocation.getCurrentPosition(position => {
+                            const userLat = position.coords.latitude;
+                            const userLng = position.coords.longitude;
+                            const userLatLng = [userLat, userLng];
+
+                            if (marker) {
+                                map.removeLayer(marker);
+                                map.removeLayer(circle);
+                            }
+
+                            circle = L.circle(userLatLng, {
+                                radius: 5000,
+                                color: 'gray',
+                                fillOpacity: 0.1
+                            }).addTo(map);
+
+                            const pulsingIcon = L.divIcon({
+                                className: '',
+                                html: '<div class="pulsing-marker"></div>',
+                                iconSize: [20, 20]
+                            });
+
+                            marker = L.marker(userLatLng, {
+                                icon: pulsingIcon,
+                                title: 'You are here'
+                            }).addTo(map);
+
+
+                            // Create Turf point for user location
+                            const userPoint = turf.point([userLng, userLat]);
+
+                            // Find nearest station
+                            const nearest = turf.nearestPoint(userPoint, data);
+
+                            // Measure distance (in kilometers)
+                            const nearestCoords = nearest.geometry.coordinates;
+                            const nearestPoint = turf.point(nearestCoords);
+                            const distance = turf.distance(userPoint, nearestPoint, { units: 'kilometers' });
+
+                            if (distance <= 5) {
+                                highlightNearestStation(nearest, distance);
+                            } else {
+                                alert("No station found within 5 km of your location.");
+                            }
+
+                            map.setView(userLatLng, 14);
+                        }, error => {
+                            alert("Unable to retrieve your location.");
+                            console.error(error);
+                        });
+                    } else {
+                        alert("Geolocation is not supported by your browser.");
+                    }
+                });
+
+            var nearestStationCircle;
+            function highlightNearestStation(feature, distance) {
+                const coords = feature.geometry.coordinates; // [lng, lat]
+                const props = feature.properties;
+                const color = props.station_color || 'red';
+
+                if (nearestStationCircle) {
+                    map.removeLayer(nearestStationCircle);
+                }
+                nearestStationCircle = L.circleMarker([coords[1], coords[0]], {
+                    radius: 10,
+                    color: color,
+                    fillColor: color,
+                    fillOpacity: 0.1
+                }).addTo(map);
+
+                document.getElementById("nearestStation").style.color = "green";
+                document.getElementById("nearestStation").textContent = props.station_name + "(" + distance.toFixed(2) + 'km)';
+                selectOptionByText("sourceStation", props.station_name);
+                nearestStationCircle.bindPopup(`
         <strong>Nearest Station</strong><br>
         ${props.station_name}<br>
        ${distance.toFixed(2)} km from your current location.
       `).openPopup();
-      }
+            }
 
 
-    }
-
-    // Function to handle geolocation error
-    function onLocationError(e) {
-      // alert(e.message);
-      document.getElementById("nearestStation").style.color = "red";
-      document.getElementById("nearestStation").textContent = "! not detected.";
-
-    }
-
-    // Request the user's location
-    map.on('locationfound', onLocationFound);
-    map.on('locationerror', onLocationError);
-    let count = 0;
-    function updateLocation() {
-   
-      map.locate({ setView: true, maxZoom: 12 });
-    }
-
-
-    // Function to handle checkbox change
-    document.getElementById('enableLocation').addEventListener('change', function () {
-      if (this.checked) {
-        // Enable location updates every 5 seconds
-        updateLocation();
-
-        intervalId = setInterval(updateLocation, 10000);
-      } else {
-        // Disable location updates
-        clearInterval(intervalId);
-        // if (marker) {
-        //   map.removeLayer(marker);
-        //   map.removeLayer(circle);
-        // }
-      }
-    });
-
-    document.addEventListener('visibilitychange', () => {
-      if (document.hidden) {
-        clearInterval(intervalId);
-      } else if (document.getElementById('enableLocation').checked) {
-        updateLocation();
-        intervalId = setInterval(updateLocation, 30000);
-      }
-    });
-
-
-    var intervalId;
-
-    function selectOptionByText(selectId, searchText) {
-      const select = document.getElementById(selectId);
-      if (!select) return;
-
-      const options = Array.from(select.options); // Convert to real array
-
-      for (let option of options) {
-        if (option.text.includes(searchText)) {
-          select.value = option.value;
-          return option;
         }
-      }
 
-      console.warn(`No option found with text containing "${searchText}"`);
-      return null;
-    }
+        // Function to handle geolocation error
+        function onLocationError(e) {
+            // alert(e.message);
+            document.getElementById("nearestStation").style.color = "red";
+            document.getElementById("nearestStation").textContent = "! not detected.";
 
+        }
 
+        // Request the user's location
+        map.on('locationfound', onLocationFound);
+        map.on('locationerror', onLocationError);
+        let count = 0;
+        function updateLocation() {
 
-    //Add Default line to map.
-    function addTrackToMap() {
-
-      fetch('data/RedLine_Track_All.geojson')
-        .then(response => response.json())
-        .then(data => {
-          //const geojsonLayer = L.geoJSON(data,{ style: { color: 'orange', dashArray: '5,5' } }).addTo(map);
-          const geojsonLayer = L.geoJSON(data, { style: { color: 'red', opacity: 0.2, weight: 10 } }).addTo(map);
-
-
-
-          // const bounds = geojsonLayer.getBounds();
-          // Fit map to bounds with padding (in pixels)
-          // map.fitBounds(bounds, {
-          //   padding: [100, 100]  // Adjust padding to your needs
-          // });
-          // Optional: Lock map to this padded bounds
-
-          // map.setMaxBounds(bounds.pad(0.15)); // Adds ~25% buffer on all sides
-          // map.setMinZoom(map.getZoom());
-        });
-
-      fetch('data/BlueLine_Track_All.geojson')
-        .then(response => response.json())
-        .then(data => {
-          //const geojsonLayer = L.geoJSON(data,{ style: { color: 'orange', dashArray: '5,5' } }).addTo(map);
-          const geojsonLayer = L.geoJSON(data, { style: { color: 'blue', opacity: 0.2, weight: 10 } }).addTo(map);
-        });
-
-    }
-
-    function addFeatureLayer() {
-
-      fetch('data/Landmarks.geojson')
-        .then(response => response.json())
-        .then(data => {
-          geojsonLayer = L.geoJSON(data, {
-            onEachFeature: function (feature, layer) {
+            map.locate({ setView: true, maxZoom: 12 });
+        }
 
 
-              var label = L.divIcon({
-                className: 'label',
-                html: feature.properties.Name,
-                iconSize: [20, 20]
-              });
-              // layer.bindTooltip(feature.properties.Name, {
-              //   className: 'label',
-              //   offset: [0, -10],  // moves tooltip 10px to the right//Yaseen
-              //   permanent: true,
-              //   direction: 'top'
-              // });
+        // Function to handle checkbox change
+        document.getElementById('enableLocation').addEventListener('change', function () {
+            if (this.checked) {
+                // Enable location updates every 5 seconds
+                updateLocation();
 
-
-            }
-          }).addTo(map);
-
-
-        })
-        .catch(error => {
-          console.error('Error loading GeoJSON:', error);
-        });
-    }
-    //addFeatureLayer();
-    function swapDefaults() {
-      const start = document.getElementById("sourceStation");
-      const end = document.getElementById("destStation");
-      const temp = start.value;
-      start.value = end.value;
-      end.value = temp;
-    }
-
-    // Add Image Overlay Gray
-    let imageOverlay;
-    function addRaster() {
-
-      if (imageOverlay) {
-        map.removeLayer(imageOverlay);
-       
-      }
-      // Your provided bounding box coordinates
-      const southwest = [25.5383985732398635, 85.0335540771484375];  // Southwest corner (lat, lng)
-      const northeast = [25.6661224365234375, 85.1988511505604009];  // Northeast corner (lat, lng)
-
-      // Image URL (replace with the actual path to your .tif image)
-      const imageUrl = 'data/icons/PatnaMetro_Gray_Label_300_New.png';  // Replace with your GeoTIFF image URL or path
-      const imageBounds = [southwest, northeast];
-
-      // Add the georeferenced image to the map using your bounds
-      imageOverlay = L.imageOverlay(imageUrl, imageBounds).addTo(map);
-
-      // Optionally, fit the map to the image bounds
-      map.fitBounds(imageBounds);
-    }
-
-    addRaster();
-    //addTrackToMap();
-
-
-    // Helper function to strip anything in parentheses (e.g., "A (Red)" -> "A")
-    function cleanValue(value) {
-      return value.replace(/\s*\(.*?\)\s*/g, '').trim();
-    }
-
-    function validateSelectBoxes(id1, id2) {
-      const select1 = document.getElementById(id1);
-      const select2 = document.getElementById(id2);
-
-      const value1 = cleanValue(select1.options[select1.selectedIndex].text);
-      const value2 = cleanValue(select2.options[select2.selectedIndex].text);
-
-      if (value1 && value2 && value1 === value2) {
-        const modal = new bootstrap.Modal(document.getElementById('errorModal'));
-        modal.show();
-        return false;
-      }
-
-      return true;
-    }
-
-
-    document.getElementById('stationForm').addEventListener('submit', function (e) {
-      if (!validateSelectBoxes('sourceStation', 'destStation')) {
-        fromtoStationMarker.forEach(marker => map.removeLayer(marker));
-        fromtoStationMarker = [];
-        e.preventDefault();
-      
-      }
-
-
-    });
-
-    // Reusable function for filtering stations
-    //md yaseen
-
-    function getStationsBetween(url, startId, endId, color, srcStation) {
-      // Ensure correct order
-      if (startId > endId) [startId, endId] = [endId, startId];
-
-      return fetch(url)
-        .then(response => response.json())
-        .then(data => {
-          let stations = data.features
-            .filter(station => {
-              const id = station.properties.STN_ID;
-              const matchColor = color
-                ? station.properties.station_color.toLowerCase() === color.toLowerCase()
-                : true;
-              return id >= startId && id <= endId && matchColor;
-            })
-            .map(station => ({
-              STN_ID: station.properties.STN_ID,
-              station_name: station.properties.station_name,
-              station_color: station.properties.station_color
-            }));
-
-          // If color is blue, sort the list by STN_ID
-          // if (color && color.toLowerCase() === 'blue') {
-          //   stations.sort((a, b) => b.STN_ID - a.STN_ID);
-     
-          // }
-
-          if (srcStation.toLowerCase() == 'blue') {
-          
-            let transformRed = false;
-            if (color.toLowerCase() == 'red' && endId >= 10) {
-              transformRed = true;
-            }
-            if (color.toLowerCase() == 'blue') {
-            
-            
-
-              if (startId > endId) {
-             
-                stations.sort((a, b) => a.STN_ID - b.STN_ID);
-              } else {
-               
-                if (startId === 7) {
-                  stations.sort((a, b) => a.STN_ID - b.STN_ID);
-                }
-                else {
-                  stations.sort((a, b) => b.STN_ID - a.STN_ID);
-                }
-
-              }
-
-            }
-            if (color.toLowerCase() == 'red') {
-                                if (startId < endId) {
-             
-                stations.sort((a, b) => a.STN_ID - b.STN_ID);
-              } else {
-                stations.sort((a, b) => b.STN_ID - a.STN_ID);
-              }
-
-            }
-
-
-          }
-
-          if (srcStation.toLowerCase() == 'red') {
-           
-                    if (startId > endId) {
-           
-              stations.sort((a, b) => b.STN_ID - a.STN_ID);
+                intervalId = setInterval(updateLocation, 10000);
             } else {
-              stations.sort((a, b) => a.STN_ID - b.STN_ID);
+                // Disable location updates
+                clearInterval(intervalId);
+                // if (marker) {
+                //   map.removeLayer(marker);
+                //   map.removeLayer(circle);
+                // }
+            }
+        });
+
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                clearInterval(intervalId);
+            } else if (document.getElementById('enableLocation').checked) {
+                updateLocation();
+                intervalId = setInterval(updateLocation, 30000);
+            }
+        });
+
+
+        var intervalId;
+
+        function selectOptionByText(selectId, searchText) {
+            const select = document.getElementById(selectId);
+            if (!select) return;
+
+            const options = Array.from(select.options); // Convert to real array
+
+            for (let option of options) {
+                if (option.text.includes(searchText)) {
+                    select.value = option.value;
+                    return option;
+                }
+            }
+
+            console.warn(`No option found with text containing "${searchText}"`);
+            return null;
+        }
+
+
+
+        //Add Default line to map.
+        function addTrackToMap() {
+
+            fetch('data/RedLine_Track_All.geojson')
+                .then(response => response.json())
+                .then(data => {
+                    //const geojsonLayer = L.geoJSON(data,{ style: { color: 'orange', dashArray: '5,5' } }).addTo(map);
+                    const geojsonLayer = L.geoJSON(data, { style: { color: 'red', opacity: 0.2, weight: 10 } }).addTo(map);
+
+
+
+                    // const bounds = geojsonLayer.getBounds();
+                    // Fit map to bounds with padding (in pixels)
+                    // map.fitBounds(bounds, {
+                    //   padding: [100, 100]  // Adjust padding to your needs
+                    // });
+                    // Optional: Lock map to this padded bounds
+
+                    // map.setMaxBounds(bounds.pad(0.15)); // Adds ~25% buffer on all sides
+                    // map.setMinZoom(map.getZoom());
+                });
+
+            fetch('data/BlueLine_Track_All.geojson')
+                .then(response => response.json())
+                .then(data => {
+                    //const geojsonLayer = L.geoJSON(data,{ style: { color: 'orange', dashArray: '5,5' } }).addTo(map);
+                    const geojsonLayer = L.geoJSON(data, { style: { color: 'blue', opacity: 0.2, weight: 10 } }).addTo(map);
+                });
+
+        }
+
+        function addFeatureLayer() {
+
+            fetch('data/Landmarks.geojson')
+                .then(response => response.json())
+                .then(data => {
+                    geojsonLayer = L.geoJSON(data, {
+                        onEachFeature: function (feature, layer) {
+
+
+                            var label = L.divIcon({
+                                className: 'label',
+                                html: feature.properties.Name,
+                                iconSize: [20, 20]
+                            });
+                            // layer.bindTooltip(feature.properties.Name, {
+                            //   className: 'label',
+                            //   offset: [0, -10],  // moves tooltip 10px to the right//Yaseen
+                            //   permanent: true,
+                            //   direction: 'top'
+                            // });
+
+
+                        }
+                    }).addTo(map);
+
+
+                })
+                .catch(error => {
+                    console.error('Error loading GeoJSON:', error);
+                });
+        }
+        //addFeatureLayer();
+        function swapDefaults() {
+            const start = document.getElementById("sourceStation");
+            const end = document.getElementById("destStation");
+            const temp = start.value;
+            start.value = end.value;
+            end.value = temp;
+        }
+
+        // Add Image Overlay Gray
+        let imageOverlay;
+        function addRaster() {
+
+            if (imageOverlay) {
+                map.removeLayer(imageOverlay);
+
+            }
+            // Your provided bounding box coordinates
+            const southwest = [25.5383985732398635, 85.0335540771484375];  // Southwest corner (lat, lng)
+            const northeast = [25.6661224365234375, 85.1988511505604009];  // Northeast corner (lat, lng)
+
+            // Image URL (replace with the actual path to your .tif image)
+            const imageUrl = 'data/icons/PatnaMetro_Gray_Label_300_New.png';  // Replace with your GeoTIFF image URL or path
+            const imageBounds = [southwest, northeast];
+
+            // Add the georeferenced image to the map using your bounds
+            imageOverlay = L.imageOverlay(imageUrl, imageBounds).addTo(map);
+
+            // Optionally, fit the map to the image bounds
+            map.fitBounds(imageBounds);
+        }
+
+        addRaster();
+        //addTrackToMap();
+
+
+        // Helper function to strip anything in parentheses (e.g., "A (Red)" -> "A")
+        function cleanValue(value) {
+            return value.replace(/\s*\(.*?\)\s*/g, '').trim();
+        }
+
+        function validateSelectBoxes(id1, id2) {
+            const select1 = document.getElementById(id1);
+            const select2 = document.getElementById(id2);
+
+            const value1 = cleanValue(select1.options[select1.selectedIndex].text);
+            const value2 = cleanValue(select2.options[select2.selectedIndex].text);
+
+            if (value1 && value2 && value1 === value2) {
+                const modal = new bootstrap.Modal(document.getElementById('errorModal'));
+                modal.show();
+                return false;
+            }
+
+            return true;
+        }
+
+
+        document.getElementById('stationForm').addEventListener('submit', function (e) {
+            if (!validateSelectBoxes('sourceStation', 'destStation')) {
+                fromtoStationMarker.forEach(marker => map.removeLayer(marker));
+                fromtoStationMarker = [];
+                e.preventDefault();
+
             }
 
 
-          }
-          return stations;
-        })
-        .catch(error => {
-          console.error('Error:', error);
-          return [];
         });
-    }
+
+        // Reusable function for filtering stations
+        //md yaseen
+
+        function getStationsBetween(url, startId, endId, color, srcStation) {
+            // Ensure correct order
+            if (startId > endId) [startId, endId] = [endId, startId];
+
+            return fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    let stations = data.features
+                        .filter(station => {
+                            const id = station.properties.STN_ID;
+                            const matchColor = color
+                                ? station.properties.station_color.toLowerCase() === color.toLowerCase()
+                                : true;
+                            return id >= startId && id <= endId && matchColor;
+                        })
+                        .map(station => ({
+                            STN_ID: station.properties.STN_ID,
+                            station_name: station.properties.station_name,
+                            station_color: station.properties.station_color
+                        }));
+
+                    // If color is blue, sort the list by STN_ID
+                    // if (color && color.toLowerCase() === 'blue') {
+                    //   stations.sort((a, b) => b.STN_ID - a.STN_ID);
+
+                    // }
+
+                    if (srcStation.toLowerCase() == 'blue') {
+
+                        let transformRed = false;
+                        if (color.toLowerCase() == 'red' && endId >= 10) {
+                            transformRed = true;
+                        }
+                        if (color.toLowerCase() == 'blue') {
+
+
+
+                            if (startId > endId) {
+
+                                stations.sort((a, b) => a.STN_ID - b.STN_ID);
+                            } else {
+
+                                if (startId === 7) {
+                                    stations.sort((a, b) => a.STN_ID - b.STN_ID);
+                                }
+                                else {
+                                    stations.sort((a, b) => b.STN_ID - a.STN_ID);
+                                }
+
+                            }
+
+                        }
+                        if (color.toLowerCase() == 'red') {
+                            if (startId < endId) {
+
+                                stations.sort((a, b) => a.STN_ID - b.STN_ID);
+                            } else {
+                                stations.sort((a, b) => b.STN_ID - a.STN_ID);
+                            }
+
+                        }
+
+
+                    }
+
+                    if (srcStation.toLowerCase() == 'red') {
+
+                        if (startId > endId) {
+
+                            stations.sort((a, b) => b.STN_ID - a.STN_ID);
+                        } else {
+                            stations.sort((a, b) => a.STN_ID - b.STN_ID);
+                        }
+
+
+                    }
+                    return stations;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    return [];
+                });
+        }
 
 
 
 
-    // Merge two ranges and display result
-    async function mergeAndShowStations() {
-      const url = 'data/Stations.geojson'; // Update with actual path
+        // Merge two ranges and display result
+        async function mergeAndShowStations() {
+            const url = 'data/Stations.geojson'; // Update with actual path
 
-      const start1 = parseInt(document.getElementById('start1').value);
-      const end1 = parseInt(document.getElementById('end1').value);
-      const start2 = parseInt(document.getElementById('start2').value);
-      const end2 = parseInt(document.getElementById('end2').value);
-      const color1 = document.getElementById('color1').value.trim();
-      const color2 = document.getElementById('color2').value.trim();
+            const start1 = parseInt(document.getElementById('start1').value);
+            const end1 = parseInt(document.getElementById('end1').value);
+            const start2 = parseInt(document.getElementById('start2').value);
+            const end2 = parseInt(document.getElementById('end2').value);
+            const color1 = document.getElementById('color1').value.trim();
+            const color2 = document.getElementById('color2').value.trim();
 
-      const [list1, list2] = await Promise.all([
-        getStationsBetween(url, start1, end1, color1),
-        getStationsBetween(url, start2, end2, color2)
-      ]);
-      list2.sort((a, b) => b.STN_ID - a.STN_ID);
-      const merged = [...list1, ...list2];
-      // const merged = [...list1, ...list2].sort((a, b) => a.STN_ID - b.STN_ID);
-    
-      // alert(JSON.stringify(merged, null, 2));  // Optional display
-    }
+            const [list1, list2] = await Promise.all([
+                getStationsBetween(url, start1, end1, color1),
+                getStationsBetween(url, start2, end2, color2)
+            ]);
+            list2.sort((a, b) => b.STN_ID - a.STN_ID);
+            const merged = [...list1, ...list2];
+            // const merged = [...list1, ...list2].sort((a, b) => a.STN_ID - b.STN_ID);
 
-
-  </script>
+            // alert(JSON.stringify(merged, null, 2));  // Optional display
+        }
 
 
+    </script>
 
-  <!-- Bootstrap Error Modal -->
-  <div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content border-danger">
-        <div class="modal-header bg-danger text-white">
-          <h5 class="modal-title" id="errorModalLabel">Duplicate Error</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+
+
+    <!-- Bootstrap Error Modal -->
+    <div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content border-danger">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="errorModalLabel">Duplicate Error</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Source and Destination Stations are same<br>Please select different station.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">OK</button>
+                </div>
+            </div>
         </div>
-        <div class="modal-body">
-          Source and Destination Stations are same<br>Please select different station.
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-danger" data-bs-dismiss="modal">OK</button>
-        </div>
-      </div>
     </div>
-  </div>
-  <!-- Bootstrap JS Bundle (includes Popper) -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Bootstrap JS Bundle (includes Popper) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>
