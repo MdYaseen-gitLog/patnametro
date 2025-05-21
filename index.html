@@ -389,7 +389,7 @@ This is main content.
       const stationNames = fullRoute.map(s => s.name);
       const stnCnt = stationNames.length;//
       document.getElementById("stnCount").textContent = "(" + stnCnt + ")";
-      //console.log(stationNames);
+    
       document.getElementById("infoStations").textContent = stationNames.join(" → ");
     }
 
@@ -504,14 +504,14 @@ This is main content.
         }
 
         if (bestConn) {
-          console.log("Connecting Journey.");
+        
           const FromConnStnID = bestConn.fromConn.properties.STN_ID;// Route1 Connecting Station STN_ID
           const ToConnStnID = bestConn.toConn.properties.STN_ID;//Route2 Connecting Station STN_ID
-          console.log(bestConn);
+         
           const srcColor = bestConn.fromConn.properties.station_color;//Route1 Connecting Station Color
           const destColor = bestConn.toConn.properties.station_color;//Route2 Connecting Station Color
-          // console.log("Connecting Stn : " + connStn);
-          // console.log("Destination : " + destColor);
+         
+        
           // Loop over route1 and log each STN_ID
           const fromStnID = from.properties.STN_ID;
           const toStnID = to.properties.STN_ID;
@@ -527,22 +527,9 @@ This is main content.
           getStationsBetween('data/Stations.geojson', fromStnID, FromConnStnID, srcColor, srcColor)
             .then(filteredStations => {
               // Return the filtered list of stations to be used elsewhere or logged
-              console.log(filteredStations);  // Logging the filtered list
+       
 
             });
-
-          // getStationsBetween('data/Stations.geojson', toStnID, ToConnStnID, destColor, srcColor)
-          //   .then(filteredStations => {
-          //     // Return the filtered list of stations to be used elsewhere or logged
-          //     console.log(filteredStations);  // Logging the filtered list
-
-          //   });
-
-
-
-
-
-
 
 
         }
@@ -744,7 +731,7 @@ This is main content.
     map.on('locationerror', onLocationError);
     let count = 0;
     function updateLocation() {
-      console.log(count++);
+   
       map.locate({ setView: true, maxZoom: 12 });
     }
 
@@ -874,7 +861,7 @@ This is main content.
 
       if (imageOverlay) {
         map.removeLayer(imageOverlay);
-        console.log("Removed Overlay");
+       
       }
       // Your provided bounding box coordinates
       const southwest = [25.5383985732398635, 85.0335540771484375];  // Southwest corner (lat, lng)
@@ -922,7 +909,7 @@ This is main content.
         fromtoStationMarker.forEach(marker => map.removeLayer(marker));
         fromtoStationMarker = [];
         e.preventDefault();
-        console.log("Check.");
+      
       }
 
 
@@ -955,24 +942,24 @@ This is main content.
           // If color is blue, sort the list by STN_ID
           // if (color && color.toLowerCase() === 'blue') {
           //   stations.sort((a, b) => b.STN_ID - a.STN_ID);
-          //   console.log("Sorting on Blue Line Source.");
+     
           // }
 
           if (srcStation.toLowerCase() == 'blue') {
-            console.log("Sorting on Blue Line Source.");
+          
             let transformRed = false;
             if (color.toLowerCase() == 'red' && endId >= 10) {
               transformRed = true;
             }
             if (color.toLowerCase() == 'blue') {
-              console.log("For Blue Line.");
-              console.log("StartID:" + startId + ", EndID:" + endId);
+            
+            
 
               if (startId > endId) {
-                console.log("Start ID id grater than End ID");
+             
                 stations.sort((a, b) => a.STN_ID - b.STN_ID);
               } else {
-                console.log("Start ID id less than End ID");
+               
                 if (startId === 7) {
                   stations.sort((a, b) => a.STN_ID - b.STN_ID);
                 }
@@ -984,11 +971,8 @@ This is main content.
 
             }
             if (color.toLowerCase() == 'red') {
-              console.log("For Red Line.");
-              console.log("StartID:" + startId + ", EndID:" + endId);
-
-              if (startId < endId) {
-                console.log("Start ID id grater than End ID");
+                                if (startId < endId) {
+             
                 stations.sort((a, b) => a.STN_ID - b.STN_ID);
               } else {
                 stations.sort((a, b) => b.STN_ID - a.STN_ID);
@@ -1000,10 +984,9 @@ This is main content.
           }
 
           if (srcStation.toLowerCase() == 'red') {
-            console.log("Sorting on Red Line Source.");
-            console.log("StartID:" + startId + ", EndID:" + endId);
-            if (startId > endId) {
-              console.log("Start ID id grater than End ID");
+           
+                    if (startId > endId) {
+           
               stations.sort((a, b) => b.STN_ID - a.STN_ID);
             } else {
               stations.sort((a, b) => a.STN_ID - b.STN_ID);
@@ -1040,7 +1023,7 @@ This is main content.
       list2.sort((a, b) => b.STN_ID - a.STN_ID);
       const merged = [...list1, ...list2];
       // const merged = [...list1, ...list2].sort((a, b) => a.STN_ID - b.STN_ID);
-      console.log('Merged List:', merged);
+    
       // alert(JSON.stringify(merged, null, 2));  // Optional display
     }
 
