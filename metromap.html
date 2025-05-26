@@ -317,6 +317,11 @@
         const esriStreet = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
             attribution: 'Tiles &copy; Esri &mdash; Source: Esri, NAVTEQ, DeLorme, USGS, NPS'
         });
+        const cartoNight = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; <a href="https://carto.com/">CARTO</a>',
+            subdomains: 'abcd',
+            maxZoom: 18
+        })
 
         // Add one default base layer to map
         esriStreet.addTo(map);
@@ -327,7 +332,8 @@
             "Satellite Plain": googleSatellite,
             "Satellite Info": googleHybrid,
             "Light Gray": esriLightGray,
-            "Light Street": esriStreet
+            "DayLight Street": esriStreet,
+            "Night Street View": cartoNight
         };
 
 
