@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Patna Metro Route</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <style>
+    .station-icon {
+      font-size: 1rem;
+      margin-right: 0.5rem;
+    }
+
+    .red-line {
+      color: red;
+    }
+
+    .blue-line {
+      color: blue;
+    }
+
+    .corridor1_color {
+      background-color: red;
+      color: white;
+      padding: 10px;
+    }
+
+    .corridor1_color:hover {
+      background-color: rgb(255, 255, 0);
+      color: black;
+      box-shadow: inset;
+      box-shadow: 0 8px 16px rgba(255, 0, 0, 0.7);
+    }
+
+    .corridor2_color:hover {
+      background-color: rgb(255, 255, 0);
+      color: black;
+      box-shadow: inset;
+      box-shadow: 0 8px 16px rgba(0, 0, 255, 0.7);
+    }
+
+    .corridor2_color {
+      background-color: blue;
+      color: white;
+      padding: 10px;
+      box-shadow: 0 8px 16px rgba(0, 0, 255, 0.1);
+    }
+
+    .interchange {
+      font-weight: bold;
+    }
+
+    ol {
+      padding-left: 1.2rem;
+    }
+
+    .mapview {
+      width: 100%;
+      height: 100%;
+      margin: 10px;
+    }
+
+    .routemap {
+
+      width: 600px;
+      height: 300px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    .routemap:hover {
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.6);
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Navigation Bar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+    <div class="container-fluid">
+      <a class="navbar-brand fw-bold" href="#">🚇 Patna Metro Route</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMetro"
+        aria-controls="navbarMetro" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarMetro">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="index.html">Journey Planner</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="metromap.html">Route Map</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+  <!-- Navbar End -->
+
+  <div class="container my-5">
+    <h2 class="mb-4">About Patna Metro</h2>
+    <p>The <strong>Patna Metro</strong> is a rapid transit system under construction in Patna, Bihar. The network
+      includes two corridors, each with multiple stations serving key areas across the city.</p>
+
+    <div class="row">
+      <div class="col-md-6">
+        <a href="routelineRed.html">
+          <h4 class="corridor1_color">Corridor 1 (Red Line)</h4>
+        </a>
+        <ul>
+          <li><strong>Route:</strong> Danapur Cantonment to Khemni Chak</li>
+          <li><strong>Length:</strong> 16.86 km</li>
+          <li><strong>Stations:</strong> 14</li>
+        </ul>
+        <ol>
+          <li><span class="fa-solid fa-train-subway text-danger me-2"> <i class="fa-solid fa-arrow-up"
+                style="color: red;"> </i></span> Danapur Cantonment</li>
+          <li><span class="fa-solid fa-train-subway text-danger me-2"> <i class="fa-solid fa-arrow-up"
+                style="color: red;"> </i></span> Saguna More</li>
+          <li><span class="fa-solid fa-train-subway text-danger me-2"> <i class="fa-solid fa-arrow-up"
+                style="color: red;"> </i></span> RPS More</li>
+          <li><span class="fa-solid fa-train-subway text-danger me-2"> <i class="fa-solid fa-arrow-up"
+                style="color: red;"> </i></span> Patliputra</li>
+          <li><span class="fa-solid fa-train-subway text-danger me-2"> <i class="fa-solid fa-arrow-down"
+                style="color: red;"> </i></span> Rukanpura</li>
+          <li><span class="fa-solid fa-train-subway text-danger me-2"> <i class="fa-solid fa-arrow-down"
+                style="color: red;"> </i></span> Raja Bazar</li>
+          <li><span class="fa-solid fa-train-subway text-danger me-2"> <i class="fa-solid fa-arrow-down"
+                style="color: red;"> </i></span> Patna Zoo</li>
+          <li><span class="fa-solid fa-train-subway text-danger me-2"> <i class="fa-solid fa-arrow-down"
+                style="color: red;"> </i></span> Vikas Bhawan</li>
+          <li><span class="fa-solid fa-train-subway text-danger me-2"> <i class="fa-solid fa-arrow-down"
+                style="color: red;"> </i></span> Vidyut Bhawan</li>
+          <li><span class="fa-solid fa-exchange-alt text-danger me-2"> <i class="fa-solid fa-arrow-down"
+                style="color: red;"> </i></span><span class="fa-solid fa-train-subway text-danger me-2"></span><span
+              class="interchange">Patna Junction</span></li>
+          <li><span class="fa-solid fa-train-subway text-danger me-2"> <i class="fa-solid fa-arrow-up"
+                style="color: red;"> </i></span> Mithapur</li>
+          <li><span class="fa-solid fa-train-subway text-danger me-2"> <i class="fa-solid fa-arrow-up"
+                style="color: red;"> </i></span> Ramkrishna Nagar</li>
+          <li><span class="fa-solid fa-train-subway text-danger me-2"> <i class="fa-solid fa-arrow-up"
+                style="color: red;"> </i></span> Jaganpura</li>
+          <li><span class="fa-solid fa-exchange-alt text-danger me-2"> <i class="fa-solid fa-arrow-up"
+                style="color: red;"> </i></span><span class="fa-solid fa-train-subway text-danger me-2"></span> <span
+              class="interchange">Khemni Chak</span></li>
+        </ol>
+      </div>
+
+      <div class="col-md-6">
+        <a href="routelineBlue.html">
+          <h4 class="corridor2_color">Corridor 2 (Blue Line)</h4>
+        </a>
+        <ul>
+          <li><strong>Route:</strong> Patna Junction to New ISBT</li>
+          <li><strong>Length:</strong> 14.06 km</li>
+          <li><strong>Stations:</strong> 12</li>
+        </ul>
+        <ol>
+          <li><span class="fa-solid fa-exchange-alt text-primary me-2"> <i class="fa-solid fa-arrow-down"
+                style="color:blue;"> </i></span><i class="fa-solid fa-train-subway text-primary me-2"></i><strong>Patna
+              Junction</strong></li>
+          <li><i class="fa-solid fa-train-subway text-primary me-2"> <i class="fa-solid fa-arrow-down"
+                style="color:blue;"> </i></i>Akashvani</li>
+          <li><i class="fa-solid fa-train-subway text-primary me-2"> <i class="fa-solid fa-arrow-down"
+                style="color:blue;"> </i></i>Gandhi Maidan</li>
+          <li><i class="fa-solid fa-train-subway text-primary me-2"> <i class="fa-solid fa-arrow-down"
+                style="color:blue;"> </i></i>PMCH</li>
+          <li><i class="fa-solid fa-train-subway text-primary me-2"> <i class="fa-solid fa-arrow-down"
+                style="color:blue;"> </i></i>Patna University</li>
+          <li><i class="fa-solid fa-train-subway text-primary me-2"> <i class="fa-solid fa-arrow-down"
+                style="color:blue;"> </i></i>Moin-ul-Haq Stadium</li>
+          <li><i class="fa-solid fa-train-subway text-primary me-2"> <i class="fa-solid fa-arrow-down"
+                style="color:blue;"> </i></i>Rajendra Nagar</li>
+          <li><i class="fa-solid fa-train-subway text-primary me-2"> <i class="fa-solid fa-arrow-up"
+                style="color:blue;"> </i></i>Malahi Pakri</li>
+          <li><span class="fa-solid fa-exchange-alt text-primary me-2"> <i class="fa-solid fa-arrow-up"
+                style="color:blue;"> </i></span><i class="fa-solid fa-train-subway text-primary me-2"></i><strong>Khemni
+              Chak</strong></li>
+          <li><i class="fa-solid fa-train-subway text-primary me-2"> <i class="fa-solid fa-arrow-up"
+                style="color:blue;"> </i></i>Bhootnath</li>
+          <li><i class="fa-solid fa-train-subway text-primary me-2"> <i class="fa-solid fa-arrow-up"
+                style="color:blue;"> </i></i>Zero Mile</li>
+          <li><i class="fa-solid fa-train-subway text-primary me-2"> <i class="fa-solid fa-arrow-up"
+                style="color:blue;"> </i></i>New ISBT</li>
+        </ol>
+
+      </div>
+      <p>
+        <strong>Legend: </strong> <i class="fa-solid fa-arrow-up" style="color: red;"> </i><i
+          class="fa-solid fa-arrow-up" style="color:blue;"> </i> Elevated | <i class="fa-solid fa-arrow-down"
+          style="color: red;"> </i><i class="fa-solid fa-arrow-down" style="color:blue;"> </i> Underground | <span
+          class="interchange"><i class="fa-solid fa-exchange-alt text-primary me-2"></i><i
+            class="fa-solid fa-exchange-alt text-danger me-2"></i>Interchange Station</span>
+      </p>
+
+      <p><strong>Patna Metro Route Map</strong></p>
+      <img src="data/icons/routemap.png" alt="patna-metro" class="img-fluid mt-2">
+    </div>
+
+
+
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-dark text-light py-4 mt-auto">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
+          <small>© 2025 Md Yaseen. All rights reserved.</small>
+        </div>
+        <div class="col-md-6 text-center text-md-end">
+          <!-- <a href="privacy.html" class="text-light text-decoration-none me-3">Privacy Policy</a> -->
+          <!-- <a href="terms.html" class="text-light text-decoration-none me-3">Terms of Service</a> -->
+          <a href="contact.html" class="text-light text-decoration-none me-3">Contact Us</a>
+          <!-- <a href="disclaimer.html" class="text-light text-decoration-none">Disclaimer</a> -->
+        </div>
+      </div>
+    </div>
+  </footer>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

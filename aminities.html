@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <title>Facilities Near Metro</title>
+
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+  <style>
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+    }
+
+    body {
+      display: flex;
+      flex-direction: row;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    #map {
+      flex: 1 1 60%;
+      height: 100vh;
+      display: none !important;
+    }
+
+    #sidebar {
+      flex: 0 0 40%;
+      height: 100vh;
+      overflow-y: auto;
+      border-left: 1px solid #ddd;
+      padding: 1rem;
+      background: #fff;
+    }
+
+    /* Marker styling: colored circle */
+    .marker-icon {
+      border-radius: 50%;
+      border: 2px solid #333;
+      width: 16px;
+      height: 16px;
+      display: block;
+    }
+
+    /* Responsive: stack vertically on smaller screens */
+    @media (max-width: 768px) {
+      body {
+        flex-direction: column;
+      }
+
+      #map,
+      #sidebar {
+        flex: none;
+        width: 100%;
+        height: 50vh;
+      }
+
+      #sidebar {
+        text-align: center;
+        border-left: none;
+        border-top: 1px solid #ddd;
+    
+      }
+    }
+
+    /* Station header with colored background */
+    .station-header {
+      color: white;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="map"></div>
+
+  <div id="sidebar">
+    <h2>Facilities Near Stations</h2>
+    <div class="accordion" id="linesAccordion">
+      <!-- Lines > Stations > Amenities -->
+    </div>
+  </div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+  <!-- Bootstrap Bundle JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // Initialize Leaflet map centered roughly on London, adjust to your location
+    const map = L.map('map').setView([25.61, 85.14], 12);
+
+    // L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    //   attribution: '© OpenStreetMap contributors'
+    // }).addTo(map);
+
+    // Create a colored circle marker icon
+    function createColoredMarker(lat, lng, color) {
+      return L.divIcon({
+        className: '',
+        html: `<span class="marker-icon" style="background-color: ${color || '#007bff'};"></span>`,
+        iconSize: [16, 16],
+        iconAnchor: [8, 8],
+      });
+    }
+
+    // Sanitize string for IDs
+    function sanitizeId(str) {
+      return str.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9\-]/g, '');
+    }
+
+    // Load Stations.geojson
+    fetch('data/Stations.geojson')
+      .then(res => {
+        if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
+        return res.json();
+      })
+      .then(data => {
+        const features = data.features;
+
+        // Group stations by line first
+        const lines = {};
+        features.forEach((feature, idx) => {
+          const props = feature.properties || {};
+          const lineName = props.station_color || 'Unknown_Line';
+          if (!lines[lineName]) lines[lineName] = [];
+          lines[lineName].push({ ...feature, idx });
+        });
+
+        const linesAccordion = document.getElementById('linesAccordion');
+
+        // For each line, create accordion item
+        Object.entries(lines).forEach(([lineName, stations], lidx) => {
+          const lineId = `line-${sanitizeId(lineName)}-${lidx}`;
+          const lineCollapseId = `${lineId}-collapse`;
+
+          const lineItem = document.createElement('div');
+          lineItem.className = 'accordion-item';
+
+          lineItem.innerHTML = `
+          <h2 class="accordion-header" id="${lineId}">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#${lineCollapseId}" aria-expanded="false" aria-controls="${lineCollapseId} " style="background-color:${lineName};color:white;font-weight: bold;font-size:28px;">
+              ${lineName.replace(/_/g, ' ') + "_Line"}
+            </button>
+          </h2>
+          <div id="${lineCollapseId}" class="accordion-collapse collapse" aria-labelledby="${lineId}" data-bs-parent="#linesAccordion">
+            <div class="accordion-body">
+              <div class="accordion" id="${lineCollapseId}-stations">
+                <!-- Stations will go here -->
+              </div>
+            </div>
+          </div>
+        `;
+
+          linesAccordion.appendChild(lineItem);
+
+          const stationsAccordion = document.getElementById(`${lineCollapseId}-stations`);
+
+          // Add stations accordion inside line group
+          stations.forEach(stationFeature => {
+            const { properties, geometry, idx } = stationFeature;
+            const coords = geometry.coordinates;
+            const stationName = properties.station_name || `Station ${idx + 1}`;
+            const color = properties.station_color || '#007bff';
+
+            // Add station marker on map
+            L.marker([coords[1], coords[0]], {
+              icon: createColoredMarker(coords[1], coords[0], color)
+            }).addTo(map).bindPopup(stationName);
+
+            // IDs for station accordion
+            const stationId = `station-${sanitizeId(stationName)}-${idx}`;
+            const stationCollapseId = `${stationId}-collapse`;
+
+            const stationItem = document.createElement('div');
+            stationItem.className = 'accordion-item';
+
+            // Station button with background color and white text
+            stationItem.innerHTML = `
+            <h2 class="accordion-header" id="${stationId}">
+              <button
+                class="accordion-button collapsed station-header"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#${stationCollapseId}"
+                aria-expanded="false"
+                aria-controls="${stationCollapseId}"
+                style="background-color: ${color};"
+              >
+                ${stationName}
+              </button>
+            </h2>
+            <div
+              id="${stationCollapseId}"
+              class="accordion-collapse collapse"
+              aria-labelledby="${stationId}"
+              data-bs-parent="#${lineCollapseId}-stations"
+            >
+              <div class="accordion-body">
+                <div class="text-muted">Loading...</div>
+                <div class="accordion" id="${stationCollapseId}-amenities"></div>
+              </div>
+            </div>
+          `;
+
+            stationsAccordion.appendChild(stationItem);
+
+            // Fetch amenities for this station within provided distance from station.
+            const overpassQuery = `
+            [out:json][timeout:25];
+            (
+              node["amenity"](around:1000,${coords[1]},${coords[0]});
+              way["amenity"](around:1000,${coords[1]},${coords[0]});
+              relation["amenity"](around:1000,${coords[1]},${coords[0]});
+            );
+            out center;
+          `;
+
+            fetch('https://overpass-api.de/api/interpreter', {
+              method: 'POST',
+              body: overpassQuery,
+              headers: { 'Content-Type': 'text/plain' }
+            })
+              .then(res => res.json())
+              .then(overpassData => {
+                const elements = overpassData.elements || [];
+                const amenitiesAccordion = document.getElementById(`${stationCollapseId}-amenities`);
+                amenitiesAccordion.innerHTML = '';
+
+                if (elements.length === 0) {
+                  amenitiesAccordion.innerHTML = '<p>No amenities found within 3 km.</p>';
+                  return;
+                }
+
+                // Group amenities by amenity type
+                const grouped = {};
+                elements.forEach(el => {
+                  const amenityType = el.tags?.amenity || 'unknown';
+                  const amenityName = el.tags?.name;
+
+                  // Skip amenities without a name
+                  if (!amenityName) return;
+
+                  if (!grouped[amenityType]) grouped[amenityType] = [];
+                  grouped[amenityType].push(amenityName);
+                });
+
+
+                // Create accordion items for each amenity group
+                Object.entries(grouped).forEach(([amenityType, names], aidx) => {
+                  const amenityId = `${stationCollapseId}-amenity-${sanitizeId(amenityType)}-${aidx}`;
+                  const amenityItem = document.createElement('div');
+                  amenityItem.className = 'accordion-item';
+
+                  amenityItem.innerHTML = `
+                <h2 class="accordion-header" id="heading-${amenityId}">
+                  <button
+                    class="accordion-button collapsed"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#${amenityId}"
+                    aria-expanded="false"
+                    aria-controls="${amenityId}"
+                  >
+                    ${amenityType} (${names.length})
+                  </button>
+                </h2>
+                <div
+                  id="${amenityId}"
+                  class="accordion-collapse collapse"
+                  aria-labelledby="heading-${amenityId}"
+                  data-bs-parent="#${stationCollapseId}-amenities"
+                >
+                  <div class="accordion-body">
+                    <ul class="list-styled mb-0">
+                      ${names.map(name => `<li>${name}</li>`).join('')}
+                    </ul>
+                  </div>
+                </div>
+              `;
+
+                  amenitiesAccordion.appendChild(amenityItem);
+                });
+              })
+              .catch(err => {
+                const amenitiesAccordion = document.getElementById(`${stationCollapseId}-amenities`);
+                amenitiesAccordion.innerHTML = '<p class="text-danger">Error loading amenities.</p>';
+                console.error('Overpass API error:', err);
+              });
+
+          }); // end stations.forEach
+
+        }); // end lines forEach
+
+      })
+      .catch(err => {
+        console.error('Failed to load Stations.geojson:', err);
+        alert('Error loading station data. Check console for details.');
+      });
+  </script>
+
+</body>
+
+</html>
