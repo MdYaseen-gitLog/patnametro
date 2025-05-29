@@ -1,4 +1,4 @@
-const CACHE_NAME = 'patnametro-v1'; // increment version to invalidate old cache
+const CACHE_NAME = 'patnametro-v2'; // increment version to invalidate old cache
 const urlsToCache = [
   '/patnametro',
   '/patnametro/index.html',
