@@ -273,8 +273,8 @@
         <div class="row mb-3">
             <div class="col-12 text-center">
                 <div class="marquee-container" id="marquee">
-                    <img id="train1" class="train" src="data/icons/trainLeftToRight_Red.png" />
-                    <img id="train2" class="train" src="data/icons/trainRightToLeft_Blue.png" />
+                    <img id="train1" class="train" src="data/icons/trainLeftToRight_Red.png" alt="movTrain1"/>
+                    <img id="train2" class="train" src="data/icons/trainRightToLeft_Blue.png" alt="movTrain2"/>
                     <div class="fixed-text" id="metroText">Plan Your Journey</div>
                 </div>
             </div>
@@ -295,7 +295,7 @@
             <div class="col-12 col-lg-3">
                 <form id="stationForm">
                     <div class="mb-2">
-                        <label>Source Station</label>
+                        <label for="sourceStation">Source Station</label>
                         <select class="form-select" id="sourceStation" required></select>
                     </div>
                     <div class="mb-2 text-center">
@@ -304,7 +304,7 @@
                         </button>
                     </div>
                     <div class="mb-2">
-                        <label>Destination Station</label>
+                        <label for="destStation">Destination Station</label>
                         <select class="form-select" id="destStation" required></select>
                     </div>
                     <button type="submit" class="btn btn-primary w-100">Show Journey</button>
@@ -347,7 +347,7 @@
 
     </div>
     <!-- Destination to Visit -->
-    <iframe src="places.html" width="100%" height="800px" style="border:none;">
+    <iframe src="places.html" title="Embedded map showing tourist places." width="100%" height="800px" style="border:none;">
         Your browser does not support iframes.
     </iframe>
 
