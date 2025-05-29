@@ -11,6 +11,18 @@
         content="Patna Metro, Patna Metro Map, GIS, Leaflet, Metro Map,Patna Metro Stations, Spatial Data">
     <meta name="author" content="Md Yaseen">
     <link rel="icon" href="favicon.ico" type="image/x-icon">
+   <!-- PWA Meta Tags -->
+    <link rel="manifest" href="/pmetro/Final/manifest.json">
+    <link rel="icon" href="data/icons/icon-192.png" sizes="192x192" type="image/png">
+    <link rel="icon" href="data/icons/icon-512.png" sizes="512x512" type="image/png">
+    <meta name="theme-color" content="#1976d2">
+
+    <!-- iOS Support -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="Patna Metro">
+    <link rel="apple-touch-icon" href="data/icons/icon-192.png">
+    
     <meta name="robots" content="index, follow">
     <link rel="sitemap" type="application/xml" title="Sitemap" href="sitemap.xml" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -227,6 +239,10 @@
 </head>
 
 <body>
+ <button id="installBtn"
+        style="display:none;position:fixed;bottom:20px;right:20px;padding:10px 20px;font-size:16px;border:none;border-radius:8px;background-color:#1976d2;color:white;box-shadow:0 4px 6px rgba(0,0,0,0.2);z-index:1000;">
+        📲 Install App
+    </button>
     <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
         <div class="container-fluid">
@@ -1605,6 +1621,51 @@
             const myModal = new bootstrap.Modal(document.getElementById('startupWarningModal'));
             myModal.show();
         });
+    </script>
+    <script>
+       if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('service-worker.js')
+                    .then(reg => {
+                        console.log('Service Worker registered:', reg);
+                    })
+                    .catch(err => {
+                        console.error('Service Worker registration failed:', err);
+                    });
+            });
+        }
+        //Add button for installation
+        let deferredPrompt;
+        const installBtn = document.getElementById('installBtn');
+
+        // Listen for install availability
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault(); // Stop automatic banner
+            deferredPrompt = e; // Save event
+            installBtn.style.display = 'block'; // Show your button
+        });
+
+        // On user clicking install button
+        installBtn.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt(); // Trigger the browser prompt
+                const result = await deferredPrompt.userChoice;
+                if (result.outcome === 'accepted') {
+                    console.log('✅ App installed');
+                } else {
+                    alert('❌ Install dismissed');
+                }
+                deferredPrompt = null;
+                installBtn.style.display = 'none';
+            }
+        });
+
+        // Hide button if already installed
+        window.addEventListener('appinstalled', () => {
+            alert('✅ App installed successfully');
+            installBtn.style.display = 'none';
+        });
+
     </script>
 </body>
 
