@@ -1,10 +1,10 @@
 const CACHE_NAME = 'patnametro-v1'; // increment version to invalidate old cache
 const urlsToCache = [
-  '/pmetro/Final',
-  '/pmetro/Final/index.html',
-  '/pmetro/Final/manifest.json',
-  '/pmetro/Final/data/icons/icon-192.png',
-  '/pmetro/Final/data/icons/icon-512.png'
+  '/patnametro',
+  '/patnametro/index.html',
+  '/patnametro/manifest.json',
+  '/patnametro/data/icons/icon-192.png',
+  '/patnametro/data/icons/icon-512.png'
 ];
 
 // Install event - caching static assets
