@@ -1,6 +1,7 @@
 {
   "name": "Patna Metro Route Map",
   "short_name": "PMet",
+  "version": "1.0.0",   // <-- Add or update this field
   "start_url": "/patnametro/",
   "display": "standalone",
   "background_color": "#ffffff",
