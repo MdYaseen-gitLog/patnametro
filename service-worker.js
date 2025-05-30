@@ -1,4 +1,4 @@
-const APP_VERSION = 'v1.0.0'; // 👈 Change this whenever you update
+const APP_VERSION = 'v1.1.0'; // 👈 Change this whenever you update
 const CACHE_NAME = 'patnametro-' + APP_VERSION;
 const urlsToCache = [
   '/patnametro',
