@@ -1,4 +1,5 @@
-const CACHE_NAME = 'patnametro-v2'; // increment version to invalidate old cache
+const APP_VERSION = 'v1.0.0'; // 👈 Change this whenever you update
+const CACHE_NAME = 'patnametro-' + APP_VERSION;
 const urlsToCache = [
   '/patnametro',
   '/patnametro/index.html',
@@ -16,6 +17,7 @@ self.addEventListener('install', event => {
         return cache.addAll(urlsToCache);
       })
   );
+   self.skipWaiting();
 });
 
 // Activate event - cleanup old caches
