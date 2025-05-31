@@ -1,7 +1,6 @@
 {
   "name": "Patna Metro Route Map",
   "short_name": "PMet",
-  "version": "1.4.0",
   "start_url": "/patnametro/",
   "display": "standalone",
   "background_color": "#ffffff",
@@ -17,6 +16,7 @@
       "sizes": "512x512",
       "type": "image/png"
     }
-  ]
+  ],
+   "version": "1.5.0"
 }
 
