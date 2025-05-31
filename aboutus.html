@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Patna Metro Route</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <style>
+    .station-icon {
+      font-size: 1rem;
+      margin-right: 0.5rem;
+    }
+
+    .red-line {
+      color: red;
+    }
+
+    .blue-line {
+      color: blue;
+    }
+
+    .corridor1_color {
+      background-color: rgb(237, 211, 211);
+      color: rgb(67, 62, 62);
+      padding: 10px;
+    }
+
+    .corridor1_color:hover {
+      color: black;
+      box-shadow: inset;
+      box-shadow: 0 8px 16px rgba(156, 154, 154, 0.7);
+    }
+
+    .corridor2_color:hover {
+      color: black;
+      box-shadow: inset;
+      box-shadow: 0 8px 16px rgba(156, 154, 154, 0.7);
+    }
+
+    .corridor2_color {
+      background-color: rgb(233, 235, 111);
+      color: rgb(67, 62, 62);
+      padding: 10px;
+      box-shadow: 0 8px 16px rgba(0, 0, 255, 0.1);
+    }
+
+    .interchange {
+      font-weight: bold;
+    }
+
+    ol {
+      padding-left: 1.2rem;
+    }
+
+    .mapview {
+      width: 100%;
+      height: 100%;
+      margin: 10px;
+    }
+
+    .routemap {
+
+      width: 600px;
+      height: 300px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    .routemap:hover {
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.6);
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Navigation Bar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+    <div class="container-fluid">
+      <a class="navbar-brand fw-bold" href="#">🚇 Patna Metro Route</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMetro"
+        aria-controls="navbarMetro" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarMetro">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="index.html">Journey Planner</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="metromap.html">Route Map</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+  <!-- Navbar End -->
+
+  <div class="container my-5">
+    <h1 class="mb-4"><img src="data/icons/icon-192.png" alt="appIcon" width="40px" height="40px">PMet Route Map.</h1>
+    <p>The <strong><img src="data/icons/icon-192.png" alt="appIcon" width="20px" height="20px">PMet</strong> app is
+      <strong>Lightweight</strong> and designed with <strong>Latest Technology</strong> to explore your journey from
+      <strong>Patna Metro</strong>. Best solution for the information of metro stations, routes, Journey plan, <strong>
+        Estimated</strong> Travel time, Fare, Distance and finding <strong>Nearest Metro Station</strong> from your
+      current location.</p>
+
+    <div class="row">
+      <div class="col-md-12">
+        <ul>
+          <h4 class="corridor1_color"><img src="data/icons/icon-192.png" alt="appIcon" width="40px" height="40px">
+            Mobile/Desktop Application</h4>
+          <li>Download Mobile/Desktop Application for fast loading and data saving.</li>
+          <li>Click on <strong>Install App</strong> button showing below when open the website or tap on three dot and
+            then tap <strong>Add to Home Screen.</strong></li>
+          <li>For Desktop see also in URL search bar(App available) for desktop application installation.</li>
+          <li>Tap/Click on Install.</li>
+          <li>After Installing syncing with device for security checkup<strong>(only for Mobile)</strong>.</li>
+          <li>After successfully installed app in your device. Tap/Double click on Icon in your Mobile/Desktop to
+            explore Smart journey.</li>
+          <li><strong>Why using our app ?</strong></li>
+          <ol>
+            <li>Light Weight Application with latest technology.</li>
+            <li><strong>Memory Saving : </strong>Our Application usage lessthan <strong>"<"1MB</strong> of memory/storage.</li>
+            <li><strong>Data Saver : </strong>You can use this Application without internet after first time usage.</li>
+            <li><strong>Data Security : </strong>Our Application not directly installed through apk, to access your
+              other data.</li>
+            <li><strong>Time Saving : </strong>Offline access features make this app better from another Application to
+              save time if internet connection is disconnected or not available.</li>
+            <li><strong>App Update :</strong> Automatically update your application when new updates are available and
+              notify for new version. No more data consuption due to its <strong>Lightweight</strong> and latest
+              technology.</li>
+          </ol>
+        </ul>
+      </div>
+      <div class="col-md-6">
+        <ul>
+          <h4 class="corridor1_color">Plan Your Journey</h4>
+
+          <li><strong>Select source station </strong> (Ex:Danapur Cantonment)</li>
+          <li><strong>Select Destination Station </strong> (Ex: New ISBT)</li>
+          <li>Click on <img src="data/icons/swap-icon.png" alt="swap-icon" width="20px" height="20px"
+              style="border: 1px solid gray;"><strong>Swap Button</strong> to exchange selected source and destination
+            station(<strong>if
+              required</strong>).</li>
+          <li>Click on <strong>"Show Journey"</strong> button.</li>
+          <li>Showing all stations on map from <strong>"Source Station"</strong> to <strong>"Destination
+              Station"</strong>.</li>
+          <li>Click on<strong> Journey Info ▼</strong> to explore your journey details.</li>
+        </ul>
+      </div>
+
+      <div class="col-md-6">
+        <ul>
+          <h4 class="corridor2_color">Enable Location(For finding nearest metro station)</h4>
+          <li>Checkout the <strong>Enable location</strong> button in the <strong> Journey Info ▼</strong> panel.</li>
+          <li><strong>Nearest</strong> Metro Station highlighted on the map and showing in journey info panel, and
+            <strong>automatically</strong> selected in source station.
+          </li>
+          <li>Select only <strong>destination</strong> station if you want.</li>
+          <li>Click on <strong>"Show Journey"</strong> button.</li>
+          <li><strong> Journey Info ▼</strong> panel showing your journey details.</li>
+        </ul>
+      </div>
+
+      <div class="col-md-6">
+        <ul>
+          <h4 class="corridor1_color">Explore Map</h4>
+          <li>Zoom in to map > click on <strong>(+)</strong> icon on map.</li>
+          <li>Zoom out from map > click on <strong>(-)</strong> icon on map.</li>
+          <li>Full Screen Map > click on <strong>(#)</strong> icon on map.</li>
+          <li>Change map theme > click on <strong>($$$)</strong> icon on map and select desired map theme.<strong>(shown
+              below)</strong></li>
+          <ol>
+            <li><strong>Street Map View</strong>: Google Map Street View.</li>
+            <li><strong>Satellite Plain</strong>: Google Satellite Map with no lable or information of landmarks.</li>
+            <li><strong>Satellite Info</strong>: Google Satellite Hybrid Map, satellite view with all information like
+              google map.</li>
+            <li><strong>Light Gray</strong>: Light Gray map for light loading and data saver.</li>
+            <li><strong>DayLight Street</strong>: Daylight view of street map.</li>
+            <li><strong>Night Street View</strong>: Dark theme of street view map.</li>
+          </ol>
+        </ul>
+      </div>
+      <div class="col-md-6">
+        <ul>
+          <h4 class="corridor2_color">Get Direction to the Nearest Metro Station</h4>
+          <li>Select Route Map <strong>from menu.</strong></li>
+          <li>Click on location icon in the map <strong>(*)</strong></li>
+          <li>Showing your nearest metro station on map and direction to the station from your current location.</li>
+          <li>Click on map icon <strong>(*)</strong> to get <strong>Direction</strong> on google map.</li>
+        </ul>
+      </div>
+      <div class="col-md-6">
+        <ul>
+          <h4 class="corridor1_color">Measure Distance</h4>
+          <li>To measure the distance on map click on <strong>(#)</strong> icon on map.</li>
+          <li>Click on <strong>Create a new measurement</strong>.</li>
+          <li>Click or touch on map for statring point of measurement and so on continuesly and finish measurement.</li>
+          <li>Distance showing on starting measurement on map.</li>
+        </ul>
+      </div>
+      <div class="col-md-6">
+        <ul>
+          <h4 class="corridor2_color">Downloading Route Map</h4>
+          <li>To downloading route map. Go to <strong>Route Map</strong> or <strong>Station Details</strong> page from
+            menu.</li>
+          <li>Click on link showing inside the map. Example:<strong style="color: blue;"><u>Metro Map 1</u></strong>
+          </li>
+          <li>Map opens in a new window.</li>
+          <li>Tap on image and click on <strong>Download image</strong>.</li>
+          <li>Open your <strong>Gallery</strong> or <strong>File Manager</strong> to view downloaded map.</li>
+        </ul>
+      </div>
+      
+
+    
+      <p>
+        <strong>Legend: </strong> <i class="fa-solid fa-arrow-up" style="color: red;"> </i><i
+          class="fa-solid fa-arrow-up" style="color:blue;"> </i> Elevated | <i class="fa-solid fa-arrow-down"
+          style="color: red;"> </i><i class="fa-solid fa-arrow-down" style="color:blue;"> </i> Underground | <span
+          class="interchange"><i class="fa-solid fa-exchange-alt text-primary me-2"></i><i
+            class="fa-solid fa-exchange-alt text-danger me-2"></i>Interchange Station</span>
+      </p>
+
+    </div>
+
+
+
+  </div>
+
+  <div class="container py-4">
+    <h2 class="text-center mb-4">Patna Metro Route Maps</h2>
+    <div class="row">
+      <!-- Repeat this block for each map -->
+      <div class="col-md-3 col-sm-6 mb-3">
+        <div class="card">
+          <img src="data/map/PatnaMetro1.png" class="card-img-top" alt="Map1">
+          <div class="card-body text-center">
+            <p class="card-text"><a href="data/map/PatnaMetro1.png" target="#">Metro Map 1</a></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-3 col-sm-6 mb-3">
+        <div class="card">
+          <img src="data/map/PatnaMetro4.png" class="card-img-top" alt="Map4">
+          <div class="card-body text-center">
+            <p class="card-text"><a href="data/map/PatnaMetro4.png" target="#">Metro Map 4</a></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Add more maps as needed -->
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-dark text-light py-4 mt-auto">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
+          <small>© 2025 Md Yaseen. All rights reserved.</small>
+        </div>
+        <div class="col-md-6 text-center text-md-end">
+          <!-- <a href="privacy.html" class="text-light text-decoration-none me-3">Privacy Policy</a> -->
+          <!-- <a href="terms.html" class="text-light text-decoration-none me-3">Terms of Service</a> -->
+          <a href="contact.html" class="text-light text-decoration-none me-3">Contact Us</a>
+          <!-- <a href="disclaimer.html" class="text-light text-decoration-none">Disclaimer</a> -->
+        </div>
+      </div>
+    </div>
+  </footer>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
