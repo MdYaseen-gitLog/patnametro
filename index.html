@@ -972,7 +972,10 @@
             document.getElementById("loadingSpinner").style.display = "none";
             document.getElementById("nearestStation").style.color = "red";
             document.getElementById("nearestStation").textContent = "! not detected.";
-
+            if (marker) {
+                map.removeLayer(marker);
+                map.removeLayer(nearestStationCircle);
+            }
         }
 
         // Request the user's location
@@ -1010,10 +1013,10 @@
             } else {
                 // Disable location updates
                 clearInterval(intervalId);
-                // if (marker) {
-                //   map.removeLayer(marker);
-                //   map.removeLayer(circle);
-                // }
+                if (marker) {
+                    map.removeLayer(marker);
+                    map.removeLayer(nearestStationCircle);
+                }
             }
         });
 
