@@ -1,1 +1,2 @@
-"Hello, Patna Metro!" 
+"Hello, Users!" 
+Welcome to Patna Route Journey Planner.
