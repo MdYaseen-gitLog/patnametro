@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="google-site-verification" content="google64da9d05f1ae93ef"/>
+    <meta name="google-site-verification" content="google64da9d05f1ae93ef" />
     <title>Patna Metro Route</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="description"
@@ -13,7 +13,7 @@
     <link rel="canonical" href="https://mdyaseen-gitlog.github.io/patnametro/" />
     <meta name="author" content="Md Yaseen">
     <link rel="icon" href="favicon.ico" type="image/x-icon">
-   <!-- PWA Meta Tags -->
+    <!-- PWA Meta Tags -->
     <link rel="manifest" href="/patnametro/manifest.json">
     <link rel="icon" href="data/icons/icon-192.png" sizes="192x192" type="image/png">
     <link rel="icon" href="data/icons/icon-512.png" sizes="512x512" type="image/png">
@@ -24,7 +24,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="apple-mobile-web-app-title" content="Patna Metro">
     <link rel="apple-touch-icon" href="data/icons/icon-192.png">
-    
+
     <meta name="robots" content="index, follow">
     <link rel="sitemap" type="application/xml" title="Sitemap" href="sitemap.xml" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -241,7 +241,7 @@
 </head>
 
 <body>
- <button id="installBtn"
+    <button id="installBtn"
         style="display:none;position:fixed;bottom:20px;right:20px;padding:10px 20px;font-size:16px;border:none;border-radius:8px;background-color:#1976d2;color:white;box-shadow:0 4px 6px rgba(0,0,0,0.2);z-index:1000;">
         📲 Install App
     </button>
@@ -260,7 +260,10 @@
                         <a class="nav-link" href="metromap.html">Route Map</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="metrolines.html">Station Details</a>
+                        <a class="nav-link" href="metrolines.html">Metro Lines</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="aboutus.html">About Us</a>
                     </li>
                 </ul>
             </div>
@@ -273,8 +276,8 @@
         <div class="row mb-3">
             <div class="col-12 text-center">
                 <div class="marquee-container" id="marquee">
-                    <img id="train1" class="train" src="data/icons/trainLeftToRight_Red.png" alt="movTrain1"/>
-                    <img id="train2" class="train" src="data/icons/trainRightToLeft_Blue.png" alt="movTrain2"/>
+                    <img id="train1" class="train" src="data/icons/trainLeftToRight_Red.png" alt="movTrain1" />
+                    <img id="train2" class="train" src="data/icons/trainRightToLeft_Blue.png" alt="movTrain2" />
                     <div class="fixed-text" id="metroText">Plan Your Journey</div>
                 </div>
             </div>
@@ -321,10 +324,10 @@
 
                     <!-- Collapsible content -->
                     <div class="collapse" id="journeyCollapse">
-                <p>
-                    <span><input type="checkbox" id="enableLocation"> Enable Location</span><br>
-                    <strong>Nearest Metro Station:</strong><br><span id="nearestStation"></span>
-                </p>
+                        <p>
+                            <span><input type="checkbox" id="enableLocation"> Enable Location</span><br>
+                            <strong>Nearest Metro Station:</strong><br><span id="nearestStation"></span>
+                        </p>
                         <p><strong>From:</strong> <span id="infoSource"></span></p>
                         <p><strong>To:</strong> <span id="infoDest"></span></p>
                         <p><strong>Distance:</strong> <span id="infoDistance"></span></p>
@@ -347,7 +350,8 @@
 
     </div>
     <!-- Destination to Visit -->
-    <iframe src="places.html" title="Embedded map showing tourist places." width="100%" height="800px" style="border:none;">
+    <iframe src="places.html" title="Embedded map showing tourist places." width="100%" height="800px"
+        style="border:none;">
         Your browser does not support iframes.
     </iframe>
 
@@ -382,7 +386,7 @@
             });
         }
 
-                //Full Screen
+        //Full Screen
         let map = L.map('map', {
             center: [25.61, 85.14], // Change to your coords
             zoom: 12,
@@ -989,7 +993,7 @@
         // Function to handle checkbox change
         document.getElementById('enableLocation').addEventListener('change', function () {
             if (this.checked) {
-                
+
                 requestUserLocation(
                     coords => {
                         //console.log("User location:", coords.lat, coords.lng);
@@ -1002,7 +1006,7 @@
                     }
                 );
                 // Enable location updates every 5 seconds
-               intervalId = setInterval(updateLocation, 30000);
+                intervalId = setInterval(updateLocation, 30000);
             } else {
                 // Disable location updates
                 clearInterval(intervalId);
@@ -1657,12 +1661,12 @@
         });
     </script>
     <script>
-       if ('serviceWorker' in navigator) {
+        if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('service-worker.js')
                     .then(reg => {
                         console.log('Service Worker registered:', reg);
-                                                reg.onupdatefound = () => {
+                        reg.onupdatefound = () => {
                             const newWorker = reg.installing;
                             newWorker.onstatechange = () => {
                                 if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
@@ -1705,7 +1709,7 @@
                 if (result.outcome === 'accepted') {
                     //console.log('✅ App installed');
                 } else {
-                   // console.log('❌ Install dismissed');
+                    // console.log('❌ Install dismissed');
                 }
                 deferredPrompt = null;
                 installBtn.style.display = 'none';
@@ -1718,7 +1722,7 @@
             installBtn.style.display = 'none';
         });
 
-                let appVersion = '';
+        let appVersion = '';
         const appVersionID = document.getElementById("appVersion");
         fetch('version.json')
             .then(res => res.json())
