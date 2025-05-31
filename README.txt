@@ -1,2 +1,2 @@
 "Hello, Users!" 
-Welcome to Patna Route Journey Planner.
+Welcome to Patna Metro Route Journey Planner.
