@@ -846,6 +846,10 @@
 
             if (!isExpanded) {
                 collapseInstance.show();
+                if (marker) {
+                    map.removeLayer(marker);
+                    map.removeLayer(nearestStationCircle);
+                }
             }
             //addFeatureLayer();
         });
