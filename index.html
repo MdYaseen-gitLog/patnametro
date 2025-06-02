@@ -495,7 +495,7 @@
         function drawStationsOnRoute(segments, fromKey, toKey) {
 
             // Remove previously added station markers
-            if (marker) {
+            if (stationMarkers) {
                 stationMarkers.forEach(marker => map.removeLayer(marker));
                 stationMarkers = [];
             }
