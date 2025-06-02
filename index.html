@@ -212,7 +212,7 @@
             .side-info {
                 padding: 10px;
                 box-shadow: 0 6px 10px rgba(121, 119, 119, 0.3);
-                border-radius:8px;
+                border-radius: 8px;
             }
 
             .train {
@@ -326,10 +326,13 @@
                         <label for="destStation">Destination Station</label>
                         <select class="form-select" id="destStation" required></select>
                     </div>
-                    <button type="submit" class="btn btn-primary w-100">Show Journey</button>
+                    <button type="submit" class="btn btn-info w-100">Show Journey</button>
                 </form>
-
-                <div class="mt-3 border p-2 side-info">
+                <p>
+                    <span><input type="checkbox" id="enableLocation"> Enable Location</span><br>
+                    <strong>Nearest Metro Station:</strong><br><span id="nearestStation"></span>
+                </p>
+                <div class="mt-3 side-info">
                     <!-- Heading acting as the collapse toggle -->
                     <h5>
                         <button class="btn btn-link text-decoration-none text-dark" data-bs-toggle="collapse"
@@ -340,10 +343,7 @@
 
                     <!-- Collapsible content -->
                     <div class="collapse" id="journeyCollapse">
-                        <p>
-                            <span><input type="checkbox" id="enableLocation"> Enable Location</span><br>
-                            <strong>Nearest Metro Station:</strong><br><span id="nearestStation"></span>
-                        </p>
+
                         <p><strong>From:</strong> <span id="infoSource"></span></p>
                         <p><strong>To:</strong> <span id="infoDest"></span></p>
                         <p><strong>Distance:</strong> <span id="infoDistance"></span></p>
