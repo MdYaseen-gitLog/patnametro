@@ -827,31 +827,33 @@
         });
 
         stationForm.addEventListener("submit", e => {
-            e.preventDefault();
-            const from = document.getElementById("sourceStation").value;
-            const to = document.getElementById("destStation").value;
+            if (validateDuplicateStations('sourceStation', 'destStation')) {
+                e.preventDefault();
+                const from = document.getElementById("sourceStation").value;
+                const to = document.getElementById("destStation").value;
 
-            //  addTrackToMap();//top of the selected route line
-            drawRouteBetween(from, to);
-            addRaster();
-            showStationOnRoute();
-            document.getElementById('infoTowards').textContent = getTowardsStationDirect();
-            document.getElementById("enableLocation").checked = false;
+                //  addTrackToMap();//top of the selected route line
+                drawRouteBetween(from, to);
+                addRaster();
+                showStationOnRoute();
+                document.getElementById('infoTowards').textContent = getTowardsStationDirect();
+                document.getElementById("enableLocation").checked = false;
 
-            var journeyCollapse = document.getElementById('journeyCollapse');
-            var collapseInstance = bootstrap.Collapse.getOrCreateInstance(journeyCollapse);
+                var journeyCollapse = document.getElementById('journeyCollapse');
+                var collapseInstance = bootstrap.Collapse.getOrCreateInstance(journeyCollapse);
 
-            // Check if collapse is currently shown (expanded)
-            var isExpanded = journeyCollapse.classList.contains('show');
-            if (marker) {
-                map.removeLayer(marker);
-                map.removeLayer(nearestStationCircle);
+                // Check if collapse is currently shown (expanded)
+                var isExpanded = journeyCollapse.classList.contains('show');
+                if (marker) {
+                    map.removeLayer(marker);
+                    map.removeLayer(nearestStationCircle);
+                }
+                if (!isExpanded) {
+                    collapseInstance.show();
+
+                }
+                //addFeatureLayer();
             }
-            if (!isExpanded) {
-                collapseInstance.show();
-
-            }
-            //addFeatureLayer();
         });
 
         // Function to handle geolocation , for finding Nearest Railway Station.
@@ -975,7 +977,7 @@
         function onLocationError(e) {
             document.getElementById("loadingSpinner").style.display = "none";
             document.getElementById("nearestStation").style.color = "red";
-            document.getElementById("nearestStation").textContent = "! not detected.";
+            document.getElementById("nearestStation").textContent = "searching....";
             if (marker) {
                 map.removeLayer(marker);
                 map.removeLayer(nearestStationCircle);
@@ -1000,7 +1002,7 @@
         // Function to handle checkbox change
         document.getElementById('enableLocation').addEventListener('change', function () {
             if (this.checked) {
-
+                document.getElementById("nearestStation").textContent = "searching....";
                 requestUserLocation(
                     coords => {
                         //console.log("User location:", coords.lat, coords.lng);
@@ -1016,6 +1018,7 @@
                 intervalId = setInterval(updateLocation, 30000);
             } else {
                 // Disable location updates
+                document.getElementById("nearestStation").textContent = "";
                 clearInterval(intervalId);
                 if (marker) {
                     map.removeLayer(marker);
@@ -1142,6 +1145,8 @@
             const temp = start.value;
             start.value = end.value;
             end.value = temp;
+            start.dispatchEvent(new Event('change'));
+            end.dispatchEvent(new Event('change'));
         }
 
         // Add Image Overlay Gray
@@ -1325,6 +1330,10 @@
             const sourceStation = sourceStationSelect.options[sourceStationSelect.selectedIndex].text;
             const destStation = destStationSelect.options[destStationSelect.selectedIndex].text;
             const colorSource = getColorFromStationName(sourceStation);
+            const colorDestination = getColorFromStationName(destStation);
+
+            sourceStationSelect.style.backgroundColor = colorSource;
+            destStationSelect.style.backgroundColor = colorDestination;
             showAllStations(sourceStationSelect);
             showAllStations(destStationSelect);
             hideStation('destStation', sourceStation);
@@ -1342,7 +1351,7 @@
                 }
             }
             else {
-                sourceStationSelect.selectedIndex = 0;
+                //sourceStationSelect.selectedIndex = 0;
                 const modal = new bootstrap.Modal(document.getElementById('errorModal'));
                 modal.show();
                 return false;
@@ -1358,6 +1367,7 @@
             const sourceStation = sourceStationSelect.options[sourceStationSelect.selectedIndex].text;
             const destStation = destStationSelect.options[destStationSelect.selectedIndex].text;
             const colorDestination = getColorFromStationName(destStation);
+            destStationSelect.style.backgroundColor = colorDestination;
             showAllStations(sourceStationSelect);
             showAllStations(destStationSelect);
             hideStation('sourceStation', destStation);
@@ -1376,7 +1386,7 @@
                     showStation('sourceStation', 'Khemni Chak Station (Blue)');
                 }
             } else {
-                destStationSelect.selectedIndex = 0;
+                // destStationSelect.selectedIndex = 0;
                 const modal = new bootstrap.Modal(document.getElementById('errorModal'));
                 modal.show();
                 return false;
@@ -1416,6 +1426,22 @@
             for (let i = 0; i < select.options.length; i++) {
                 select.options[i].style.display = 'block';
             }
+        }
+
+        function validateDuplicateStations(id1, id2) {
+            const select1 = document.getElementById(id1);
+            const select2 = document.getElementById(id2);
+
+            const value1 = cleanValue(select1.options[select1.selectedIndex].text);
+            const value2 = cleanValue(select2.options[select2.selectedIndex].text);
+
+            if (value1 && value2 && value1 === value2) {
+                const modal = new bootstrap.Modal(document.getElementById('errorModal'));
+                modal.show();
+                return false;
+            }
+
+            return true;
         }
 
         const redLine = [
@@ -1521,6 +1547,25 @@
         }
 
     </script>
+
+    <!-- Bootstrap Error Modal -->
+    <div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content border-danger">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="errorModalLabel">Route not found.</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Source and Destination Stations are same<br>Please select different station.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Bootstrap Error Modal -->
     <div class="modal fade" id="startupWarningModal" tabindex="-1" aria-labelledby="startupWarningLabel"
         aria-hidden="true">
