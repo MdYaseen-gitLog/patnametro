@@ -220,7 +220,7 @@
         .then(res => res.json())
         .then(data => {
           const temp = data.main.temp;
-          const heatAlert = temp > 38
+          const heatAlert = temp > 44
             ? `<div class="alert alert-danger"><i class="fas fa-fire"></i> Extreme Heat Alert: ${temp}°C</div>`
             : '';
 
