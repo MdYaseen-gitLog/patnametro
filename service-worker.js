@@ -1,8 +1,13 @@
-const APP_VERSION = 'v1.5.1'; // 👈 Change this whenever you update
+const APP_VERSION = 'v1.5.2'; // 👈 Change this whenever you update
 const CACHE_NAME = 'patnametro-' + APP_VERSION;
 const urlsToCache = [
   '/patnametro',
   '/patnametro/index.html',
+  '/pmetro/Final/data/icons/redStn.png',
+  '/pmetro/Final/data/icons/blueStn.png',
+  '/pmetro/Final/data/icons/connStn1.png',
+  '/pmetro/Final/data/icons/stnFrom.png',
+  '/pmetro/Final/data/icons/stnTo.png',
   '/patnametro/manifest.json',
   '/patnametro/data/icons/icon-192.png',
   '/patnametro/data/icons/icon-512.png'
@@ -17,7 +22,7 @@ self.addEventListener('install', event => {
         return cache.addAll(urlsToCache);
       })
   );
-   self.skipWaiting();
+  self.skipWaiting();
 });
 
 // Activate event - cleanup old caches
