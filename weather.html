@@ -88,6 +88,35 @@
 </head>
 
 <body>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+    <div class="container-fluid">
+      <a class="navbar-brand fw-bold" href="#">🚇 Patna Metro Route</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMetro"
+        aria-controls="navbarMetro" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarMetro">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="index.html">Journey Planner</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="metromap.html">Route Map</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="metrolines.html">Metro Lines</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="aboutus.html">About Us</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+  <!-- Navbar End -->
   <!-- Weather animation layers -->
   <div id="weatherEffect" class="weather-effect"></div>
   <div class="flash"></div>
@@ -206,7 +235,7 @@
         };
 
         //L.control.layers(baseMaps, overlayMaps).addTo(map);
-        
+
 
         // Fetch all weather-related data
         fetchWeather(lat, lon);
@@ -305,6 +334,23 @@
         });
     }
   </script>
+
+  <!-- Footer with legal links -->
+  <footer class="bg-dark text-light py-4 mt-auto">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
+          <small>© 2025 https://patnametroroute.in (<span id="appVersion"></span>). All rights reserved.</small>
+        </div>
+        <div class="col-md-6 text-center text-md-end">
+          <!-- <a href="privacy.html" class="text-light text-decoration-none me-3">Privacy Policy</a> -->
+          <!-- <a href="terms.html" class="text-light text-decoration-none me-3">Terms of Service</a> -->
+          <a href="contact.html" class="text-light text-decoration-none me-3">Contact Us</a>
+          <!-- <a href="disclaimer.html" class="text-light text-decoration-none">Disclaimer</a> -->
+        </div>
+      </div>
+    </div>
+  </footer>
 </body>
 
 </html>
