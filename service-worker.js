@@ -1,17 +1,18 @@
 const APP_VERSION = 'v1.6.1'; // 👈 Change this whenever you update
 const CACHE_NAME = 'patnametro-' + APP_VERSION;
 const urlsToCache = [
-  '/patnametro',
-  '/patnametro/index.html',
-  '/pmetro/Final/data/icons/redStn.png',
-  '/pmetro/Final/data/icons/blueStn.png',
-  '/pmetro/Final/data/icons/connStn1.png',
-  '/pmetro/Final/data/icons/stnFrom.png',
-  '/pmetro/Final/data/icons/stnTo.png',
-  '/patnametro/manifest.json',
-  '/patnametro/data/icons/icon-192.png',
-  '/patnametro/data/icons/icon-512.png'
+  '/',
+  '/index.html',
+  '/data/icons/redStn.png',
+  '/data/icons/blueStn.png',
+  '/data/icons/connStn1.png',
+  '/data/icons/stnFrom.png',
+  '/data/icons/stnTo.png',
+  '/manifest.json',
+  '/data/icons/icon-192.png',
+  '/data/icons/icon-512.png'
 ];
+
 
 // Install event - caching static assets
 self.addEventListener('install', event => {
