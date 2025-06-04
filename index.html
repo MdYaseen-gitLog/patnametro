@@ -303,11 +303,6 @@
             <!-- Map -->
             <div class="col-12 col-lg-9" style="margin-top:0px;">
                 <div id="map"></div>
-                <p id="stationOnRoute" class="mt-2">
-                    <img src="data/icons/pmrc_icon.png" alt="Station Icon" width="14px">
-                    <strong>Stations on Route <span id="stnCount">0</span></strong><br>
-                    <span id="infoStations"></span>
-                </p>
             </div>
 
             <!-- Journey Planning & Info -->
@@ -346,6 +341,11 @@
 
                         <p><strong>From:</strong> <span id="infoSource"></span></p>
                         <p><strong>To:</strong> <span id="infoDest"></span></p>
+                        <p id="stationOnRoute" class="mt-2">
+                            <img src="data/icons/pmrc_icon.png" alt="Station Icon" width="14px">
+                            <strong>Stations : </strong><span id="stnCount">0</span>
+                            <span id="infoStations"></span>
+                        </p>
                         <p><strong>Distance:</strong> <span id="infoDistance"></span></p>
                         <p><strong>Travel Time:</strong> <span id="infoTime"></span></p>
                         <p><strong>Fare:</strong> ₹<span id="infoFare"></span>
@@ -1710,7 +1710,8 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
-                    <small>© 2025 https://patnametroroute.in (<span id="appVersion"></span>). All rights reserved.</small>
+                    <small>© 2025 https://patnametroroute.in (<span id="appVersion"></span>). All rights
+                        reserved.</small>
                 </div>
                 <div class="col-md-6 text-center text-md-end">
                     <!-- <a href="privacy.html" class="text-light text-decoration-none me-3">Privacy Policy</a> -->
