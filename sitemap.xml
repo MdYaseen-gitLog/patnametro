@@ -18,7 +18,7 @@
   <priority>0.80</priority>
 </url>
 <url>
-  <loc>https://mdyaseen-gitlog.github.io/patnametro/about.html</loc>
+  <loc>https://mdyaseen-gitlog.github.io/patnametro/aboutus.html</loc>
   <lastmod>2025-05-26T12:05:23+00:00</lastmod>
   <priority>0.80</priority>
 </url>
@@ -44,6 +44,11 @@
 </url>
 <url>
   <loc>https://mdyaseen-gitlog.github.io/patnametro/routelineBlue.html</loc>
+  <lastmod>2025-05-26T12:05:23+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://mdyaseen-gitlog.github.io/patnametro/metrolines.html</loc>
   <lastmod>2025-05-26T12:05:23+00:00</lastmod>
   <priority>0.64</priority>
 </url>
