@@ -37,7 +37,7 @@
         #map {
             height: 480px;
             background-color: white;
-            border-radius:4px;
+            border-radius: 4px;
             border: 1px solid gainsboro;
             width: 100%;
             margin-top: 8px;
@@ -252,6 +252,15 @@
             /* Adjust as needed */
             overflow-y: auto;
         }
+
+        .navbar-brand {
+            font-size: 1rem;
+            white-space: nowrap;
+        }
+
+        .navbar-brand img {
+            margin-right: 6px;
+        }
     </style>
 
 
@@ -265,7 +274,8 @@
     <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
         <div class="container-fluid">
-            <a class="navbar-brand fw-bold" href="#"><img src="data/icons/icon-192.png" alt="patna-metro" width="32"> Patna Metro Route Finder</a>
+            <a class="navbar-brand fw-bold" href="#"><img src="data/icons/icon-192.png" alt="patna-metro" width="32">
+                Patna Metro Route Finder</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMetro"
                 aria-controls="navbarMetro" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -290,7 +300,7 @@
 
     <div id="loadingSpinner" class="spinner" style="display:none;"></div>
     <div class="container-fluid p-3">
- 
+
         <div class="row g-3">
             <!-- Map -->
             <div class="col-12 col-lg-9" style="margin-top:0px;">
@@ -1605,7 +1615,7 @@
     <!-- Bootstrap JS Bundle (includes Popper) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-    
+
     <script>
         const apiKey = 'e8d83feabbee14a0c1323f56e4c48145';
         const lat = 25.6;
