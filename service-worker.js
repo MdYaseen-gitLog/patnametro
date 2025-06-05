@@ -6,6 +6,7 @@ const urlsToCache = [
   '/data/icons/redStn.png',
   '/data/icons/blueStn.png',
   '/data/icons/connStn1.png',
+  '/data/icons/swap-icon.png',
   '/data/icons/stnFrom.png',
   '/data/icons/stnTo.png',
   '/manifest.json',
