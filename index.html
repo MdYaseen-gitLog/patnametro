@@ -906,7 +906,7 @@
             document.getElementById("infoDest").textContent = to.properties.station_name;
             document.getElementById("infoDistance").textContent = totalLen.toFixed(2) + " Km";
             document.getElementById("infoTime").textContent = totalTime + " min";
-            document.getElementById("infoFare").textContent = fare;
+            document.getElementById("infoFare").textContent = '₹ ' + fare;
             // document.getElementById("infoTowards").textContent = getTowardsStation(from);
             document.getElementById("infoConnection").textContent = connectionText || "Direct Route";
         }
