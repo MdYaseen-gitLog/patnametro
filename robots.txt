@@ -1,3 +1,5 @@
-Sitemap: https://mdyaseen-gitlog.github.io/patnametro/sitemap.xml
 User-agent: *
 Disallow:
+
+Sitemap: https://www.patnametroroute.in/sitemap.xml
+
