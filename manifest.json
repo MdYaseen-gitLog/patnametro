@@ -1,4 +1,5 @@
 {
+  "version": "1.0.0",
   "name": "Patna Metro Route Finder",
   "short_name": "PMet",
   "start_url": "/",
@@ -17,7 +18,31 @@
       "type": "image/png"
     }
   ],
-  "version": "1.0.0"
+  "shortcuts": [
+    {
+      "name": "Home",
+      "short_name": "Home",
+      "url": "/index.html",
+      "icons": [{ "src": "icons/shortcut/home-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Metro Route",
+      "short_name": "Route",
+      "url": "/metromap.html",
+      "icons": [{ "src": "icons/shortcut/map-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Metro Lines",
+      "short_name": "MetroLines",
+      "url": "/metrolines.html",
+      "icons": [{ "src": "icons/shortcut/metrolines-192.png", "sizes": "192x192" }]
+    }
+   
+   
+  
+
+  ]
 }
+
 
 
