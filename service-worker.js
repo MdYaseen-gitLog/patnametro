@@ -3,6 +3,7 @@ const CACHE_NAME = 'patnametro-' + APP_VERSION;
 const urlsToCache = [
   '/',
   '/index.html',
+  '/apple-touch-icon.png',
   '/data/icons/redStn.png',
   '/data/icons/blueStn.png',
   '/data/icons/connStn1.png',
