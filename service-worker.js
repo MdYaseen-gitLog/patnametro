@@ -1,5 +1,6 @@
-const APP_VERSION = 'v1.0.2'; // 👈 Change this whenever you update
+const APP_VERSION = 'v1.0.3'; // 👈 Updated version
 const CACHE_NAME = 'patnametro-' + APP_VERSION;
+
 const urlsToCache = [
   '/',
   '/index.html',
@@ -17,7 +18,6 @@ const urlsToCache = [
   '/data/icons/icon-192.png',
   '/data/icons/icon-512.png'
 ];
-
 
 // Install event - caching static assets
 self.addEventListener('install', event => {
@@ -49,6 +49,13 @@ self.addEventListener('activate', event => {
 
 // Fetch event - serve cached content or go to network
 self.addEventListener('fetch', event => {
+  const requestUrl = event.request.url;
+
+  // 🚫 Don't cache Google Analytics script
+  if (requestUrl.includes('https://www.googletagmanager.com/gtag/js')) {
+    return;
+  }
+
   event.respondWith(
     caches.match(event.request)
       .then(response => {
@@ -56,4 +63,3 @@ self.addEventListener('fetch', event => {
       })
   );
 });
-
