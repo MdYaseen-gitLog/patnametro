@@ -11,6 +11,16 @@
 
         gtag('config', 'G-WWJ6P7DGYL');
     </script>
+    <script>
+        // Detect PWA standalone mode
+        if (window.matchMedia('(display-mode: standalone)').matches) {
+            gtag('event', 'pwa_launch', {
+                event_category: 'PWA',
+                event_label: 'Launched as standalone PWA'
+            });
+            console.log('PWA launched in standalone mode');
+        }
+    </script>
     <meta charset="UTF-8">
     <!--     <meta name="google-site-verification" content="google64da9d05f1ae93ef" /> -->
     <title>Patna Metro Route Finder & PMet App</title>
