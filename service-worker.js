@@ -16,7 +16,11 @@ const urlsToCache = [
   '/data/icons/shortcut/metrolines-192.png',
   '/manifest.json',
   '/data/icons/icon-192.png',
-  '/data/icons/icon-512.png'
+  '/data/icons/icon-512.png',
+  '/data/icons/pmrc_icon-blue.png',
+  '/data/icons/pmrc_icon.png',
+  '/data/images/Patna-Zoo.jpg',
+  '/data/icons/PatnaMetro_Gray_Label_300_New.png'
 ];
 
 // Install event - caching static assets
