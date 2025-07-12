@@ -101,8 +101,18 @@
             }
         }
 
+        #routeDistance {
+            padding: 10px;
+            font-weight: bold;
+            display: none;
+        }
+
         .leaflet-routing-container {
             display: none !important;
+        }
+
+        h3 {
+            display: none;
         }
 
         .navbar-brand {
@@ -546,7 +556,7 @@
 
         function findRouteToNearestStation(start, end) {
             // Add the routing control
-           routingControl = L.Routing.control({
+            routingControl = L.Routing.control({
                 waypoints: [start, end],
                 routeWhileDragging: true,
                 show: true,
