@@ -178,6 +178,8 @@
     <!-- Leaflet FullScreen -->
     <script src="https://unpkg.com/leaflet.fullscreen@1.6.0/Control.FullScreen.js"></script>
     <script>
+        let totaldistance = 0;
+        let nearestMetroStation = null;
         let map = L.map('map', {
             center: [25.61, 85.14], // Change to your coords
             zoom: 11,
@@ -521,7 +523,7 @@
                 }).addTo(map);
 
                 // alert("Nearest Metro Station " + props.station_name + " " + distance.toFixed(2) + " km");
-
+                nearestMetroStation = props.station_name;
                 nearestStationCircle.bindPopup(`
         <strong>Nearest Station</strong><br>
         ${props.station_name}<br>
