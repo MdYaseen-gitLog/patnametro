@@ -146,44 +146,57 @@
     <!-- Navbar End -->
     <div id="map"></div>
 
-<div class="container py-4">
-    <h1 class="mb-3 text-danger">Patna Metro Red Line (East–West Corridor)</h1>
-    <p>
-      The Red Line of the Patna Metro spans approximately <strong>16.86 km</strong>, connecting <strong>Danapur Cantonment</strong> to <strong>Khemnichak</strong> through a mix of elevated (9.36 km) and underground (7.5 km) track sections.
-    </p>
+    <div class="container py-4">
+        <h1 class="mb-3 text-danger">Patna Metro Red Line (East–West Corridor)</h1>
+        <p>
+            The Red Line of the Patna Metro spans approximately <strong>16.86 km</strong>, connecting <strong>Danapur
+                Cantonment</strong> to <strong>Khemnichak</strong>. The corridor features a combination of <strong>7
+                elevated</strong> and <strong>7 underground</strong> stations.
+        </p>
 
-    <div class="mb-4">
-      <h5 class="text-muted">🗺️ Route Overview</h5>
-      <ul class="list-group list-group-flush">
-        <li class="list-group-item">Total Length: <strong>16.86 km</strong></li>
-        <li class="list-group-item">Stations: <strong>14</strong> (7 Elevated, 7 Underground)</li>
-        <li class="list-group-item">Interchange Stations: <strong>Patna Junction</strong>, <strong>Khemnichak</strong></li>
-        <li class="list-group-item">Line Color: <span class="badge bg-danger">Red</span></li>
-      </ul>
+        <div class="mb-4">
+            <h5 class="text-muted">🗺️ Route Overview</h5>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">Total Length: <strong>16.86 km</strong></li>
+                <li class="list-group-item">Stations: <strong>14</strong> (7 Elevated, 7 Underground)</li>
+                <li class="list-group-item">Interchange Stations: <strong>Patna Junction</strong>,
+                    <strong>Khemnichak</strong>
+                </li>
+                <li class="list-group-item">Line Color: <span class="badge bg-danger">Red</span></li>
+            </ul>
+        </div>
+
+        <div class="mb-4">
+            <h5 class="text-muted">📍 Station List by Type</h5>
+            <div class="row">
+                <div class="col-md-6">
+                    <h6>Elevated Stations</h6>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">Danapur Cantonment</li>
+                        <li class="list-group-item">Saguna Mor</li>
+                        <li class="list-group-item">RPS Mor</li>
+                        <li class="list-group-item">Patliputra</li>
+                        <li class="list-group-item">Rukanpura</li>
+                        <li class="list-group-item">Raja Bazar</li>
+                        <li class="list-group-item">Patna Zoo</li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h6>Underground Stations</h6>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">Vikas Bhawan</li>
+                        <li class="list-group-item">Vidyut Bhawan</li>
+                        <li class="list-group-item">Patna Junction <em>(interchange)</em></li>
+                        <li class="list-group-item">Mithapur</li>
+                        <li class="list-group-item">Ramkrishan Nagar</li>
+                        <li class="list-group-item">Jaganpura</li>
+                        <li class="list-group-item">Khemnichak <em>(interchange)</em></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div class="mb-4">
-      <h5 class="text-muted">📍 Station List (West to East)</h5>
-      <ol class="list-group list-group-numbered">
-        <li class="list-group-item">Danapur Cantonment</li>
-        <li class="list-group-item">Saguna Mor</li>
-        <li class="list-group-item">RPS Mor</li>
-        <li class="list-group-item">Patliputra</li>
-        <li class="list-group-item">Rukanpura</li>
-        <li class="list-group-item">Raja Bazar</li>
-        <li class="list-group-item">Patna Zoo</li>
-        <li class="list-group-item">Vikas Bhawan</li>
-        <li class="list-group-item">Vidyut Bhawan</li>
-        <li class="list-group-item">Patna Junction <em>(interchange)</em></li>
-        <li class="list-group-item">Mithapur</li>
-        <li class="list-group-item">Ramkrishan Nagar</li>
-        <li class="list-group-item">Jaganpura</li>
-        <li class="list-group-item">Khemnichak <em>(interchange)</em></li>
-      </ol>
-    </div>
-
-  </div>
-    
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <!-- Turf.js for buffer -->
