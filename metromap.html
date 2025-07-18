@@ -462,13 +462,13 @@
                             const nearestPoint = turf.point(nearestCoords);
                             const distance = turf.distance(userPoint, nearestPoint, { units: 'kilometers' });
                             const nearestLatLng = [nearestCoords[1], nearestCoords[0]];
-                            // var polyline = L.polyline([userLatLng, nearestLatLng], { color: 'yellow' }).addTo(map);
+                            var polyline = L.polyline([userLatLng, nearestLatLng], { color: 'yellow' }).addTo(map);
 
                             if (distance <= 5) {
                                 marker.addTo(map);
                                 map.flyTo([nearestCoords[1], nearestCoords[0]], 14);
                                 highlightNearestStation(nearest, distance);
-                                findRouteToNearestStation(userLatLng, nearestLatLng);
+                               // findRouteToNearestStation(userLatLng, nearestLatLng);// creating problem 18-07-25
                             } else {
                                 alert("No station found within 5 km of your location.");
                             }
