@@ -280,22 +280,45 @@
             });
         }
 
-        // Load station points
-        fetch('data/Stations.geojson')
-            .then(response => response.json())
-            .then(data => {
-                L.geoJSON(data, {
-                    pointToLayer: function (feature, latlng) {
-                        const color = feature.properties?.station_color?.toLowerCase();
-                        let icon = defaultIcon;
-                        if (color === 'red') icon = redStationIcon;
-                        else if (color === 'blue') icon = blueStationIcon;
-                        return L.marker(latlng, { icon: icon });
-                    },
-                    onEachFeature: onEachFeature
-                }).addTo(map);
-            })
-            .catch(error => console.error('Error loading Stations.geojson:', error));
+ fetch('data/Stations.geojson')
+    .then(response => response.json())
+    .then(data => {
+        L.geoJSON(data, {
+            pointToLayer: function (feature, latlng) {
+                const color = feature.properties?.station_color?.toLowerCase();
+                let icon = defaultIcon;
+                if (color === 'red') icon = redStationIcon;
+                else if (color === 'blue') icon = blueStationIcon;
+                return L.marker(latlng, { icon: icon });
+            },
+            onEachFeature: function (feature, layer) {
+                const name = feature.properties?.station_name || 'Unnamed Station';
+                const latlng = layer.getLatLng();
+
+                const openInMapUrl = `https://www.google.com/maps?q=${latlng.lat},${latlng.lng}`;
+                const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${latlng.lat},${latlng.lng}`;
+
+                const popupContent = `
+                    <div style="text-align:center;">
+                        <strong>${name}</strong><br/><br/>
+                        <a href="${openInMapUrl}" target="_blank" title="Open in Google Maps" style="margin-right: 10px;">
+                            <img src="data/icons/gmap_32.png" 
+                                 alt="Open in Map" 
+                                 style="width: 28px; height: 28px;" />
+                        </a>
+                        <a href="${directionsUrl}" target="_blank" title="Get Directions">
+                            <img src="data/icons/gmap_dir_32.png" 
+                                 alt="Get Directions" 
+                                 style="width: 28px; height: 28px;" />
+                        </a>
+                    </div>
+                `;
+
+                layer.bindPopup(popupContent);
+            }
+        }).addTo(map);
+    })
+    .catch(error => console.error('Error loading Stations.geojson:', error));
 
         // Load metro track and buffer
         let lineLayer, bufferLayer;
