@@ -330,39 +330,29 @@
         fetch('data/metro_track.geojson')
             .then(response => response.json())
             .then(data => {
+                // A: Add metro line layer
                 lineLayer = L.geoJSON(data, {
                     style: lineStyle,
                     filter: f => f.geometry.type === "LineString" || f.geometry.type === "MultiLineString"
                 }).addTo(map);
-                // Fit map view to the extent of the metro lines
-                //map.fitBounds(lineLayer.getBounds());
 
+                // B: Add buffer layer
                 bufferLayer = createBufferedLayer(data, 0.05, 'kilometers', {
                     color: 'red',
                     fillColor: 'yellow',
                     fillOpacity: 0.2
                 }).addTo(map);
 
-                // L.control.layers(null, {
-                //     "Metro Lines": lineLayer,
-                //     "Buffer Zone": bufferLayer
-                // }, { collapsed: false }).addTo(map);
+                // C: Fit bounds
+                const bounds = lineLayer.getBounds();
+                map.fitBounds(bounds, {
+                    padding: [0, 0]
+                });
+                map.setMaxBounds(bounds.pad(0.50));
+                map.setMinZoom(map.getZoom());
             })
             .catch(error => console.error("Error loading metro_track.geojson:", error));
 
-        fetch('data/metro_track.geojson')
-            .then(response => response.json())
-            .then(data => {
-                const geojsonLayer = L.geoJSON(data);
-                const bounds = geojsonLayer.getBounds();
-                // Fit map to bounds with padding (in pixels)
-                map.fitBounds(bounds, {
-                    padding: [0, 0]  // Adjust padding to your needs
-                });
-                // Optional: Lock map to this padded bounds
-                map.setMaxBounds(bounds.pad(0.50)); // Adds ~25% buffer on all sides
-                map.setMinZoom(map.getZoom());
-            });
         // Base layers
         const openStreetMap = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; OpenStreetMap contributors'
