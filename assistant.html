@@ -243,19 +243,25 @@
 
       // Nearest station query
       if (lower.includes("nearest station") || lower.includes("nearest metro station")) {
+        awaitingNearest = true;
         return "Ensure your GPS or Location is enabled, and I’ll show the nearest station on map.";
       }
 
-      // If previous prompt and we ask for nearest station after location prompt
-      if (awaitingNearest) {
-        awaitingNearest = false;
-        return await respondWithNearestStation();
+      // User confirms location access (yes/gps enabled)
+      if (awaitingNearest && (
+        lower.includes("location enabled") ||
+        lower.includes("gps") ||
+        lower.includes("yes") ||
+        lower.includes("enabled")
+      )) {
+        awaitingNearest = false;  // reset flag
+        return await respondWithNearestStation(); // trigger location
       }
 
-      // After user says they have location enabled
-      if (lower.includes("location enabled") || lower.includes("yes location")) {
-        awaitingNearest = true;
-        return "Great! Locating nearest station...";
+      // (optional) user says "show station" after enabling GPS
+      if (lower.includes("show station") && awaitingNearest) {
+        awaitingNearest = false;
+        return await respondWithNearestStation();
       }
 
       // ✅ Station follow-up
