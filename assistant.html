@@ -244,9 +244,9 @@
       // Menu controls using chat
       // ✅ Auto-open your menu link when user types command
       if (lower.includes("open map") || lower.includes("metro map") || lower.includes("map")) {
-        chatBox.innerHTML += `<div><strong>Zora:</strong>please wait...</div>`;
+        chatBox.innerHTML += `<div><strong>Zora:</strong> Opening Metro Map page...</div>`;
         input.value = "";
-        window.location.href = "/metromap.html";  // 🔄 Navigate to local page
+        window.location.href = "https://www.patnametroroute.in/metromap.html";
         return;
       }
       //*******************
