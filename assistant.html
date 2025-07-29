@@ -1,10 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Add Leaflet and Turf.js -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/@turf/turf/turf.min.js"></script>
+
   <title>Zora Chatbot</title>
-<style>
+  <style>
     /* Chat toggle button */
     .chatbot-container {
       position: fixed;
@@ -114,13 +121,12 @@
     }
 
     .chat-input-area button:nth-child(2) {
-  background-color: #28a745;
-}
+      background-color: #28a745;
+    }
 
-.chat-input-area button:nth-child(2):hover {
-  background-color: #218838;
-}
-
+    .chat-input-area button:nth-child(2):hover {
+      background-color: #218838;
+    }
   </style>
 </head>
 
@@ -135,6 +141,7 @@
     <div id="chatMessages">
       <div><strong>Zora:</strong> Hi, I’m Zora, your AI assistant.</div>
     </div>
+    <div id="map" style="height: 200px; border-top: 1px solid #ddd; display: none;"></div>
     <div class="chat-input-area">
       <input type="text" id="chatInput" placeholder="Type your message...">
       <button onclick="startVoiceInput()">🎤</button>
@@ -232,6 +239,23 @@
         return "Ask me things like:\n• When is the next train from Rajendra Nagar?\n• What is the fare?\n• What is the weather in Patna?";
       }
 
+      // Nearest station query
+      if (lower.includes("nearest station") || lower.includes("nearest metro station")) {
+        return "Ensure your GPS or Location is enabled, and I’ll show the nearest station on map.";
+      }
+
+      // If previous prompt and we ask for nearest station after location prompt
+      if (awaitingNearest) {
+        awaitingNearest = false;
+        return await respondWithNearestStation();
+      }
+
+      // After user says they have location enabled
+      if (lower.includes("location enabled") || lower.includes("yes location")) {
+        awaitingNearest = true;
+        return "Great! Locating nearest station...";
+      }
+
       // ✅ Station follow-up
       if (awaitingStationFor) {
         const stationKey = findStationKey(msg);
@@ -317,8 +341,8 @@
 
     function capitalizeFirst(text) {
       return text.includes("first") ? "First" :
-             text.includes("last") ? "Last" :
-             text.includes("next") ? "Next" : text;
+        text.includes("last") ? "Last" :
+          text.includes("next") ? "Next" : text;
     }
 
     function findNextTrainTime(freqArray, now) {
@@ -394,6 +418,60 @@
       div.innerHTML = html;
       return div.textContent || div.innerText || "";
     }
+
+    // Add near-station logic
+
+    let awaitingNearest = false;
+
+    async function respondWithNearestStation() {
+      return new Promise((resolve) => {
+        if (!navigator.geolocation) {
+          resolve("Geolocation is not supported in your browser.");
+          return;
+        }
+
+        navigator.geolocation.getCurrentPosition(position => {
+          const userPoint = turf.point([position.coords.longitude, position.coords.latitude]);
+          const nearest = turf.nearestPoint(userPoint, stationsGeojson.features);
+          const stationName = nearest.properties.name || nearest.properties.station || "Station";
+          // Show map
+          renderMap(position.coords.latitude, position.coords.longitude, nearest);
+
+          resolve(`The nearest station is *${stationName}*. 🌐`);
+        }, err => {
+          console.error(err);
+          resolve("Could not get your location. Please enable GPS access and try again.");
+        });
+      });
+    }
+
+    function renderMap(lat, lng, nearestFeature) {
+      const mapDiv = document.getElementById("map");
+      mapDiv.style.display = "block";
+
+      // Initialize map if not already done
+      if (!window._leafletMap) {
+        window._leafletMap = L.map("map").setView([lat, lng], 14);
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+          attribution: "&copy; OpenStreetMap contributors"
+        }).addTo(window._leafletMap);
+      } else {
+        window._leafletMap.setView([lat, lng], 14);
+      }
+
+      // Clear old markers
+      if (window._stationMarker) window._stationMarker.remove();
+      if (window._userMarker) window._userMarker.remove();
+
+      // Add markers
+      window._userMarker = L.marker([lat, lng]).addTo(window._leafletMap)
+        .bindPopup("You are here").openPopup();
+
+      const [stLng, stLat] = nearestFeature.geometry.coordinates;
+      window._stationMarker = L.marker([stLat, stLng]).addTo(window._leafletMap)
+        .bindPopup(nearestFeature.properties.name || "Station");
+    }
   </script>
 </body>
+
 </html>
