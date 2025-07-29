@@ -453,7 +453,7 @@
             return;
           }
 
-          const stationName = nearest.properties.name || nearest.properties.station || "Station";
+          const stationName = nearest.properties.station_name || "Station";
           renderMap(position.coords.latitude, position.coords.longitude, nearest);
           resolve(`The nearest station is <strong>${stationName}</strong>.`);
         }, err => {
