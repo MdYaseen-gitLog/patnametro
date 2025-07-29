@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zora Chatbot</title>
+  <style>
+    /* Chat toggle button */
+    .chatbot-container {
+      position: fixed;
+      bottom: 90px;
+      /* Leaves room for the toggle button below */
+      right: 20px;
+      width: 350px;
+      height: 500px;
+      background: white;
+      border-radius: 10px;
+      display: none;
+      flex-direction: column;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      font-family: Arial, sans-serif;
+      z-index: 1001;
+      /* Higher than toggle */
+    }
+
+    .chat-toggle {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 60px;
+      height: 60px;
+      font-size: 24px;
+      background-color: #007bff;
+      color: white;
+      border-radius: 50%;
+      z-index: 1000;
+      cursor: pointer;
+      border: none;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+
+    .chat-header {
+      background-color: #007bff;
+      color: white;
+      padding: 10px;
+      position: relative;
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+      font-weight: bold;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .chat-close {
+      background: transparent;
+      border: none;
+      color: white;
+      font-size: 20px;
+      cursor: pointer;
+      padding: 0 5px;
+    }
+
+
+    #chatMessages {
+      flex-grow: 1;
+      overflow-y: auto;
+      padding: 10px;
+      background: #f7f7f7;
+      font-size: 14px;
+    }
+
+    .chat-input-area {
+      display: flex;
+      padding: 10px;
+      border-top: 1px solid #ddd;
+      gap: 5px;
+    }
+
+    .chat-input-area input[type="text"] {
+      flex-grow: 1;
+      padding: 8px;
+      font-size: 14px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    .chat-input-area button {
+      padding: 8px 10px;
+      font-size: 14px;
+      border: none;
+      background: #007bff;
+      color: white;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .chat-input-area button:hover {
+      background: #0056b3;
+    }
+
+    /* Mobile responsiveness */
+    @media (max-width: 480px) {
+      .chatbot-container {
+        width: 90%;
+        height: 100dvh;
+        /* Dynamic viewport height */
+        max-height: 90dvh;
+        bottom: 0;
+        right: 5%;
+        border-radius: 10px 10px 0 0;
+      }
+    }
+
+    .chat-input-area button:nth-child(2) {
+  background-color: #28a745;
+}
+
+.chat-input-area button:nth-child(2):hover {
+  background-color: #218838;
+}
+
+  </style>
+
+</head>
+
+<body>
+
+  <!-- Chat Toggle Button -->
+  <button class="chat-toggle" onclick="toggleChatbot()">💬</button>
+
+  <!-- Chatbot Window -->
+  <div class="chatbot-container" id="chatbot">
+    <div class="chat-header">
+      Zora - Metro Assistant
+      <button class="chat-close" onclick="toggleChatbot()">×</button>
+    </div>
+    <div id="chatMessages">
+      <div><strong>Zora:</strong> Hi, I’m Zora, your AI assistant.</div>
+    </div>
+    <div class="chat-input-area">
+      <input type="text" id="chatInput" placeholder="Type your message...">
+      <button onclick="startVoiceInput()">🎤</button>
+      <button onclick="sendChat()">Send</button>
+      <button onclick="clearChat()">Clear</button>
+    </div>
+  </div>
+
+
+  <script>
+  let awaitingStationFor = null;
+  let scheduleData = {};
+
+  const terminalStations = {
+    'East': 'Khemni Chak',
+    'West': 'Danapur',
+    'North': 'Patna_Junction Blue_Line',
+    'South': 'New ISBT'
+  };
+
+  // Load the JSON schedule
+  fetch("data/schedule/schedule_both_directions.json")
+    .then(response => response.json())
+    .then(data => {
+      scheduleData = data;
+    })
+    .catch(error => {
+      console.error("Failed to load schedule.json:", error);
+    });
+
+  function toggleChatbot() {
+    const bot = document.getElementById("chatbot");
+    bot.style.display = bot.style.display === 'none' || bot.style.display === '' ? 'flex' : 'none';
+  }
+
+  function sendChat() {
+    const input = document.getElementById("chatInput");
+    const message = input.value.trim();
+    if (!message) return;
+
+    const chatBox = document.getElementById("chatMessages");
+    chatBox.innerHTML += `<div><strong>You:</strong> ${message}</div>`;
+
+    const reply = getZoraReply(message);
+    chatBox.innerHTML += `<div><strong>Zora:</strong> ${reply}</div>`;
+    input.value = "";
+    setTimeout(() => {
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }, 100);
+  }
+
+  function clearChat() {
+    const chatBox = document.getElementById("chatMessages");
+    chatBox.innerHTML = `<div><strong>Zora:</strong> Hi, I’m Zora, your AI assistant.</div>`;
+    awaitingStationFor = null;
+  }
+
+  function getZoraReply(msg) {
+    const lower = msg.toLowerCase();
+
+    // Awaiting follow-up
+    if (awaitingStationFor) {
+      const stationKey = findStationKey(msg);
+
+      if (!stationKey) {
+        awaitingStationFor = null;
+        return `I couldn’t find a station matching "${msg}". Please check the name and try again.`;
+      }
+
+      const stationInfo = scheduleData[stationKey];
+      const directions = stationInfo.directions;
+
+      if (awaitingStationFor === "next_train") {
+        const now = new Date();
+        let response = `<strong>Next train from ${stationKey}:</strong><br>`;
+
+        for (let dir in directions) {
+          const freqArray = directions[dir].frequency;
+          const nextTrain = findNextTrainTime(freqArray, now);
+          const directionLabel = terminalStations[dir] ? `Towards ${terminalStations[dir]}` : dir;
+
+          if (nextTrain) {
+            response += `• ${directionLabel}: ${nextTrain.time} (in ${nextTrain.minutes} minute${nextTrain.minutes !== 1 ? 's' : ''})<br>`;
+          } else {
+            response += `• ${directionLabel}: No more trains today<br>`;
+          }
+        }
+
+        awaitingStationFor = null;
+        return response;
+      }
+
+      // First or last train
+      let reply = `<strong>${capitalizeFirst(awaitingStationFor)} train from ${stationKey}:</strong><br>`;
+      for (let dir in directions) {
+        const time = directions[dir][awaitingStationFor];
+        const directionLabel = terminalStations[dir] ? `Towards ${terminalStations[dir]}` : dir;
+        if (time) {
+          reply += `• ${directionLabel}: ${time}<br>`;
+        }
+      }
+
+      awaitingStationFor = null;
+      return reply;
+    }
+
+    // Greetings
+    if (["hi", "hello", "hey", "good morning", "good evening", "good night"].some(g => lower.includes(g))) {
+      return getGreeting();
+    }
+
+    // Triggers
+    if (lower.includes("first train")) {
+      awaitingStationFor = "first_train";
+      return "What station are you boarding from?";
+    }
+
+    if (lower.includes("last train")) {
+      awaitingStationFor = "last_train";
+      return "What station are you boarding from?";
+    }
+
+    if (lower.includes("next train")) {
+      awaitingStationFor = "next_train";
+      return "What station are you boarding from?";
+    }
+
+    if (lower.includes("fare") || lower.includes("min") || lower.includes("max")) {
+      return "Minimum fare is ₹10, maximum is ₹50.";
+    }
+
+    if (lower.includes("help")) {
+      return "You can ask me about first/last/next train, fares, or station schedules.";
+    }
+
+    // ✅ Check if user entered a partial station name directly
+    const stationKey = findStationKey(msg);
+    if (stationKey) {
+      const now = new Date();
+      const directions = scheduleData[stationKey].directions;
+      let response = `<strong>Next train from ${stationKey}:</strong><br>`;
+
+      for (let dir in directions) {
+        const freqArray = directions[dir].frequency;
+        const nextTrain = findNextTrainTime(freqArray, now);
+        const directionLabel = terminalStations[dir] ? `Towards ${terminalStations[dir]}` : dir;
+
+        if (nextTrain) {
+          response += `• ${directionLabel}: ${nextTrain.time} (in ${nextTrain.minutes} minute${nextTrain.minutes !== 1 ? 's' : ''})<br>`;
+        } else {
+          response += `• ${directionLabel}: No more trains today<br>`;
+        }
+      }
+
+      return response;
+    }
+
+    return "Sorry, I didn't understand that. Try asking about first train, last train, or next train.";
+  }
+
+  // ✅ Helper: Find station by partial name match
+  function findStationKey(userInput) {
+    const lowerInput = userInput.toLowerCase();
+    return Object.keys(scheduleData).find(
+      key => key.toLowerCase().includes(lowerInput)
+    );
+  }
+
+  function getGreeting() {
+    const hour = new Date().getHours();
+    if (hour >= 5 && hour < 12) return "Good Morning!";
+    if (hour >= 12 && hour < 17) return "Good Afternoon!";
+    if (hour >= 17 && hour < 21) return "Good Evening!";
+    return "Good Night!";
+  }
+
+  function capitalizeFirst(type) {
+    return type === "first_train"
+      ? "First"
+      : type === "last_train"
+        ? "Last"
+        : type === "next_train"
+          ? "Next"
+          : type;
+  }
+
+  function findNextTrainTime(frequencyArray, now) {
+    for (const block of frequencyArray) {
+      const start = parseTime(block.start);
+      const end = parseTime(block.end);
+
+      if (now >= start && now <= end) {
+        const interval = block.interval;
+        let minutesSinceStart = Math.floor((now - start) / (60 * 1000));
+        let nextTrainMinutes = Math.ceil(minutesSinceStart / interval) * interval;
+        let nextTrain = new Date(start.getTime() + nextTrainMinutes * 60000);
+
+        if (nextTrain > end) return null;
+
+        const minutesAway = Math.round((nextTrain - now) / 60000);
+        return {
+          time: formatTime(nextTrain),
+          minutes: minutesAway
+        };
+      }
+    }
+    return null;
+  }
+
+  function parseTime(timeStr) {
+    const [h, m] = timeStr.split(":").map(Number);
+    const now = new Date();
+    now.setHours(h, m, 0, 0);
+    return now;
+  }
+
+  function formatTime(date) {
+    let h = date.getHours();
+    let m = date.getMinutes();
+    if (h < 10) h = "0" + h;
+    if (m < 10) m = "0" + m;
+    return `${h}:${m}`;
+  }
+
+  function startVoiceInput() {
+  if (!('webkitSpeechRecognition' in window)) {
+    alert("Voice input is not supported in this browser.");
+    return;
+  }
+
+  const recognition = new webkitSpeechRecognition();
+  recognition.lang = 'en-IN';
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
+
+  const input = document.getElementById("chatInput");
+  input.placeholder = "🎤 Listening...";
+
+  recognition.onstart = () => {
+    console.log("Voice recognition started...");
+  };
+
+  recognition.onresult = (event) => {
+    const transcript = event.results[0][0].transcript;
+    input.value = transcript;
+    input.placeholder = "Type your message...";
+    sendChat();
+  };
+
+  recognition.onerror = (event) => {
+    console.error("Voice recognition error:", event.error);
+    if (event.error === 'no-speech') {
+      input.placeholder = "No speech detected. Try again 🎤";
+    } else {
+      input.placeholder = "Voice error. Try typing...";
+    }
+  };
+
+  recognition.onend = () => {
+    // Reset placeholder if recognition ends without result
+    if (!input.value.trim()) {
+      input.placeholder = "Type your message...";
+    }
+  };
+
+  recognition.start();
+}
+
+
+</script>
+
+</body>
+
+</html>
