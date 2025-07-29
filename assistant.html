@@ -534,7 +534,7 @@
 
       // Initialize map if not already done
       if (!window._leafletMap) {
-        window._leafletMap = L.map("map").setView([lat, lng], 14);
+        window._leafletMap = L.map("map").setView([lat, lng], 12);
         L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
           attribution: "&copy; OpenStreetMap contributors"
         }).addTo(window._leafletMap);
