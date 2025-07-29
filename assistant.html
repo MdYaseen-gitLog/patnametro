@@ -420,6 +420,12 @@
     }
 
     // Add near-station logic
+    // Load your Stations.geojson (same directory or adjust path)
+    let stationsGeojson = {};
+    fetch("data/Stations.geojson")
+      .then(res => res.json())
+      .then(data => { stationsGeojson = data; })
+      .catch(err => console.error("Failed to load Stations.geojson:", err));
 
     let awaitingNearest = false;
 
@@ -433,7 +439,7 @@
         navigator.geolocation.getCurrentPosition(position => {
           const userPoint = turf.point([position.coords.longitude, position.coords.latitude]);
           const nearest = turf.nearestPoint(userPoint, stationsGeojson.features);
-          const stationName = nearest.properties.name || nearest.properties.station || "Station";
+          const stationName = nearest.properties.station_name || "Station";
           // Show map
           renderMap(position.coords.latitude, position.coords.longitude, nearest);
 
@@ -469,7 +475,7 @@
 
       const [stLng, stLat] = nearestFeature.geometry.coordinates;
       window._stationMarker = L.marker([stLat, stLng]).addTo(window._leafletMap)
-        .bindPopup(nearestFeature.properties.name || "Station");
+        .bindPopup(nearestFeature.properties.station_name || "Station");
     }
   </script>
 </body>
