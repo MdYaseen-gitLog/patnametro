@@ -438,18 +438,31 @@
 
         navigator.geolocation.getCurrentPosition(position => {
           const userPoint = turf.point([position.coords.longitude, position.coords.latitude]);
-          const nearest = turf.nearestPoint(userPoint, stationsGeojson.features);
-          const stationName = nearest.properties.station_name || "Station";
-          // Show map
-          renderMap(position.coords.latitude, position.coords.longitude, nearest);
 
-          resolve(`The nearest station is *${stationName}*. 🌐`);
+          // ✅ Create valid point FeatureCollection
+          const stationPoints = turf.featureCollection(
+            stationsGeojson.features.map(f =>
+              turf.point(f.geometry.coordinates, f.properties)
+            )
+          );
+
+          const nearest = turf.nearestPoint(userPoint, stationPoints);
+
+          if (!nearest) {
+            resolve("Could not find any nearby stations.");
+            return;
+          }
+
+          const stationName = nearest.properties.name || nearest.properties.station || "Station";
+          renderMap(position.coords.latitude, position.coords.longitude, nearest);
+          resolve(`The nearest station is <strong>${stationName}</strong>.`);
         }, err => {
           console.error(err);
           resolve("Could not get your location. Please enable GPS access and try again.");
         });
       });
     }
+
 
     function renderMap(lat, lng, nearestFeature) {
       const mapDiv = document.getElementById("map");
