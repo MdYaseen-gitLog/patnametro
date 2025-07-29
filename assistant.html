@@ -242,9 +242,9 @@
       }
 
       // Nearest station query
-      if (lower.includes("nearest station") || lower.includes("nearest metro station")) {
+      if (lower.includes("nearest station") || lower.includes("nearest metro station") || lower.includes("nearest") || lower.includes("nearest metro")) {
         awaitingNearest = true;
-        return "Ensure your GPS or Location is enabled, and I’ll show the nearest station on map.";
+        return "Ensure your GPS or Location is enabled, and I’ll show the nearest station on map.<br> Yes<br>No";
       }
 
       // User confirms location access (yes/gps enabled)
