@@ -241,6 +241,15 @@
         return "Ask me things like:\n• When is the next train from Rajendra Nagar?\n• What is the fare?\n• What is the weather in Patna?";
       }
 
+      // Menu controls using chat
+      // ✅ Auto-open your menu link when user types command
+      if (lower.includes("open map") || lower.includes("metro map") || lower.includes("map")) {
+        chatBox.innerHTML += `<div><strong>Zora:</strong>please wait...</div>`;
+        input.value = "";
+        window.location.href = "metromap.html";  // 🔄 Navigate to local page
+        return;
+      }
+      //*******************
       // Nearest station query
       if (lower.includes("nearest station") || lower.includes("nearest metro station") || lower.includes("nearest") || lower.includes("nearest metro")) {
         awaitingNearest = true;
