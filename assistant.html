@@ -423,8 +423,16 @@ function speakText(text) {
 function stripHtml(html) {
   const div = document.createElement("div");
   div.innerHTML = html;
-  return div.textContent || div.innerText || "";
+  let text = div.textContent || div.innerText || "";
+
+  // Replace underscores, dash with spaces
+  text = text.replace(/[-_]/g, " ");
+
+
+  // Optional: remove extra newlines or trim
+  return text.trim();
 }
+
 
 
 </script>
