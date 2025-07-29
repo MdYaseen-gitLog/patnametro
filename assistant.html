@@ -242,17 +242,60 @@
       }
 
       // Menu controls using chat
-      // ✅ Auto-open your menu link when user types command
-      // ✅ Check if the message should open the external page
-      if (lower.includes("open metro map") || lower.includes("open map")) {
-        //chatBox.innerHTML += `<div><strong>Zora:</strong> Opening Metro Map page...</div>`;
-          // ✅ Use setTimeout to allow the message to render before redirect
+      //Open Map
+      if (lower.includes("open metro map") || lower.includes("open map") || lower.includes("map")) {
         setTimeout(() => {
           window.location.href = "https://www.patnametroroute.in/metromap.html";
         }, 1000); // optional delay so message appears
 
         return "Opening map....";
       }
+
+      //Open About us
+      if (lower.includes("about") || lower.includes("about patna metro")) {
+        setTimeout(() => {
+          window.location.href = "https://www.patnametroroute.in/aboutus.html";
+        }, 1000); // optional delay so message appears
+
+        return "Please wait....";
+      }
+
+      //Open Metro Lines
+      if (lower.includes("metro lines") || lower.includes("lines") || lower.includes("line")) {
+        setTimeout(() => {
+          window.location.href = "https://www.patnametroroute.in/metrolines.html";
+        }, 1000); // optional delay so message appears
+
+        return "Please wait....";
+      }
+
+      //Open Metro Red Line
+      if (lower.includes("red line") || lower.includes("red line map") || lower.includes("redline")) {
+        setTimeout(() => {
+          window.location.href = "https://www.patnametroroute.in/routelineRed.html";
+        }, 1000); // optional delay so message appears
+
+        return "Please wait....";
+      }
+
+      //Open Metro Blue Line
+      if (lower.includes("blue line") || lower.includes("blue line map") || lower.includes("blueline")) {
+        setTimeout(() => {
+          window.location.href = "https://www.patnametroroute.in/routelineBlue.html";
+        }, 1000); // optional delay so message appears
+
+        return "Please wait....";
+      }
+
+      //Open Weather page
+      if (lower.includes("Weather Forecast") || lower.includes("Patna Weather Info")) {
+        setTimeout(() => {
+          window.location.href = "https://www.patnametroroute.in/weather.html";
+        }, 1000); // optional delay so message appears
+
+        return "Please wait....";
+      }
+
       //*******************
       // Nearest station query
       if (lower.includes("nearest station") || lower.includes("nearest metro station") || lower.includes("nearest") || lower.includes("nearest metro")) {
