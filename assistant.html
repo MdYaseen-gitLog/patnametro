@@ -413,9 +413,19 @@ function speakText(text) {
   if ('speechSynthesis' in window) {
     const utter = new SpeechSynthesisUtterance(text);
     utter.lang = 'en-IN';
+    utter.rate = 1;
+    utter.pitch = 1;
+    window.speechSynthesis.cancel(); // stop overlapping
     window.speechSynthesis.speak(utter);
   }
 }
+
+function stripHtml(html) {
+  const div = document.createElement("div");
+  div.innerHTML = html;
+  return div.textContent || div.innerText || "";
+}
+
 
 </script>
 
