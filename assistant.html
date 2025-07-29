@@ -191,6 +191,8 @@
     }
 
     function clearChat() {
+      const mapDiv = document.getElementById("map");
+      mapDiv.style.display = "none";
       document.getElementById("chatMessages").innerHTML = `<div><strong>Zora:</strong> Hi, I’m Zora, your AI assistant.</div>`;
       awaitingStationFor = null;
     }
