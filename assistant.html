@@ -185,6 +185,7 @@
 
     const reply = getZoraReply(message);
     chatBox.innerHTML += `<div><strong>Zora:</strong> ${reply}</div>`;
+    speakText(stripHtml(reply)); // make Zora speak it
     input.value = "";
     setTimeout(() => {
       chatBox.scrollTop = chatBox.scrollHeight;
@@ -408,6 +409,13 @@
   recognition.start();
 }
 
+function speakText(text) {
+  if ('speechSynthesis' in window) {
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.lang = 'en-IN';
+    window.speechSynthesis.speak(utter);
+  }
+}
 
 </script>
 
