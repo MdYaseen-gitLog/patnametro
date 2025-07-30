@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Add Leaflet and Turf.js -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/@turf/turf/turf.min.js"></script>
+
+    <title>Zora Chatbot</title>
+    <style>
+        /* Chat toggle button */
+        .chatbot-container {
+            position: fixed;
+            bottom: 90px;
+            /* Leaves room for the toggle button below */
+            right: 20px;
+            width: 350px;
+            height: 500px;
+            background: white;
+            border-radius: 10px;
+            display: none;
+            flex-direction: column;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            font-family: Arial, sans-serif;
+            z-index: 1001;
+            /* Higher than toggle */
+        }
+
+        .chat-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            font-size: 24px;
+            background-color: #007bff;
+            color: white;
+            border-radius: 50%;
+            z-index: 1000;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        #muteBtn {
+            background-color: #007bff;
+            border: none;
+        }
+
+        .chat-header {
+            background-color: #007bff;
+            color: white;
+            padding: 10px;
+            position: relative;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-close {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 0 5px;
+        }
+
+
+        #chatMessages {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 10px;
+            background: #f7f7f7;
+            font-size: 14px;
+        }
+
+        .chat-input-area {
+            display: flex;
+            padding: 10px;
+            border-top: 1px solid #ddd;
+            gap: 5px;
+        }
+
+        .chat-input-area input[type="text"] {
+            flex-grow: 1;
+            padding: 8px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .chat-input-area button {
+            padding: 4px 8px;
+            font-size: 12px;
+            border: none;
+            background: #007bff;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .chat-input-area button:hover {
+            background: #0056b3;
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 480px) {
+            .chatbot-container {
+                width: 90%;
+                height: 100dvh;
+                /* Dynamic viewport height */
+                max-height: 90dvh;
+                bottom: 0;
+                right: 5%;
+                border-radius: 10px 10px 0 0;
+            }
+        }
+
+        .chat-input-area button:nth-child(2) {
+            background-color: white;
+        }
+
+
+
+        /* Voice listening animation */
+        .listening {
+            animation: pulse 1s infinite;
+            background-color: #d147f8 !important;
+            color: black !important;
+        }
+
+        .voice-button {
+            width: 40px;
+            height: 40px;
+            padding: 0;
+            border: none;
+            background: transparent;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .voice-button.listening {
+            animation: pulsePink 1s infinite;
+            background-color: #d147f8;
+            box-shadow: 0 0 0 0 rgba(209, 71, 248, 0.7);
+        }
+
+        .voice-button img {
+            width: 24px;
+            height: 24px;
+        }
+
+        /* Pulse animation */
+        @keyframes pulse{
+            0% {
+                box-shadow: 0 0 0 0 rgba(209, 71, 248, 0.7);
+            }
+
+            70% {
+                box-shadow: 0 0 0 10px rgba(209, 71, 248, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(209, 71, 248, 0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <button class="chat-toggle" onclick="toggleChatbot()">💬</button>
+
+    <div class="chatbot-container" id="chatbot">
+        <div class="chat-header">
+            Zora - Patna Metro Assistant
+            <button id="muteBtn" onclick="toggleMute()" class="btn btn-primary">🔊</button>
+            <button class="chat-close" onclick="toggleChatbot()">×</button>
+        </div>
+        <div id="chatMessages">
+            <div><strong>Zora:</strong> Hi, I’m Zora, your AI assistant.</div>
+        </div>
+        <div id="map" style="height: 200px; border-top: 1px solid #ddd; display: none;"></div>
+        <div class="chat-input-area">
+            <input type="text" id="chatInput" placeholder="Type your message...">
+            <button id="voiceBtn" onclick="startVoiceInput()" class="voice-button">
+                <img src="data/icons/chatmic.png" alt="mic" width="24" height="24">
+            </button>
+            <button onclick="sendChat()">Send</button>
+            <button onclick="clearChat()">Clear</button>
+        </div>
+
+    </div>
+
+    <script>
+        let awaitingStationFor = null;
+        let scheduleData = {};
+        const OPENWEATHER_API_KEY = "e8d83feabbee14a0c1323f56e4c48145"; // 🔐 Replace this
+
+        const terminalStations = {
+            'East': 'Khemni Chak',
+            'West': 'Danapur',
+            'North': 'Patna_Junction Blue_Line',
+            'South': 'New ISBT'
+        };
+
+        // Load JSON schedule
+        fetch("data/schedule_both_directions.json")
+            .then(response => response.json())
+            .then(data => { scheduleData = data; })
+            .catch(err => console.error("Failed to load schedule:", err));
+
+        function toggleChatbot() {
+            const bot = document.getElementById("chatbot");
+            bot.style.display = bot.style.display === 'none' || bot.style.display === '' ? 'flex' : 'none';
+        }
+
+        async function sendChat() {
+            const input = document.getElementById("chatInput");
+            const message = input.value.trim();
+            if (!message) return;
+
+            const chatBox = document.getElementById("chatMessages");
+            chatBox.innerHTML += `<div><strong>You:</strong> ${message}</div>`;
+
+            const reply = await getZoraReply(message);
+            chatBox.innerHTML += `<div><strong>Zora:</strong> ${reply}</div>`;
+            speakText(stripHtml(reply));
+            input.value = "";
+            setTimeout(() => {
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }, 100);
+        }
+
+        function clearChat() {
+            const mapDiv = document.getElementById("map");
+            mapDiv.style.display = "none";
+            document.getElementById("chatMessages").innerHTML = `<div><strong>Zora:</strong> Hi, I’m Zora, your AI assistant.</div>`;
+            awaitingStationFor = null;
+        }
+        const lineStations = {
+            red: [
+                "Danapur", "Saguna Mor", "RPS Mor", "Patliputra", "Rukanpura",
+                "Raja Bazar", "Patna Zoo", "Vikas Bhawan", "Vidyut Bhawan",
+                "Patna_Junction Red_Line", "Mithapur", "Ramkrishna Nagar",
+                "Jaganpura", "Khemni_Chak Red_Line"
+            ],
+            blue: [
+                "Patna_Junction Blue_Line", "Akashvani", "Gandhi Maidan", "PMCH",
+                "University", "Moin-ul-Haq Stadium", "Rajendra Nagar", "Malahi Pakri",
+                "Khemni_Chak Blue_Line", "Bhootnath", "Zero Mile", "New ISBT"
+            ]
+        };
+
+
+        const travData = {
+            "Danapur>Saguna Mor": { time: 1, distance: 2.5 },
+            "Saguna Mor>RPS Mor": { time: 1, distance: 1.8 },
+            "RPS Mor>Patliputra": { time: 1, distance: 2.0 },
+            "Patliputra>Rukanpura": { time: 3, distance: 4.0 },
+            "Rukanpura>Raja Bazar": { time: 3, distance: 3.5 },
+            "Raja Bazar>Patna Zoo": { time: 2, distance: 2.2 },
+            "Patna Zoo>Vikas Bhawan": { time: 2, distance: 1.9 },
+            "Vikas Bhawan>Vidyut Bhawan": { time: 2, distance: 2.1 },
+            "Vidyut Bhawan>Patna_Junction Red_Line": { time: 2, distance: 2.6 },
+            "Patna_Junction Red_Line>Mithapur": { time: 4, distance: 5.0 },
+            "Mithapur>Ramkrishna Nagar": { time: 1, distance: 1.2 },
+            "Ramkrishna Nagar>Jaganpura": { time: 1, distance: 1.3 },
+            "Jaganpura>Khemni_Chak Red_Line": { time: 1, distance: 1.5 },
+
+            "Patna_Junction Blue_Line>Akashvani": { time: 1, distance: 1.0 },
+            "Akashvani>Gandhi Maidan": { time: 2, distance: 2.0 },
+            "Gandhi Maidan>PMCH": { time: 2, distance: 2.2 },
+            "PMCH>University": { time: 2, distance: 2.5 },
+            "University>Moin-ul-Haq Stadium": { time: 3, distance: 3.2 },
+            "Moin-ul-Haq Stadium>Rajendra Nagar": { time: 2, distance: 2.1 },
+            "Rajendra Nagar>Malahi Pakri": { time: 2, distance: 2.0 },
+            "Malahi Pakri>Khemni_Chak Blue_Line": { time: 2, distance: 2.3 },
+            "Khemni_Chak Blue_Line>Bhootnath": { time: 2, distance: 2.2 },
+            "Bhootnath>Zero Mile": { time: 2, distance: 2.4 },
+            "Zero Mile>New ISBT": { time: 3, distance: 3.0 }
+        };
+
+
+
+        const metroGraph = {};
+
+        for (let key in travData) {
+            const [from, to] = key.split(">");
+            if (!metroGraph[from]) metroGraph[from] = [];
+            if (!metroGraph[to]) metroGraph[to] = [];
+
+            const edge = travData[key];
+            //console.log(edge);
+            metroGraph[from].push({ station: to, ...edge });
+            metroGraph[to].push({ station: from, ...edge }); // Bidirectional
+        }
+
+        async function getZoraReply(msg) {
+            const lower = msg.toLowerCase();
+
+
+
+            // ✅ General Questions
+            if (lower.includes("your name")) return "My name is Zora, your Metro Assistant!";
+            if (lower.includes("friend")) return "My friend name is Haya Perveen";
+            if (lower.includes("country")) return "I am from India";
+            if (lower.includes("state")) return "I am from Bihar";
+            if (lower.includes("city")) return "I am from capital of bihar Patna, now a metro city.";
+            if (lower.includes("age")) return "I don’t have an age like a person, but I was created by a developer and first released to the public in 15 August 2025. So if you’re asking how long I’ve been around—technically, about  1 months as of now.";
+            if (lower.includes("gender")) return "I don’t have a gender—I’m just an AI designed to assist with information about patna metro journey.";
+            if (lower.includes("you are a robot")) return "Sort of! I'm not a robot with a body, like something walking around with wires and limbs. I'm a virtual AI—a program that exists in the digital world. You can think of me more like a super-advanced chatbot or assistant that lives in the cloud, not in a machine.";
+            if (lower.includes("who are you")) return "I'm Zora, an AI here to help you with the metro system.";
+            if (lower.includes("how are you")) return "I'm always great! Ready to assist you!";
+            if (lower.includes("thank")) return "You're welcome! Heehii..Heehii...Heehii....";
+            if (lower.includes("bye")) return "Goodbye! Have a safe journey.";
+            if (lower.includes("what can you do")) return "I can help with train schedules, fares, and station details.";
+            if (lower.includes("joke")) return "Why don’t trains ever get lost? Because they always follow their tracks! 🚆";
+            if (lower.includes("time now")) return `It's currently ${new Date().toLocaleTimeString()}.`;
+            if (lower.includes("date") || lower.includes("day")) return `Today is ${new Date().toDateString()}.`;
+
+
+            // ✅ Show All Stations
+            if (lower.includes("all stations") || lower.includes("stations list") || lower === "stations") {
+                return `<strong>Red Line Stations:</strong><br>${lineStations.red.join("<br> ")}<br><br>
+          <strong>Blue Line Stations:</strong><br>${lineStations.blue.join("<br> ")}`;
+            }
+
+            // ✅ Red Line stations
+            if (lower.includes("red line stations") || lower.includes("red stations")) {
+                return `<strong>Red Line Stations:</strong><br>${lineStations.red.join("<br> ")}`;
+            }
+
+            // ✅ Blue Line stations
+            if (lower.includes("blue line stations") || lower.includes("blue stations")) {
+                return `<strong>Blue Line Stations:</strong><br>${lineStations.blue.join("<br> ")}`;
+            }
+            // ✅ Travel time/distance between stations
+            if (lower.includes("from") && lower.includes("to")) {
+                const parts = lower.toLowerCase().split("from")[1].split("to");
+                const rawFrom = parts[0].trim();
+                const rawTo = parts[1].trim();
+
+                const fromStation = findStationKey(rawFrom);
+                const toStation = findStationKey(rawTo);
+                console.log(fromStation);
+                console.log(toStation);
+                if (!fromStation || !toStation) {
+                    return `I couldn't recognize one or both stations: "${rawFrom}", "${rawTo}"`;
+                }
+
+                const route = findShortestRoute(fromStation, toStation);
+
+                if (!route) {
+                    return `No valid route found from <strong>${fromStation}</strong> to <strong>${toStation}</strong>.`;
+                }
+
+                return `Route from <strong>${fromStation}</strong> to <strong>${toStation}</strong>:<br>
+     <strong>Time:</strong> ${route.time} min<br>
+     <strong>Distance:</strong> ${route.distance.toFixed(1)} km<br>
+     <strong>Stations between route:</strong> ${route.path.join(" → ")}<br>`;
+            }
+
+
+
+            // ✅ Weather
+            if (lower.includes("weather") || lower.includes("temperature") || lower.includes("raining")) {
+                return await getWeather("Patna"); // Replace or extend for dynamic city support
+            }
+
+            // ✅ Greetings
+            if (["hii", "hello", "hey", "good morning", "good evening", "good night"].some(g => lower.includes(g))) {
+                return getGreeting();
+            }
+
+            // ✅ Metro-specific triggers
+            if (lower.includes("first train")) {
+                awaitingStationFor = "first_train";
+                return "What station are you boarding from?";
+            }
+            if (lower.includes("last train")) {
+                awaitingStationFor = "last_train";
+                return "What station are you boarding from?";
+            }
+            if (lower.includes("next train")) {
+                // Check if user included 'from <station>'
+                const fromIndex = lower.indexOf("from ");
+                if (fromIndex !== -1) {
+                    // Extract station name after "from "
+                    const stationName = msg.substring(fromIndex + 5).trim();
+                    const stationKey = findStationKey(stationName);
+                    if (!stationKey) {
+                        return `I couldn’t find a station matching "${stationName}".`;
+                    }
+                    // Prepare next train response immediately
+                    const now = new Date();
+                    const directions = scheduleData[stationKey].directions;
+                    let res = `<strong>Next train from ${stationKey}:</strong><br>`;
+                    for (let dir in directions) {
+                        const next = findNextTrainTime(directions[dir].frequency, now);
+                        const dirName = terminalStations[dir] || dir;
+                        res += next ? `Towards ${dirName}: ${next.time} (in ${next.minutes} min)<br>` : `• ${dirName}: No more trains<br>`;
+                    }
+                    return res;
+                } else {
+                    // No station provided yet, ask for it
+                    awaitingStationFor = "next_train";
+                    return "What station are you boarding from?";
+                }
+            }
+
+            function cleanStationInput(input) {
+                return input
+                    .toLowerCase()
+                    .replace(/\b(station|stations|stn)\b/g, '')  // remove these words as whole words
+                    .replace(/\s+/g, ' ')                         // collapse multiple spaces to one
+                    .trim();
+            }
+
+            if (lower.includes("fare")) {
+                return "Minimum fare is ₹10, maximum is ₹50.";
+            }
+            if (lower.includes("help")) {
+                return "Ask me things like:\n• When is the next train from Rajendra Nagar?\n• What is the fare?\n• What is the weather in Patna?";
+            }
+
+            // Menu controls using chat
+            //Open Map
+            if (lower.includes("open metro map") || lower.includes("open map") || lower.includes("map")) {
+                setTimeout(() => {
+                    window.location.href = "https://www.patnametroroute.in/metromap.html";
+                }, 1000); // optional delay so message appears
+
+                return "Opening map....";
+            }
+
+            //Open About us
+            if (lower.includes("about") || lower.includes("about patna metro")) {
+                setTimeout(() => {
+                    window.location.href = "https://www.patnametroroute.in/aboutus.html";
+                }, 1000); // optional delay so message appears
+
+                return "Please wait....";
+            }
+
+            //Open Metro Lines
+            if (lower.includes("metro lines") || lower.includes("metro line") || lower.includes("Station info") || lower.includes("Stations")) {
+                setTimeout(() => {
+                    window.location.href = "https://www.patnametroroute.in/metrolines.html";
+                }, 1000); // optional delay so message appears
+
+                return "Please wait....";
+            }
+
+            //Open Metro Red Line
+            if (lower.includes("red line") || lower.includes("red line map") || lower.includes("redline")) {
+                setTimeout(() => {
+                    window.location.href = "https://www.patnametroroute.in/routelineRed.html";
+                }, 1000); // optional delay so message appears
+
+                return "Please wait....";
+            }
+
+            //Open Metro Blue Line
+            if (lower.includes("blue line") || lower.includes("blue line map") || lower.includes("blueline")) {
+                setTimeout(() => {
+                    window.location.href = "https://www.patnametroroute.in/routelineBlue.html";
+                }, 1000); // optional delay so message appears
+
+                return "Please wait....";
+            }
+
+            //Open Weather page
+            if (lower.includes("Forecast")) {
+                setTimeout(() => {
+                    window.location.href = "https://www.patnametroroute.in/weather.html";
+                }, 1000); // optional delay so message appears
+
+                return "Please wait....";
+            }
+
+            //*******************
+            // Nearest station query
+            if (lower.includes("nearest station") || lower.includes("nearest metro station") || lower.includes("nearest") || lower.includes("nearest metro") || lower.includes("locate") || lower.includes("locate me")) {
+                awaitingNearest = true;
+                return "Ensure your GPS or Location is enabled, and I’ll show the nearest station on map.<br> Yes<br>No";
+            }
+
+            // User confirms location access (yes/gps enabled)
+            if (awaitingNearest && (
+                lower.includes("location enabled") ||
+                lower.includes("gps") ||
+                lower.includes("yes") ||
+                lower.includes("enabled")
+            )) {
+                awaitingNearest = false;  // reset flag
+                return await respondWithNearestStation(); // trigger location
+            }
+
+            // (optional) user says "show station" after enabling GPS
+            if (lower.includes("show station") && awaitingNearest) {
+                awaitingNearest = false;
+                return await respondWithNearestStation();
+            }
+
+            // ✅ Station follow-up
+            if (awaitingStationFor) {
+                const stationKey = findStationKey(msg);
+                if (!stationKey) {
+                    awaitingStationFor = null;
+                    return `I couldn’t find a station matching "${msg}".`;
+                }
+
+                const directions = scheduleData[stationKey].directions;
+
+                if (awaitingStationFor === "next_train") {
+                    const now = new Date();
+                    let res = `<strong>Next train from ${stationKey}:</strong><br>`;
+                    for (let dir in directions) {
+                        const next = findNextTrainTime(directions[dir].frequency, now);
+                        const dirName = terminalStations[dir] || dir;
+                        res += next ? `Towards ${dirName}: ${next.time} (in ${next.minutes} min)<br>` : `• ${dirName}: No more trains<br>`;
+                    }
+                    awaitingStationFor = null;
+                    return res;
+                }
+
+                // First or last train
+                let res = `<strong>${capitalizeFirst(awaitingStationFor)} train from ${stationKey}:</strong><br>`;
+                for (let dir in directions) {
+                    const time = directions[dir][awaitingStationFor];
+                    if (time) {
+                        const dirName = terminalStations[dir] || dir;
+                        res += `• ${dirName}: ${time}<br>`;
+                    }
+                }
+                awaitingStationFor = null;
+                return res;
+            }
+
+            // ✅ Station query (direct)
+            const stationKey = findStationKey(msg);
+            if (stationKey) {
+                const now = new Date();
+                const directions = scheduleData[stationKey].directions;
+                let res = `<strong>Next train from ${stationKey}:</strong><br>`;
+                for (let dir in directions) {
+                    const next = findNextTrainTime(directions[dir].frequency, now);
+                    const dirName = terminalStations[dir] || dir;
+                    res += next ? `Towards ${dirName}: ${next.time} (in ${next.minutes} min)<br>` : `• ${dirName}: No more trains<br>`;
+                }
+                return res;
+            }
+
+            return `I'm not sure how to answer that. Try asking:
+• "When is the next train from Rajendra Nagar?"
+• "What is the fare?"
+• "What is the weather in Patna?"`;
+        }
+
+        async function getWeather(cityName) {
+            try {
+                const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${OPENWEATHER_API_KEY}&units=metric`);
+                const data = await res.json();
+                if (data.cod !== 200) return `Couldn't fetch weather for ${cityName}.`;
+
+                const { temp, feels_like, humidity } = data.main;
+                const description = data.weather[0].description;
+                return `The weather in ${cityName} is ${description}, ${temp}°C (feels like ${feels_like}°C), humidity: ${humidity}%.`;
+            } catch (err) {
+                return "Sorry, I couldn’t fetch the weather.";
+            }
+        }
+
+        function findStationKey(input) {
+            const term = input.toLowerCase();
+            const exact = Object.keys(scheduleData).find(key => key.toLowerCase() === term);
+            return exact || Object.keys(scheduleData).find(key => key.toLowerCase().includes(term));
+        }
+
+        function getGreeting() {
+            const h = new Date().getHours();
+            if (h < 12) return "Good morning! 🌅";
+            if (h < 17) return "Good afternoon! ☀️";
+            if (h < 21) return "Good evening! 🌇";
+            return "Good night! 🌙";
+        }
+
+        function capitalizeFirst(text) {
+            return text.includes("first") ? "First" :
+                text.includes("last") ? "Last" :
+                    text.includes("next") ? "Next" : text;
+        }
+
+        function findNextTrainTime(freqArray, now) {
+            for (const block of freqArray) {
+                const start = parseTime(block.start);
+                const end = parseTime(block.end);
+                if (now >= start && now <= end) {
+                    const interval = block.interval;
+                    let mins = Math.ceil((now - start) / 60000 / interval) * interval;
+                    const nextTrain = new Date(start.getTime() + mins * 60000);
+                    if (nextTrain > end) return null;
+                    const minutesAway = Math.round((nextTrain - now) / 60000);
+                    return { time: formatTime(nextTrain), minutes: minutesAway };
+                }
+            }
+            return null;
+        }
+
+        function parseTime(str) {
+            const [h, m] = str.split(":").map(Number);
+            const d = new Date();
+            d.setHours(h, m, 0, 0);
+            return d;
+        }
+
+        function formatTime(d) {
+            return `${d.getHours().toString().padStart(2, "0")}:${d.getMinutes().toString().padStart(2, "0")}`;
+        }
+
+        function startVoiceInput() {
+            const micBtn = event.target;
+            micBtn.classList.add("listening");
+
+            if (!('webkitSpeechRecognition' in window)) {
+                alert("Voice input is not supported in this browser.");
+                micBtn.classList.remove("listening");
+                return;
+            }
+
+            const recog = new webkitSpeechRecognition();
+            recog.lang = 'en-IN';
+            recog.interimResults = false;
+            recog.maxAlternatives = 1;
+
+            const input = document.getElementById("chatInput");
+            input.placeholder = "🎤 Listening...";
+
+            recog.onresult = (event) => {
+                input.value = event.results[0][0].transcript;
+                input.placeholder = "Type your message...";
+                micBtn.classList.remove("listening");
+                sendChat();
+            };
+
+            recog.onerror = (e) => {
+                micBtn.classList.remove("listening");
+                const input = document.getElementById("chatInput");
+
+                if (e.error === "no-speech") {
+                    input.placeholder = "No voice detected. Try again...";
+                    console.warn("🎤 No speech detected. Please speak clearly.");
+                } else {
+                    input.placeholder = "Voice error. Try typing...";
+                    console.error("Speech recognition error:", e);
+                    alert(e);
+                }
+            };
+
+
+            recog.onend = () => {
+                if (!input.value.trim()) input.placeholder = "Type your message...";
+                micBtn.classList.remove("listening");
+            };
+
+            recog.start();
+        }
+
+
+        let isMuted = false;
+
+        function toggleMute() {
+            isMuted = !isMuted;
+            const btn = document.getElementById("muteBtn");
+            btn.innerText = isMuted ? "🔇" : "🔊";
+
+            // 🔇 Stop speech immediately when muted
+            if (isMuted && window.speechSynthesis.speaking) {
+                window.speechSynthesis.cancel();
+            }
+        }
+
+
+        // Override speakText to respect mute
+        function speakText(text) {
+            if (isMuted || !('speechSynthesis' in window)) return;
+            const utter = new SpeechSynthesisUtterance(text);
+            utter.lang = 'en-IN';
+            window.speechSynthesis.cancel(); // Optional: cancel any previous speech
+            window.speechSynthesis.speak(utter);
+        }
+
+
+
+        function stripHtml(html) {
+            const div = document.createElement("div");
+            div.innerHTML = html;
+            const text = div.textContent || div.innerText || "";
+            return text.replace(/[-_]/g, '');  // remove hyphens and underscores
+        }
+
+
+        function findShortestRoute(from, to) {
+            const visited = new Set();
+            const queue = [{ station: from, path: [from], time: 0, distance: 0 }];
+
+            while (queue.length) {
+                const current = queue.shift();
+                const { station, path, time, distance } = current;
+
+                if (station === to) {
+                    return { path, time, distance };
+                }
+
+                if (visited.has(station)) continue;
+                visited.add(station);
+
+                for (const neighbor of metroGraph[station] || []) {
+                    if (!visited.has(neighbor.station)) {
+                        queue.push({
+                            station: neighbor.station,
+                            path: [...path, neighbor.station],
+                            time: time + neighbor.time,
+                            distance: distance + neighbor.distance
+                        });
+                    }
+                }
+            }
+
+            return null; // No route found
+        }
+
+
+
+        // Add near-station logic
+        // Load your Stations.geojson (same directory or adjust path)
+        let stationsGeojson = {};
+        fetch("data/Stations.geojson")
+            .then(res => res.json())
+            .then(data => { stationsGeojson = data; })
+            .catch(err => console.error("Failed to load Stations.geojson:", err));
+
+        let awaitingNearest = false;
+
+        async function respondWithNearestStation() {
+            return new Promise((resolve) => {
+                if (!navigator.geolocation) {
+                    resolve("Geolocation is not supported in your browser.");
+                    return;
+                }
+
+                navigator.geolocation.getCurrentPosition(position => {
+                    const userPoint = turf.point([position.coords.longitude, position.coords.latitude]);
+
+                    // ✅ Create valid point FeatureCollection
+                    const stationPoints = turf.featureCollection(
+                        stationsGeojson.features.map(f =>
+                            turf.point(f.geometry.coordinates, f.properties)
+                        )
+                    );
+
+                    const nearest = turf.nearestPoint(userPoint, stationPoints);
+
+                    if (!nearest) {
+                        resolve("Could not find any nearby stations.");
+                        return;
+                    }
+
+                    const stationName = nearest.properties.station_name || "Station";
+                    renderMap(position.coords.latitude, position.coords.longitude, nearest);
+                    resolve(`The nearest station is <strong>${stationName}</strong>.`);
+                }, err => {
+                    console.error(err);
+                    resolve("Could not get your location. Please enable GPS access and try again.");
+                });
+            });
+        }
+
+
+        function renderMap(lat, lng, nearestFeature) {
+            const mapDiv = document.getElementById("map");
+            mapDiv.style.display = "block";
+
+            // Initialize map if not already done
+            if (!window._leafletMap) {
+                window._leafletMap = L.map("map").setView([lat, lng], 12);
+                L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+                    attribution: "&copy; OpenStreetMap contributors"
+                }).addTo(window._leafletMap);
+            } else {
+                window._leafletMap.setView([lat, lng], 14);
+            }
+
+            // Clear old markers
+            if (window._stationMarker) window._stationMarker.remove();
+            if (window._userMarker) window._userMarker.remove();
+
+            // Add markers
+            window._userMarker = L.marker([lat, lng]).addTo(window._leafletMap)
+                .bindPopup("You are here").openPopup();
+
+            const [stLng, stLat] = nearestFeature.geometry.coordinates;
+            window._stationMarker = L.marker([stLat, stLng]).addTo(window._leafletMap)
+                .bindPopup(nearestFeature.properties.station_name || "Station");
+        }
+
+
+        document.getElementById("chatInput").addEventListener("keydown", function (event) {
+            if (event.key === "Enter") {
+                event.preventDefault(); // Prevent default form submission or newline
+                sendChat();
+            }
+        });
+
+    </script>
+
+</body>
+
+</html>
