@@ -952,6 +952,15 @@
                 const from = document.getElementById("sourceStation").value;
                 const to = document.getElementById("destStation").value;
 
+     // 🔹 ✅ Send custom event to Google Analytics
+        gtag('event', 'start_journey', {
+            event_category: 'engagement',
+            event_label: 'Start Journey Form Submitted',
+            source_station: from,
+            destination_station: to,
+            timestamp: new Date().toISOString()
+        });
+
                 //  addTrackToMap();//top of the selected route line
                 drawRouteBetween(from, to);
                 addRaster();
