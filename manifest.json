@@ -1,5 +1,5 @@
 {
-  "version": "1.0.5",
+  "version": "1.0.6",
   "name": "Patna Metro Route Finder",
   "short_name": "PMet",
   "start_url": "/",
@@ -43,6 +43,7 @@
 
   ]
 }
+
 
 
 
