@@ -946,9 +946,10 @@
             });
         });
 
-                // Function to get the first 3 words
-        function getFirstThreeWords(text) {
-            return text.split(/\s+/).slice(0, 3).join(" ");
+        // Function to get the first 3 words from the selected text
+        function getFirstThreeCharacters(text) {
+            // Trim the text to remove leading/trailing spaces and return the first 3 characters
+            return text.trim().slice(0, 3).toUpperCase();
         }
         
         stationForm.addEventListener("submit", e => {
@@ -957,13 +958,14 @@
                 const from = document.getElementById("sourceStation").value;
                 const to = document.getElementById("destStation").value;
 
-                const fromText = document.getElementById("sourceStation").selectedOptions[0].textContent;
-                const toText = document.getElementById("destStation").selectedOptions[0].textContent;
+                const fromText = document.getElementById("sourceStation").selectedOptions[0].textContent.trim();
+                const toText = document.getElementById("destStation").selectedOptions[0].textContent.trim();
 
-                const fromShort = getFirstThreeWords(fromText);
-                const toShort = getFirstThreeWords(toText);
-                // Combine into a single parameter
-                const journeySummary = '${fromShort} → ${toShort}';
+                const fromShort = getFirstThreeCharacters(fromText);
+                const toShort = getFirstThreeCharacters(toText);
+
+                const journeySummary = `${fromShort} → ${toShort}`;
+                console.log('Journey Summary:', journeySummary); // Debug output
 
                 // 🔹 ✅ Send custom event to Google Analytics
                 gtag('event', 'start_journey', {
