@@ -349,6 +349,9 @@
     </div>
 
     <script>
+        if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
+    document.getElementById('zoraContainer').style.display = 'block';
+}
         document.getElementById('zoraBtn').addEventListener('click', function () {
             document.getElementById('zoraMsg').style.display = 'block';
         });
