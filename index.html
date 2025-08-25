@@ -303,6 +303,63 @@
         style="display:none;position:fixed;bottom:20px;right:20px;padding:10px 20px;font-size:16px;border:none;border-radius:8px;background-color:#1976d2;color:white;box-shadow:0 4px 6px rgba(0,0,0,0.2);z-index:1000;">
         📲 Install App
     </button>
+<!-- Chatbot Button -->
+    <div id="zoraContainer" style="position: fixed; bottom: 20px; right: 20px;">
+        <button id="zoraBtn" style="
+        background: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 50px;
+        padding: 14px 20px;
+        font-size: 16px;
+        cursor: pointer;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
+            💬 Chatbot
+        </button>
+
+        <!-- Message Box (hidden initially) -->
+        <div id="zoraMsg" style="
+        display: none;
+        position: absolute;
+        bottom: 60px;
+        right: 0;
+        background: #fff7d1;
+        border: 1px solid #ffcc00;
+        border-radius: 10px;
+        padding: 12px 14px;
+        width: 240px;
+        font-family: Arial, sans-serif;
+        font-size: 14px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);">
+            🚧 Chatbot is in <strong>beta</strong> — <a href="chatbot_help.html" target="_blank"
+                style="color:#007bff;">Read the User Guide</a> before using.
+            <div style="margin-top:8px; text-align:right;">
+                <button id="closeMsg" style="
+            background:#007bff;
+            color:#fff;
+            border:none;
+            padding:4px 8px;
+            border-radius:6px;
+            cursor:pointer;
+            font-size:12px;">
+                    OK
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('zoraBtn').addEventListener('click', function () {
+            document.getElementById('zoraMsg').style.display = 'block';
+        });
+
+        document.getElementById('closeMsg').addEventListener('click', function () {
+            document.getElementById('zoraMsg').style.display = 'none';
+            // Here you can trigger chatbot open instead of hiding message
+        });
+    </script>
+    <!-- Chatbot Button -->
+    
     <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
         <div class="container-fluid">
