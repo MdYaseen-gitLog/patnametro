@@ -293,16 +293,40 @@
             font-size: 28px;
 
         }
+
+        #installBtn {
+  display: none;
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 8px;
+  background-color: #1976d2;
+  color: white;
+  box-shadow: 0 0 15px rgba(25, 118, 210, 0.8);
+  z-index: 1000;
+  transition: box-shadow 0.3s ease, background-color 0.3s ease;
+}
+
+#installBtn:hover {
+  background-color: #1565c0;
+  box-shadow: 0 0 20px rgba(25, 118, 210, 1);
+}
+
     </style>
 
 
 </head>
 
 <body>
-    <button id="installBtn"
-        style="display:none;position:fixed;bottom:20px;right:20px;padding:10px 20px;font-size:16px;border:none;border-radius:8px;background-color:#1976d2;color:white;box-shadow:0 4px 6px rgba(0,0,0,0.2);z-index:1000;">
+    <button id="installBtn">
         📲 Install App
     </button>
+    <!-- 
+    style="display:none;position:fixed;bottom:20px;right:20px;padding:10px 20px;font-size:16px;border:none;border-radius:8px;background-color:#1976d2;color:white;box-shadow:0 4px 6px rgba(0,0,0,0.2);z-index:1000;"
+    -->
 <!-- Chatbot Button -->
     <div id="zoraContainer" style="display:none; position: fixed; bottom: 20px; right: 20px;">
         <button id="zoraBtn" style="
