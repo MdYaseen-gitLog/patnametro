@@ -294,7 +294,7 @@
 
         }
 
-        #installBtn {
+   #installBtn {
   display: none;
   position: fixed;
   bottom: 20px;
@@ -305,15 +305,23 @@
   border-radius: 8px;
   background-color: #1976d2;
   color: white;
-  box-shadow: 0 0 15px rgba(25, 118, 210, 0.8);
   z-index: 1000;
-  transition: box-shadow 0.3s ease, background-color 0.3s ease;
+  animation: glowPulse 1.5s infinite alternate;
+}
+
+@keyframes glowPulse {
+  0% {
+    box-shadow: 0 0 10px rgba(25, 118, 210, 0.6);
+  }
+  100% {
+    box-shadow: 0 0 20px rgba(25, 118, 210, 1);
+  }
 }
 
 #installBtn:hover {
   background-color: #1565c0;
-  box-shadow: 0 0 20px rgba(25, 118, 210, 1);
 }
+
 
     </style>
 
