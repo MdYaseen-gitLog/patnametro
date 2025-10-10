@@ -1907,10 +1907,13 @@
     </footer>
 
     <script>
-        window.addEventListener('load', () => {
-            const myModal = new bootstrap.Modal(document.getElementById('startupWarningModal'));
-            myModal.show();
-        });
+        if (!(window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone)) {
+            window.addEventListener('load', () => {
+                const myModal = new bootstrap.Modal(document.getElementById('startupWarningModal'));
+                myModal.show();
+            });
+        }
+
     </script>
     <script>
         if ('serviceWorker' in navigator) {
