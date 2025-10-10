@@ -294,36 +294,34 @@
 
         }
 
-  #installBtn {
-  display: none;
-  position: fixed;
-  bottom: 20px;
-  left: 20px;
-  padding: 10px 20px;
-  font-size: 16px;
-  border: none;
-  border-radius: 8px;
-  background-color: #1976d2;
-  color: white;
-  z-index: 1000;
-  animation: glowPulse 0.8s infinite alternate;
-}
+        #installBtn {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            background-color: #1976d2;
+            color: white;
+            z-index: 1000;
+            animation: glowPulse 0.8s infinite alternate;
+        }
 
-@keyframes glowPulse {
-  0% {
-    box-shadow: 0 0 15px rgba(255, 255, 0, 0.6);
-  }
-  100% {
-    box-shadow: 0 0 35px rgba(255, 255, 0, 1);
-  }
-}
+        @keyframes glowPulse {
+            0% {
+                box-shadow: 0 0 15px rgba(255, 255, 0, 0.6);
+            }
 
-#installBtn:hover {
-  background-color: #1565c0;
-}
+            100% {
+                box-shadow: 0 0 35px rgba(255, 255, 0, 1);
+            }
+        }
 
-
-
+        #installBtn:hover {
+            background-color: #1565c0;
+        }
     </style>
 
 
@@ -336,7 +334,7 @@
     <!-- 
     style="display:none;position:fixed;bottom:20px;right:20px;padding:10px 20px;font-size:16px;border:none;border-radius:8px;background-color:#1976d2;color:white;box-shadow:0 4px 6px rgba(0,0,0,0.2);z-index:1000;"
     -->
-<!-- Chatbot Button -->
+    <!-- Chatbot Button -->
     <div id="zoraContainer" style="display:none; position: fixed; bottom: 20px; right: 20px;">
         <button id="zoraBtn" style="
         background: #007bff;
@@ -383,8 +381,8 @@
 
     <script>
         if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
-    document.getElementById('zoraContainer').style.display = 'block';
-}
+            document.getElementById('zoraContainer').style.display = 'block';
+        }
         document.getElementById('zoraBtn').addEventListener('click', function () {
             document.getElementById('zoraMsg').style.display = 'block';
         });
@@ -395,7 +393,7 @@
         });
     </script>
     <!-- Chatbot Button -->
-    
+
     <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
         <div class="container-fluid">
@@ -1047,7 +1045,7 @@
             // Trim the text to remove leading/trailing spaces and return the first 3 characters
             return text.trim().slice(0, 7).toUpperCase();
         }
-        
+
         stationForm.addEventListener("submit", e => {
             if (validateDuplicateStations('sourceStation', 'destStation')) {
                 e.preventDefault();

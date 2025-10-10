@@ -179,6 +179,8 @@
 </head>
 
 <body>
+    <button id="shareBtn">🔗 Share App</button>
+
     <button class="chat-toggle" onclick="toggleChatbot()">💬</button>
 
     <div class="chatbot-container" id="chatbot">
@@ -202,6 +204,20 @@
 
     </div>
 
+    <script>
+    document.getElementById('shareBtn').addEventListener('click', async () => {
+      if (navigator.share) {
+        await navigator.share({
+          title: 'Patna Metro Route App',
+          text: 'Check out the Patna Metro Route PWA!',
+          url: 'https://www.patnametroroute.in/'
+        });
+      } else {
+        alert("Sharing not supported on this browser. Copy link: https://www.patnametroroute.in/");
+      }
+    });
+
+    </script>
     <script>
         let awaitingStationFor = null;
         let scheduleData = {};
