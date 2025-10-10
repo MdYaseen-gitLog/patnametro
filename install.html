@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Install Patna Metro Route App</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#004AAD">
+
+    <style>
+        body {
+            background: linear-gradient(180deg, #004AAD, #0077FF);
+            color: white;
+            font-family: "Poppins", sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        img.logo {
+            width: 100px;
+            border-radius: 20%;
+            margin-bottom: 15px;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+        }
+
+        h1 {
+            font-size: 22px;
+            margin-bottom: 10px;
+        }
+
+        p {
+            font-size: 15px;
+            margin: 0 20px 20px 20px;
+            color: #e0e0e0;
+        }
+
+        button {
+            background: white;
+            color: #004AAD;
+            border: none;
+            border-radius: 30px;
+            padding: 12px 30px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            animation: pulse 1.5s infinite;
+            margin-top: 10px;
+        }
+
+        button[disabled] {
+            background: #ccc;
+            color: #555;
+            animation: none;
+            cursor: default;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.6);
+            }
+
+            70% {
+                box-shadow: 0 0 0 15px rgba(255, 255, 255, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+            }
+        }
+
+        .qr-box {
+            background: white;
+            border-radius: 16px;
+            padding: 12px;
+            margin-top: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .qr-box img {
+            width: 160px;
+            height: 160px;
+            display: block;
+            margin: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <img src="data/icons/icon-192.png" alt="PMet Logo" class="logo">
+    <h1>Install Patna Metro Route App</h1>
+    <p>Access live metro routes, fares, and offline mode. Tap install below or scan the QR to share with friends.</p>
+
+    <button id="installBtn">📲 Install Now</button>
+    <br>
+    <p>Scan to open<br><b>patnametroroute.in</b></p>
+    <div class="qr-box">
+
+        <img src="data/icons/scanWeb.png" alt="Scan QR to open patnametroroute.in">
+    </div>
+
+    <script>
+        // Register Service Worker
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('service-worker.js');
+        }
+
+        const installBtn = document.getElementById('installBtn');
+        let deferredPrompt;
+
+        // Detect if app already installed
+        function checkIfInstalled() {
+            if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+                installBtn.textContent = '✅ Already Installed';
+                installBtn.disabled = true;
+                return true;
+            }
+            return false;
+        }
+
+        // Run check on load
+        if (checkIfInstalled()) {
+            console.log('App already installed');
+        }
+
+        // Listen for beforeinstallprompt
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installBtn.style.display = 'inline-block';
+        });
+
+        // Handle install button click
+        installBtn.addEventListener('click', async () => {
+            if (checkIfInstalled()) return;
+
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    installBtn.textContent = 'Installing...';
+                } else {
+                    installBtn.textContent = 'Install Cancelled';
+                }
+                deferredPrompt = null;
+            } else {
+                alert('To install manually, tap the browser menu → "Add to Home Screen"');
+            }
+        });
+
+        // Optional: Detect installation event
+        window.addEventListener('appinstalled', () => {
+            installBtn.textContent = '✅ Installed';
+            installBtn.disabled = true;
+        });
+    </script>
+</body>
+
+</html>
