@@ -1,4 +1,4 @@
-const APP_VERSION = 'v1.0.7'; // 👈 Updated version
+const APP_VERSION = 'v1.0.8'; // 👈 Updated version
 const CACHE_NAME = 'patnametro-' + APP_VERSION;
 
 const urlsToCache = [
@@ -67,5 +67,6 @@ self.addEventListener('fetch', event => {
       })
   );
 });
+
 
 
