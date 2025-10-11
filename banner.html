@@ -1,0 +1,58 @@
+<!-- banner.html -->
+<div id="metro-banner">
+    <!-- <strong>🚇 Patna Metro Update:</strong>
+    Services have started between <b>Bhoothnath → Zero Mile → New ISBT</b>.
+    Minimum fare ₹15, maximum ₹30.
+    Tickets valid for 20 mins — ₹10 fine after expiry. -->
+    <strong>पटना मेट्रो अपडेट:</strong>
+    स्टेशनों के बीच किराया <b>भूतनाथ → जीरो माइल → नया आईएसबीटी</b>.
+    न्यूनतम किराया ₹15, अधिकतम ₹30।<br>
+    <p style="color: rgb(232, 113, 113);background-color: aliceblue;">!टिकट 20 मिनट के लिए वैध - समाप्ति के बाद ₹10 का जुर्माना।</p>
+ 
+</div>
+</div>
+
+
+<style>
+    #metro-banner {
+        display: none;
+        background: linear-gradient(90deg, #004aad, #007bff);
+        color: #fff;
+        padding: 12px 18px;
+        text-align: center;
+        font-family: "Segoe UI", sans-serif;
+        font-size: 16px;
+        font-weight: 500;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 9999;
+        animation: fadeIn 1s ease-out;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            top: -50px;
+        }
+
+        to {
+            opacity: 1;
+            top: 0;
+        }
+    }
+
+    @keyframes fadeOut {
+        from {
+            opacity: 1;
+            top: 0;
+        }
+
+        to {
+            opacity: 0;
+            top: -50px;
+        }
+    }
+</style>
