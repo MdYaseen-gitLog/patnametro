@@ -17,7 +17,7 @@ window.addEventListener("load", function() {
       setTimeout(() => {
         banner.style.animation = "fadeOut 1s forwards";
         setTimeout(() => banner.remove(), 1000);
-      }, 10000);
+      }, 16000);
     })
     .catch(err => console.error("Banner failed to load:", err));
 });
