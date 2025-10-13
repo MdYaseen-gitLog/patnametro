@@ -1,23 +1,30 @@
-// banner.js
-window.addEventListener("load", function() {
-  // Skip if already shown this session
-//   if (sessionStorage.getItem("metroBannerShown")) return;
-//   sessionStorage.setItem("metroBannerShown", "true");
+window.addEventListener("load", function () {
+  // Get current count from sessionStorage
+  const count = parseInt(sessionStorage.getItem("metroBannerCount") || "0", 10);
+
+  // Show banner only if shown less than 3 times
+  if (count >= 3) return;
+
+  // Increment and store the new count
+  sessionStorage.setItem("metroBannerCount", (count + 1).toString());
 
   // Load banner.html
   fetch("banner.html")
     .then(res => res.text())
     .then(html => {
+      if (document.getElementById("metro-banner")) return;
       document.body.insertAdjacentHTML("afterbegin", html);
 
       const banner = document.getElementById("metro-banner");
+      if (!banner) return;
+
       banner.style.display = "block";
 
       // Auto-hide after 10 seconds
       setTimeout(() => {
         banner.style.animation = "fadeOut 1s forwards";
         setTimeout(() => banner.remove(), 1000);
-      }, 16000);
+      }, 14000);
     })
-    .catch(err => console.error("Banner failed to load:", err));
+    .catch(err => console.error("🚨 Banner failed to load:", err));
 });
