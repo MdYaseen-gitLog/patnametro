@@ -322,6 +322,12 @@
         #installBtn:hover {
             background-color: #1565c0;
         }
+
+        #aqi-alert {
+      display: none;
+      margin: 20px auto;
+      max-width: 600px;
+    }
     </style>
 
 
@@ -329,6 +335,8 @@
 
 <body>
     <script src="banner.js"></script>
+    <div id="aqi-alert" class="alert" role="alert"></div>
+     <script src="aqi.js"></script>
     <button id="installBtn">
         📲 Install App
     </button>
