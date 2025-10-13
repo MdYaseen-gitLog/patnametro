@@ -1,7 +1,7 @@
 //Air quality index
     //const apiKey = 'e8d83feabbee14a0c1323f56e4c48145';// <-- Replace with your OpenWeatherMap API key
-    const lat = 25.585407; // Your location
-    const lon = 85.187736;
+    //const lat = 25.585407; // Your location
+    //const lon = 85.187736;
 
     function getAQIDescription(lat, lon, apiKey) {
       const url = `https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${apiKey}`;
