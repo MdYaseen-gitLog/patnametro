@@ -33,22 +33,29 @@
     }
 
     window.addEventListener('load', () => {
-      setTimeout(() => {
-        getAQIDescription(lat, lon, apiKey).then(aqi => {
-          const alertBox = document.getElementById('aqi-alert');
+setTimeout(() => {
+  getAQIDescription(lat, lon, apiKey).then(aqi => {
+    const alertBox = document.getElementById('aqi-alert');
 
-          if (aqi) {
-            const alertClass = getBootstrapAlertClass(aqi.value);
-            alertBox.className = `alert ${alertClass}`;
-            alertBox.innerHTML = `
-              <strong>Air Quality Alert:</strong> The air quality is <strong>${aqi.label}</strong>. Please take precautions.
-            `;
-            alertBox.style.display = 'block';
-          } else {
-            alertBox.className = 'alert alert-secondary';
-            alertBox.innerHTML = 'Could not retrieve air quality data.';
-            alertBox.style.display = 'block';
-          }
-        });
-      }, 10000); // Show alert after 10 seconds
+    if (aqi) {
+      const alertClass = getBootstrapAlertClass(aqi.value);
+      alertBox.className = `alert ${alertClass}`;
+      alertBox.innerHTML = `
+        <strong>Air Quality Alert:</strong> The air quality is <strong>${aqi.label}</strong>. Please take precautions.
+      `;
+    } else {
+      alertBox.className = 'alert alert-secondary';
+      alertBox.innerHTML = 'Could not retrieve air quality data.';
+    }
+
+    alertBox.style.display = 'block';
+
+    // Auto-hide after 5 seconds (5000 ms)
+    setTimeout(() => {
+      alertBox.style.display = 'none';
+    }, 10000);
+
+  });
+}, 10000); // Show alert after 10 seconds
+
     });
