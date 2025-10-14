@@ -108,11 +108,108 @@
       margin-right: 6px;
     }
   </style>
+  <!-- START: Interactive Journey-CTA Banner -->
+  <style>
+    /* Banner container */
+    .pmet-banner {
+      background: linear-gradient(90deg, rgba(0, 74, 173, 0.12), rgba(0, 119, 255, 0.06));
+      border: 1px solid rgba(0, 74, 173, 0.14);
+      border-radius: 15px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+      margin: 15px auto;
+      padding: 20px;
+      animation: slideIn .4s ease;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .pmet-station {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 0 10px;
+    }
+
+    .pmet-station .icon {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .pmet-station .label {
+      margin-top: 5px;
+      font-weight: 600;
+      color: #022943;
+      font-size: 13px;
+    }
+
+    .pmet-line {
+      height: 6px;
+      width: 100%;
+      border-radius: 4px;
+      background: linear-gradient(90deg, #004AAD, #0077FF);
+      margin: 10px 0;
+    }
+
+    .pmet-msg h4 {
+      font-weight: 700;
+      color: #00274d;
+    }
+
+    .pmet-msg p {
+      color: #1f4a6a;
+      font-size: 14px;
+    }
+
+    .pmet-btn {
+      background-color: #004AAD;
+      border: none;
+      color: white;
+      font-weight: 600;
+      border-radius: 30px;
+      padding: 10px 22px;
+      transition: all 0.2s ease;
+    }
+
+    .pmet-btn:hover {
+      background-color: #0077FF;
+      transform: scale(1.05);
+    }
+
+    .pmet-close {
+      background: transparent;
+      border: none;
+      font-size: 20px;
+      color: #05407a;
+      position: absolute;
+      top: 8px;
+      right: 10px;
+      cursor: pointer;
+    }
+  </style>
 </head>
 
 <body>
-<script src="banner.js"></script>
-  <button id="installBtn" style="display:block;position:fixed;bottom:20px;right:20px;padding:10px 20px;font-size:16px;border:none;border-radius:8px;background-color:#1976d2;color:white;box-shadow:0 4px 6px rgba(0,0,0,0.2);z-index:1000;" onclick="goToPageHref()">
+  <script src="banner.js"></script>
+  <button id="installBtn"
+    style="display:block;position:fixed;bottom:20px;right:20px;padding:10px 20px;font-size:16px;border:none;border-radius:8px;background-color:#1976d2;color:white;box-shadow:0 4px 6px rgba(0,0,0,0.2);z-index:1000;"
+    onclick="goToPageHref()">
     App available
   </button>
 
@@ -153,9 +250,81 @@
 
   <div class="container my-5">
     <h2 class="mb-4">About Patna Metro</h2>
-    <p>The <strong>Patna Metro</strong> is a rapid transit system under construction in Patna, Bihar. The network
-      includes two corridors, each with multiple stations serving key areas across the city.</p>
+    <strong>The Patna Metro</strong> is a modern rapid transit system being developed in <strong>Patna, Bihar</strong>,
+    designed to provide fast,
+    convenient, and eco-friendly urban transport.
+    The network features <strong>two major corridors</strong> connecting important residential, commercial, and transit
+    hubs across the city.
+    Currently, metro services are <strong>operational between Bhootnath Temple → Zero Mile → New ISBT on the Blue Line
+    (Corridor-II)</strong> — marking the first phase of Patna’s journey toward a seamless public transport future.
 
+    <!-- START: Interactive Journey-CTA Banner -->
+    <div id="pmetBanner" class="container pmet-banner position-relative">
+      <button id="pmetClose" class="pmet-close" title="Close">×</button>
+
+      <div class="row align-items-center gy-4">
+        <!-- Column 1: Stations -->
+        <div class="col-md-6 text-center">
+          <div class="d-flex justify-content-center align-items-center flex-wrap">
+            <div class="pmet-station">
+              <div class="icon">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="#004AAD">
+                  <path d="M12 2C8.686 2 6 4.686 6 8c0 4.5 6 12 6 12s6-7.5 6-12c0-3.314-2.686-6-6-6z" />
+                  <circle cx="12" cy="8" r="2.2" fill="#fff" />
+                </svg>
+              </div>
+              <div class="label">New ISBT</div>
+            </div>
+
+            <div class="pmet-station">
+              <div class="icon">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="#004AAD">
+                  <path d="M12 2C8.686 2 6 4.686 6 8c0 4.5 6 12 6 12s6-7.5 6-12c0-3.314-2.686-6-6-6z" />
+                  <circle cx="12" cy="8" r="2.2" fill="#fff" />
+                </svg>
+              </div>
+              <div class="label">Zero Mile</div>
+            </div>
+
+            <div class="pmet-station">
+              <div class="icon">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="#004AAD">
+                  <path d="M12 2C8.686 2 6 4.686 6 8c0 4.5 6 12 6 12s6-7.5 6-12c0-3.314-2.686-6-6-6z" />
+                  <circle cx="12" cy="8" r="2.2" fill="#fff" />
+                </svg>
+              </div>
+              <div class="label">Bhootnath</div>
+            </div>
+          </div>
+
+          <div class="pmet-line mx-auto mt-2"></div>
+          <p class="text-primary fw-semibold mt-1">Blue Line • Towards North–South</p>
+        </div>
+
+        <!-- Column 2: Message + CTA -->
+        <div class="col-md-6 text-center text-md-start pmet-msg">
+          <h4>Planning a trip from New ISBT → Zero Mile → Bhootnath?</h4>
+          <p>Use our Journey Planner to get real-time routes, travel times, and fare details instantly.</p>
+          <a href="index.html" class="btn pmet-btn mt-2">🚇 Plan Your Journey</a>
+        </div>
+      </div>
+    </div>
+    <script>
+      // Hide banner when closed and remember choice
+      (function () {
+        const banner = document.getElementById("pmetBanner");
+        const closeBtn = document.getElementById("pmetClose");
+        const key = "pmet_banner_hidden_v1";
+
+        if (localStorage.getItem(key) === "1") banner.style.display = "block";
+
+        closeBtn.addEventListener("click", () => {
+          banner.style.display = "none";
+          localStorage.setItem(key, "1");
+        });
+      })();
+    </script>
+    <!-- END: Interactive Journey-CTA Banner -->
     <div class="row">
       <div class="col-md-6">
         <a href="routelineRed.html" class="decoNone">
@@ -170,33 +339,33 @@
           <li><span class="fa-solid fa-train-subway text-danger me-2"> <i class="fa-solid fa-arrow-up"
                 style="color: red;"> </i></span> Danapur Cantonment-दानापुर छावनी</li>
           <li><span class="fa-solid fa-train-subway text-danger me-2"> <i class="fa-solid fa-arrow-up"
-                style="color: red;"> </i></span> Saguna More</li>
+                style="color: red;"> </i></span> Saguna More-सगुना मोड़</li>
           <li><span class="fa-solid fa-train-subway text-danger me-2"> <i class="fa-solid fa-arrow-up"
-                style="color: red;"> </i></span> RPS More</li>
+                style="color: red;"> </i></span> RPS More-आर पी एस मोड़</li>
           <li><span class="fa-solid fa-train-subway text-danger me-2"> <i class="fa-solid fa-arrow-up"
-                style="color: red;"> </i></span> Patliputra</li>
+                style="color: red;"> </i></span> Patliputra-पाटलिपुत्र</li>
           <li><span class="fa-solid fa-train-subway text-danger me-2"> <i class="fa-solid fa-arrow-down"
-                style="color: red;"> </i></span> Rukanpura</li>
+                style="color: red;"> </i></span> Rukanpura-रुकनपुरा</li>
           <li><span class="fa-solid fa-train-subway text-danger me-2"> <i class="fa-solid fa-arrow-down"
-                style="color: red;"> </i></span> Raja Bazar</li>
+                style="color: red;"> </i></span> Raja Bazar-राजा बाजार</li>
           <li><span class="fa-solid fa-train-subway text-danger me-2"> <i class="fa-solid fa-arrow-down"
-                style="color: red;"> </i></span> Patna Zoo</li>
+                style="color: red;"> </i></span> Patna Zoo-चिड़ियाघर</li>
           <li><span class="fa-solid fa-train-subway text-danger me-2"> <i class="fa-solid fa-arrow-down"
-                style="color: red;"> </i></span> Vikas Bhawan</li>
+                style="color: red;"> </i></span> Vikas Bhawan-विकास भवन</li>
           <li><span class="fa-solid fa-train-subway text-danger me-2"> <i class="fa-solid fa-arrow-down"
-                style="color: red;"> </i></span> Vidyut Bhawan</li>
+                style="color: red;"> </i></span> Vidyut Bhawan-विद्युत भवन</li>
           <li><span class="fa-solid fa-exchange-alt text-danger me-2"> <i class="fa-solid fa-arrow-down"
                 style="color: red;"> </i></span><span class="fa-solid fa-train-subway text-danger me-2"></span><span
-              class="interchange">Patna Junction</span></li>
+              class="interchange">Patna Junction-पटना जंक्शन</span></li>
           <li><span class="fa-solid fa-train-subway text-danger me-2"> <i class="fa-solid fa-arrow-up"
-                style="color: red;"> </i></span> Mithapur</li>
+                style="color: red;"> </i></span> Mithapur-मीठापुर</li>
           <li><span class="fa-solid fa-train-subway text-danger me-2"> <i class="fa-solid fa-arrow-up"
-                style="color: red;"> </i></span> Ramkrishna Nagar</li>
+                style="color: red;"> </i></span> Ramkrishna Nagar-रामकृष्ण नगर</li>
           <li><span class="fa-solid fa-train-subway text-danger me-2"> <i class="fa-solid fa-arrow-up"
-                style="color: red;"> </i></span> Jaganpura</li>
+                style="color: red;"> </i></span> Jaganpura-जगनपुरा</li>
           <li><span class="fa-solid fa-exchange-alt text-danger me-2"> <i class="fa-solid fa-arrow-up"
                 style="color: red;"> </i></span><span class="fa-solid fa-train-subway text-danger me-2"></span> <span
-              class="interchange">Khemni Chak</span></li>
+              class="interchange">Khemni Chak-खेमनीचक</span></li>
         </ol>
       </div>
 
@@ -212,30 +381,30 @@
         <ol>
           <li><span class="fa-solid fa-exchange-alt text-primary me-2"> <i class="fa-solid fa-arrow-down"
                 style="color:blue;"> </i></span><i class="fa-solid fa-train-subway text-primary me-2"></i><strong>Patna
-              Junction</strong></li>
+              Junction-पटना जंक्शन</strong></li>
           <li><i class="fa-solid fa-train-subway text-primary me-2"> <i class="fa-solid fa-arrow-down"
-                style="color:blue;"> </i></i>Akashvani</li>
+                style="color:blue;"> </i></i>Akashvani-आकाशवाणी</li>
           <li><i class="fa-solid fa-train-subway text-primary me-2"> <i class="fa-solid fa-arrow-down"
-                style="color:blue;"> </i></i>Gandhi Maidan</li>
+                style="color:blue;"> </i></i>Gandhi Maidan-गांधी मैदान</li>
           <li><i class="fa-solid fa-train-subway text-primary me-2"> <i class="fa-solid fa-arrow-down"
-                style="color:blue;"> </i></i>PMCH</li>
+                style="color:blue;"> </i></i>PMCH-पी एम सी एच</li>
           <li><i class="fa-solid fa-train-subway text-primary me-2"> <i class="fa-solid fa-arrow-down"
-                style="color:blue;"> </i></i>Patna University</li>
+                style="color:blue;"> </i></i>Patna Science College(University)-पटना विज्ञान महाविद्यालय</li>
           <li><i class="fa-solid fa-train-subway text-primary me-2"> <i class="fa-solid fa-arrow-down"
-                style="color:blue;"> </i></i>Moin-ul-Haq Stadium</li>
+                style="color:blue;"> </i></i>Moin-ul-Haq Stadium-मोइनुल हक स्टेडियम</li>
           <li><i class="fa-solid fa-train-subway text-primary me-2"> <i class="fa-solid fa-arrow-down"
-                style="color:blue;"> </i></i>Rajendra Nagar</li>
+                style="color:blue;"> </i></i>Rajendra Nagar-राजेन्द्र नगर</li>
           <li><i class="fa-solid fa-train-subway text-primary me-2"> <i class="fa-solid fa-arrow-up"
-                style="color:blue;"> </i></i>Malahi Pakri</li>
+                style="color:blue;"> </i></i>Malahi Pakri-मलाही पकड़ी</li>
           <li><span class="fa-solid fa-exchange-alt text-primary me-2"> <i class="fa-solid fa-arrow-up"
                 style="color:blue;"> </i></span><i class="fa-solid fa-train-subway text-primary me-2"></i><strong>Khemni
-              Chak</strong></li>
+              Chak-खेमनीचक</strong></li>
           <li><i class="fa-solid fa-train-subway text-primary me-2"> <i class="fa-solid fa-arrow-up"
-                style="color:blue;"> </i></i>Bhootnath</li>
+                style="color:blue;"> </i></i>Bhootnath-भूतनाथ</li>
           <li><i class="fa-solid fa-train-subway text-primary me-2"> <i class="fa-solid fa-arrow-up"
-                style="color:blue;"> </i></i>Zero Mile</li>
+                style="color:blue;"> </i></i>Zero Mile-जीरो माइल</li>
           <li><i class="fa-solid fa-train-subway text-primary me-2"> <i class="fa-solid fa-arrow-up"
-                style="color:blue;"> </i></i>New ISBT</li>
+                style="color:blue;"> </i></i>New ISBT-आई एस बी टी(पाटलिपुत्र बस टर्मिनल)</li>
         </ol>
 
       </div>
