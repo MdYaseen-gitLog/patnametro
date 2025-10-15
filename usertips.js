@@ -79,10 +79,10 @@ window.addEventListener('DOMContentLoaded', () => {
     
                   checkbox._tippy.show();
     
-                  // Hide tooltip after 5 seconds
+                  // Hide tooltip after 15 seconds
                   setTimeout(() => {
                     checkbox._tippy.hide();
-                  }, 10000);
+                  }, 15000);
     
                   // Stop observing after first appearance
                   observer.unobserve(checkbox);
