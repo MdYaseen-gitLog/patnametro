@@ -3,7 +3,7 @@ window.addEventListener("load", function () {
   const count = parseInt(sessionStorage.getItem("metroBannerCount") || "0", 10);
 
   // Show banner only if shown less than 3 times
-  if (count >= 3) return;
+  if (count >= 1) return;
 
   // Increment and store the new count
   sessionStorage.setItem("metroBannerCount", (count + 1).toString());
