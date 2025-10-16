@@ -1973,7 +1973,7 @@
             if (aqiValue >= 4) return 'alert-danger';     // Poor or Very Poor
         }
 
-        window.addEventListener('load', () => {
+       /* window.addEventListener('load', () => {
             setTimeout(() => {
                 getAQIDescription(lat, lon, apiKey).then(aqi => {
                     const alertBox = document.getElementById('aqi-alert');
@@ -1999,7 +1999,7 @@
                 });
             }, 25000); // Show alert after 10 seconds
 
-        });
+        });*/
 
         // aqi alert end 
     </script>
