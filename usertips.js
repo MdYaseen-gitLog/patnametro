@@ -30,7 +30,7 @@ window.addEventListener('DOMContentLoaded', () => {
     // Optional: auto hide after 5 seconds
     setTimeout(() => {
       btn._tippy.hide();
-    }, 5000);
+    }, 15000);
   });
 
   // Zoom Out button
@@ -43,7 +43,7 @@ window.addEventListener('DOMContentLoaded', () => {
       trigger: 'manual'
     });
     btn._tippy.show();
-    setTimeout(() => btn._tippy.hide(), 5000);
+    setTimeout(() => btn._tippy.hide(), 15000);
   });
 
   // Fullscreen button (if present)
@@ -56,7 +56,7 @@ window.addEventListener('DOMContentLoaded', () => {
       trigger: 'manual'
     });
     btn._tippy.show();
-    setTimeout(() => btn._tippy.hide(), 5000);
+    setTimeout(() => btn._tippy.hide(), 15000);
   });
 
   const checkbox = document.getElementById('enableLocation');
