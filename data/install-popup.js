@@ -1,5 +1,5 @@
 // install-popup.js
-let deferredPrompt;
+let pmetDeferredPrompt;
 
 function showInstallPopup() {
     if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
@@ -27,13 +27,13 @@ function showInstallPopup() {
         document.body.appendChild(popup);
 
         document.getElementById('installBtn').addEventListener('click', async () => {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                const choice = await deferredPrompt.userChoice;
+            if (pmetDeferredPrompt) {
+                pmetDeferredPrompt.prompt();
+                const choice = await pmetDeferredPrompt.userChoice;
                 if (choice.outcome === 'accepted') {
                     // console.log('User accepted the PWA install prompt');
                 }
-                deferredPrompt = null;
+                pmetDeferredPrompt = null;
             }
             popup.remove();
         });
@@ -67,6 +67,6 @@ function showInstallPopup() {
 
 window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
-    deferredPrompt = e;
+    pmetDeferredPrompt = e;
     showInstallPopup();
 });
