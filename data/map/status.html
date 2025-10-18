@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Patna Metro — Accurate Live Loop</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 16px;
+            font-family: Inter, system-ui;
+            background: #081222;
+            color: #eaf2ff
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto
+        }
+
+        h1 {
+            font-size: 18px;
+            margin: 0 0 8px
+        }
+
+        .line-wrap {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 16px;
+            border-radius: 12px;
+            margin-top: 10px
+        }
+
+        .station {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            margin: 10px 0
+        }
+
+        .name {
+            width: 120px;
+            font-weight: 600
+        }
+
+        .line {
+            flex: 1;
+            height: 4px;
+            background: linear-gradient(90deg, #0b64ff, #43aaff);
+            border-radius: 4px;
+            position: relative
+        }
+
+        .dot {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #fff
+        }
+
+        .badge {
+            min-width: 150px;
+            padding: 8px 10px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 13px
+        }
+
+        .green {
+            background: #c9ffd9;
+            color: #064022;
+            box-shadow: 0 0 12px rgba(0, 255, 100, .3)
+        }
+
+        .red {
+            background: #ffcfcf;
+            color: #5a0a0a;
+            box-shadow: 0 0 12px rgba(255, 80, 80, .3)
+        }
+
+        .yellow {
+            background: #fff3c1;
+            color: #5a3d00;
+            box-shadow: 0 0 12px rgba(255, 200, 0, .3)
+        }
+
+        .muted {
+            background: rgba(255, 255, 255, .05);
+            color: #aaa
+        }
+
+        @media(max-width:600px) {
+            .station {
+                flex-direction: column;
+                align-items: flex-start
+            }
+
+            .name {
+                width: 100%
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🚇 Patna Metro Live Status (Real Offsets)</h1>
+        <div class="line-wrap" id="list"></div>
+        <p id="clock" style="opacity:.7;font-size:13px"></p>
+    </div>
+
+    <script>
+        const STATIONS = ["New ISBT", "Zero Mile", "Bhootnath"];
+        // travel time map (in minutes)
+        const travelMap = [
+            { from: "New ISBT", to: "Zero Mile", minutes: 3 },
+            { from: "Zero Mile", to: "Bhootnath", minutes: 2 },
+            { from: "Bhootnath", to: "Zero Mile", minutes: 2 },
+            { from: "Zero Mile", to: "New ISBT", minutes: 3 }
+        ];
+
+        const TRAVEL_MIN = 5, CYCLE_MIN = 20, START = "04:00", END = "23:00";
+        const ARRIVE_S = 30, DEPART_S = 15;
+
+        function toDate(hm) { const [h, m] = hm.split(":").map(Number); const n = new Date(); return new Date(n.getFullYear(), n.getMonth(), n.getDate(), h, m, 0, 0); }
+        function addMin(d, m) { return new Date(d.getTime() + m * 60000); }
+        function addSec(d, s) { return new Date(d.getTime() + s * 1000); }
+        function fmt(t) { return t.toLocaleTimeString(); }
+        function hhmmss(ms) { if (ms < 0) ms = 0; const s = Math.floor(ms / 1000), m = Math.floor(s / 60) % 60, h = Math.floor(s / 3600); return (h > 0 ? h.toString().padStart(2, "0") + ":" : "") + String(m).padStart(2, "0") + ":" + String(s % 60).padStart(2, "0"); }
+
+        function buildLoopTimes() {
+            const map = {};
+            STATIONS.forEach(s => map[s] = []);
+            let start = toDate(START), end = toDate(END);
+
+            while (start <= end) {
+                let t = new Date(start);
+                // step through the travel map sequence
+                for (const seg of travelMap) {
+                    // record arrival at each destination
+                    if (!map[seg.to]) map[seg.to] = [];
+                    t = addMin(t, seg.minutes);
+                    map[seg.to].push(new Date(t));
+                }
+                // repeat next loop cycle (sum of all minutes)
+                const total = travelMap.reduce((a, b) => a + b.minutes, 0);
+                start = addMin(start, total);
+            }
+            return map;
+        }
+        const times = buildLoopTimes();
+
+        const wrap = document.getElementById("list");
+        STATIONS.forEach(s => {
+            const div = document.createElement("div");
+            div.className = "station";
+            div.innerHTML = `<div class="name">${s}</div><div class="line"><div class="dot"></div></div><div class="badge muted" id="b_${s.replace(/\s/g, "_")}">--</div>`;
+            wrap.appendChild(div);
+        });
+
+        function update() {
+            const now = new Date();
+            const loggedArrivals = {};
+            document.getElementById("clock").textContent = "Now " + fmt(now);
+            STATIONS.forEach(s => {
+                const arr = times[s]; let prev = null, next = null;
+                for (let i = arr.length - 1; i >= 0; i--) { if (arr[i] <= now) { prev = arr[i]; break; } }
+                for (const t of arr) { if (t >= now) { next = t; break; } }
+                let text = ""; let cls = "muted";
+                if (prev && now < addSec(prev, ARRIVE_S)) {
+                    cls = "green";
+                    text = `Arrived<br>${fmt(prev)}`;
+
+                    // ✅ log only once per arrival time
+                    const key = `${s}_${prev.getTime()}`;
+                    if (!loggedArrivals[key]) {
+                        console.log(`Arrived at ${s} — ${fmt(prev)}`);
+                        loggedArrivals[key] = true;
+                    }
+
+                }
+                else if (prev && now < addSec(prev, ARRIVE_S + DEPART_S)) { cls = "red"; text = `Departed<br>${fmt(prev)}`; }
+                else if (next) { cls = "yellow"; text = `Next Train<br>${hhmmss(next - now)}`; }
+                else { text = "Service Closed"; }
+                const el = document.getElementById("b_" + s.replace(/\s/g, "_"));
+                el.className = "badge " + cls; el.innerHTML = text;
+            });
+        }
+        update(); setInterval(update, 700);
+    </script>
+</body>
+
+</html>
