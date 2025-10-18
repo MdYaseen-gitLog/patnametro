@@ -41,13 +41,15 @@
 
         .name {
             width: 120px;
-            font-weight: 600
+            font-weight: 600;
+            margin-top: 20px;
+            margin-bottom: 20px
         }
 
         .line {
             flex: 1;
-            height: 4px;
-            background: linear-gradient(90deg, #0b64ff, #43aaff);
+            height: 8px;
+            background: linear-gradient(90deg, #0b64ff, #3c14b4);
             border-radius: 4px;
             position: relative
         }
@@ -69,7 +71,10 @@
             border-radius: 8px;
             text-align: center;
             font-weight: 600;
-            font-size: 13px
+            font-size: 13px;
+            margin-left: 4px;
+            margin-top: 20px;
+            margin-bottom: 20px
         }
 
         .green {
@@ -77,6 +82,35 @@
             color: #064022;
             box-shadow: 0 0 12px rgba(0, 255, 100, .3)
         }
+        /* .green {
+            background: #c9ffd9;
+            color: #064022;
+        } */
+
+        .green-glow {
+            background: #c9ffd9;
+            color: #064022;
+            border: 2px solid #00ff88;
+            box-shadow: 0 0 15px 4px rgba(0, 255, 100, 0.5);
+            animation: glowPulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes glowPulse {
+            0% {
+                box-shadow: 0 0 5px 2px rgba(0, 255, 100, 0.4);
+            }
+
+            50% {
+                box-shadow: 0 0 15px 6px rgba(0, 255, 100, 0.6);
+            }
+
+            100% {
+                box-shadow: 0 0 5px 2px rgba(0, 255, 100, 0.4);
+            }
+        }
+
+
+
 
         .red {
             background: #ffcfcf;
@@ -95,14 +129,78 @@
             color: #aaa
         }
 
-        @media(max-width:600px) {
+        h1 {
+            text-align: center;
+        }
+
+        #clock {
+            width: 74px;
+            height: 74px;
+            border-radius: 50%;
+            background: #ffffff;
+            /* White background */
+            color: #000000;
+            /* Black text */
+            font-size: 12px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px auto;
+            text-align: center;
+            white-space: nowrap;
+            user-select: none;
+            box-shadow: 0 0 12px rgba(0, 128, 255, 0.6);
+            /* Glowing blue border */
+            transition: box-shadow 0.3s ease;
+        }
+
+        #clock:hover {
+            box-shadow: 0 0 20px rgba(0, 128, 255, 0.8);
+        }
+
+
+
+
+
+        @media (max-width: 600px) {
             .station {
                 flex-direction: column;
-                align-items: flex-start
+                align-items: center;
+                text-align: center;
+            }
+
+            .line {
+                flex: none;
+                /* ← IMPORTANT: override flex:1 here */
+                width: 8px;
+                height: 100px;
+                background: linear-gradient(to bottom, #0b64ff, #3c14b4);
+                /* vertical gradient */
+                margin: 8px 0;
+            }
+
+            .dot {
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+            }
+
+            .badge {
+                margin-top: 12px;
+                margin-left: 0;
             }
 
             .name {
-                width: 100%
+                width: auto;
+                margin-bottom: 8px;
+            }
+
+            #clock {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                font-size: 10px
             }
         }
     </style>
@@ -110,19 +208,20 @@
 
 <body>
     <div class="container">
-        <h1>🚇 Patna Metro Live Status (Real Offsets)</h1>
+        <h1>Patna Metro Live Status</h1>
+        <p id="clock" style="text-align: center;"></p>
         <div class="line-wrap" id="list"></div>
-        <p id="clock" style="opacity:.7;font-size:13px"></p>
+
     </div>
 
     <script>
         const STATIONS = ["New ISBT", "Zero Mile", "Bhootnath"];
         // travel time map (in minutes)
         const travelMap = [
-            { from: "New ISBT", to: "Zero Mile", minutes: 3 },
-            { from: "Zero Mile", to: "Bhootnath", minutes: 2 },
-            { from: "Bhootnath", to: "Zero Mile", minutes: 2 },
-            { from: "Zero Mile", to: "New ISBT", minutes: 3 }
+            { from: "New ISBT", to: "Zero Mile", minutes: 5 },
+            { from: "Zero Mile", to: "Bhootnath", minutes: 5 },
+            { from: "Bhootnath", to: "Zero Mile", minutes: 5 },
+            { from: "Zero Mile", to: "New ISBT", minutes: 5 }
         ];
 
         const TRAVEL_MIN = 5, CYCLE_MIN = 20, START = "04:00", END = "23:00";
@@ -166,34 +265,82 @@
 
         function update() {
             const now = new Date();
+            document.getElementById("clock").textContent = fmt(now);
+
             const loggedArrivals = {};
-            document.getElementById("clock").textContent = "Now " + fmt(now);
+            const nextArrivals = [];
+
+            // First pass: gather prev/next times per station
             STATIONS.forEach(s => {
-                const arr = times[s]; let prev = null, next = null;
-                for (let i = arr.length - 1; i >= 0; i--) { if (arr[i] <= now) { prev = arr[i]; break; } }
-                for (const t of arr) { if (t >= now) { next = t; break; } }
-                let text = ""; let cls = "muted";
+                const arr = times[s];
+                let prev = null, next = null;
+
+                for (let i = arr.length - 1; i >= 0; i--) {
+                    if (arr[i] <= now) { prev = arr[i]; break; }
+                }
+                for (const t of arr) {
+                    if (t >= now) { next = t; break; }
+                }
+
+                nextArrivals.push({ station: s, prev, next });
+            });
+
+            // 🔍 Find the station with the nearest next train (minimum countdown)
+            const activeArrivals = nextArrivals.filter(e => e.next);
+            let minStation = null;
+
+            if (activeArrivals.length > 0) {
+                minStation = activeArrivals.reduce((a, b) =>
+                    (a.next - now < b.next - now ? a : b)
+                ).station;
+            }
+
+            // Second pass: render each station's badge
+            nextArrivals.forEach(({ station: s, prev, next }) => {
+                const el = document.getElementById("b_" + s.replace(/\s/g, "_"));
+                let text = "";
+                let cls = "muted";
+
                 if (prev && now < addSec(prev, ARRIVE_S)) {
                     cls = "green";
                     text = `Arrived<br>${fmt(prev)}`;
 
-                    // ✅ log only once per arrival time
+                    // Log once per arrival
                     const key = `${s}_${prev.getTime()}`;
                     if (!loggedArrivals[key]) {
                         console.log(`Arrived at ${s} — ${fmt(prev)}`);
                         loggedArrivals[key] = true;
                     }
 
+                } else if (prev && now < addSec(prev, ARRIVE_S + DEPART_S)) {
+                    cls = "red";
+                    text = `Departed<br>${fmt(prev)}`;
+
+                } else if (next) {
+                    const countdown = hhmmss(next - now);
+                    const arrivalTime = next.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+                    // ✅ Highlight only the soonest train in green
+                    cls = (s === minStation) ? "green-glow" : "yellow";
+
+
+                    text = `Next Train at <b>${arrivalTime}</b><br>in ${countdown}`;
+                    console.log(`Next Train at ${s} — in ${countdown} (at ${arrivalTime})`);
+
+                    localStorage.setItem(`nextTrain_${s.replace(/\s/g, "_")}`, next.toISOString());
+
+                } else {
+                    text = "Service Closed";
                 }
-                else if (prev && now < addSec(prev, ARRIVE_S + DEPART_S)) { cls = "red"; text = `Departed<br>${fmt(prev)}`; }
-                else if (next) { cls = "yellow"; text = `Next Train<br>${hhmmss(next - now)}`; }
-                else { text = "Service Closed"; }
-                const el = document.getElementById("b_" + s.replace(/\s/g, "_"));
-                el.className = "badge " + cls; el.innerHTML = text;
+
+                el.className = "badge " + cls;
+                el.innerHTML = text;
             });
         }
+
         update(); setInterval(update, 700);
     </script>
+    <a href="nexttrain2.html">Next train</a>
 </body>
 
 </html>

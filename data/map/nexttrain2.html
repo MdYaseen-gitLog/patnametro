@@ -1,0 +1,141 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Next Train Tester</title>
+  <style>
+    body { background:#081222; color:#eaf2ff; font-family:Inter,system-ui; padding:20px; }
+    .card { background: rgba(255,255,255,0.03); padding:16px; border-radius:8px; max-width:420px; margin:24px auto; text-align:center; }
+    #stationName { font-weight:700; font-size:18px; margin-bottom:8px; color:#9bbcff; }
+    #next-train { font-size:16px; }
+    .muted { color:#99a3b8; font-size:14px; margin-top:6px; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div id="stationName">Loading…</div>
+    <div id="next-train">—</div>
+    <div id="countdown" class="muted"></div>
+  </div>
+
+<script>
+/*
+  Usage examples:
+    /next.html?station=Bhootnath
+    /next.html?station=Zero%20Mile
+    /next.html?s=New_ISBT
+    /next.html?station=2    (index-based: 0 = first station)
+*/
+
+// Keep a copy of your station list here for matching
+const STATIONS = ["New ISBT", "Zero Mile", "Bhootnath"];
+
+/** Helpers **/
+function safeText(el, txt) { el.textContent = txt; }
+function pad(n, len=2){ return String(n).padStart(len, '0'); }
+function hhmmss(ms){
+  if (ms < 0) ms = 0;
+  const s = Math.floor(ms/1000);
+  const h = Math.floor(s/3600);
+  const m = Math.floor((s%3600)/60);
+  const sec = s % 60;
+  return (h>0 ? pad(h)+':' : '') + pad(m) + ':' + pad(sec);
+}
+function formatHM(d){
+  if (!d) return "—";
+  return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+
+/** Read and normalize station from URL params **/
+function getStationFromUrl() {
+  const params = new URLSearchParams(window.location.search);
+  let raw = params.get('station') || params.get('s') || '';
+  raw = raw.trim();
+  if (!raw) return null;
+
+  // If numeric -> treat as index
+  if (/^\d+$/.test(raw)) {
+    const idx = parseInt(raw, 10);
+    if (idx >= 0 && idx < STATIONS.length) return STATIONS[idx];
+    return null;
+  }
+
+  // Normalize: replace underscores with spaces, decode, collapse extra spaces, lowercase
+  raw = raw.replace(/_/g, ' ');
+  try { raw = decodeURIComponent(raw); } catch(e) { /* ignore */ }
+  raw = raw.replace(/\s+/g, ' ').trim().toLowerCase();
+
+  // Find best match in STATIONS (case-insensitive)
+  for (const s of STATIONS) {
+    if (s.toLowerCase() === raw) return s;                 // exact match
+  }
+  // partial match (start)
+  for (const s of STATIONS) {
+    if (s.toLowerCase().startsWith(raw)) return s;
+  }
+  // fallback: try contains
+  for (const s of STATIONS) {
+    if (s.toLowerCase().includes(raw)) return s;
+  }
+
+  return null;
+}
+
+/** Read saved next train ISO time from localStorage (same key your main page writes) **/
+function readNextTrainIso(stationName) {
+  const key = `nextTrain_${stationName.replace(/\s/g, "_")}`;
+  return localStorage.getItem(key); // may be null
+}
+
+/** Render function: reads localStorage, shows arrival and countdown **/
+function renderForStation(station) {
+  const nameEl = document.getElementById('stationName');
+  const nextEl = document.getElementById('next-train');
+  const cdEl = document.getElementById('countdown');
+
+  if (!station) {
+    safeText(nameEl, "Unknown station");
+    safeText(nextEl, "No station specified in URL");
+    safeText(cdEl, "Use ?station=Bhootnath or ?s=New_ISBT or ?station=1");
+    return;
+  }
+
+  safeText(nameEl, station);
+
+  function updateOnce() {
+    const iso = readNextTrainIso(station);
+    if (!iso) {
+      safeText(nextEl, "No next-train info available (localStorage empty)");
+      safeText(cdEl, "Make sure the main page has run and saved times.");
+      return;
+    }
+
+    const next = new Date(iso);
+    if (isNaN(next.getTime())) {
+      safeText(nextEl, "Invalid time stored");
+      safeText(cdEl, "");
+      return;
+    }
+
+    const now = new Date();
+    const ms = next - now;
+    safeText(nextEl, `Next train at ${formatHM(next)}`);
+    safeText(cdEl, ms > 0 ? `in ${hhmmss(ms)}` : "arriving now / soon");
+  }
+
+  // update immediately and then every 1s while page is open
+  updateOnce();
+  // clear any previous interval (defensive)
+  if (window.__nextTrainInterval) clearInterval(window.__nextTrainInterval);
+  window.__nextTrainInterval = setInterval(updateOnce, 1000);
+}
+
+/** Init **/
+(function init(){
+  const station = getStationFromUrl();
+  renderForStation(station);
+})();
+</script>
+</body>
+</html>
