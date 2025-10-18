@@ -56,6 +56,9 @@
     <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/themes/light-border.css" />
     <script src="https://unpkg.com/@popperjs/core@2"></script>
     <script src="https://unpkg.com/tippy.js@6"></script>
+    <link rel="stylesheet" href="install-popup.css">
+
+
     <style>
         /* Page fade-in animation */
         #map {
@@ -356,6 +359,7 @@
 
 <body>
     <script src="banner.js"></script>
+    <script src="install-popup.js"></script>
     <script src="usertips.js"></script>
     <div id="aqi-alert" class="alert" role="alert"><i class="fas fa-head-side-mask"></i></div>
     <button id="installBtn">
@@ -1973,33 +1977,33 @@
             if (aqiValue >= 4) return 'alert-danger';     // Poor or Very Poor
         }
 
-       /* window.addEventListener('load', () => {
-            setTimeout(() => {
-                getAQIDescription(lat, lon, apiKey).then(aqi => {
-                    const alertBox = document.getElementById('aqi-alert');
+        /* window.addEventListener('load', () => {
+             setTimeout(() => {
+                 getAQIDescription(lat, lon, apiKey).then(aqi => {
+                     const alertBox = document.getElementById('aqi-alert');
 
-                    if (aqi) {
-                        const alertClass = getBootstrapAlertClass(aqi.value);
-                        alertBox.className = `alert ${alertClass}`;
-                        alertBox.innerHTML = `
-        <strong>Air Quality Alert:</strong> The air quality is <strong>${aqi.label}</strong>. Please take precautions.
-      `;
-                    } else {
-                        alertBox.className = 'alert alert-secondary';
-                        alertBox.innerHTML = 'Could not retrieve air quality data.';
-                    }
+                     if (aqi) {
+                         const alertClass = getBootstrapAlertClass(aqi.value);
+                         alertBox.className = `alert ${alertClass}`;
+                         alertBox.innerHTML = `
+         <strong>Air Quality Alert:</strong> The air quality is <strong>${aqi.label}</strong>. Please take precautions.
+       `;
+                     } else {
+                         alertBox.className = 'alert alert-secondary';
+                         alertBox.innerHTML = 'Could not retrieve air quality data.';
+                     }
 
-                    alertBox.style.display = 'block';
+                     alertBox.style.display = 'block';
 
-                    // Auto-hide after 5 seconds (5000 ms)
-                    setTimeout(() => {
-                        alertBox.style.display = 'none';
-                    }, 10000);
+                     // Auto-hide after 5 seconds (5000 ms)
+                     setTimeout(() => {
+                         alertBox.style.display = 'none';
+                     }, 10000);
 
-                });
-            }, 25000); // Show alert after 10 seconds
+                 });
+             }, 25000); // Show alert after 10 seconds
 
-        });*/
+         });*/
 
         // aqi alert end 
     </script>
