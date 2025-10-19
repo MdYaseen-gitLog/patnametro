@@ -1,0 +1,146 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+#diwaliBanner {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    background: radial-gradient(circle, #1a1a1a, #000);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    color: #fff;
+    text-align: center;
+    font-family: sans-serif;
+}
+
+.diwali-banner-content {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2em;
+}
+
+
+
+
+
+.diwali-banner-content img {
+    width: 96px;
+    height: 96px;
+    margin-top: 10px;
+    animation: pulse 2s infinite;
+}
+
+.diwali-banner-content h1 {
+    font-size: 3em;
+    color: #ffcc00;
+    text-shadow: 2px 2px #ff6600;
+    margin: 0.5em 0;
+    animation: pulse 2s infinite;
+}
+
+.diwali-banner-content p {
+    font-size: 1.5em;
+    margin-bottom: 1em;
+}
+
+#closeBanner {
+    padding: 10px 20px;
+    background: #ff6600;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-size: 1.2em;
+    cursor: pointer;
+    transition: background 0.3s;
+    margin-bottom: 20px;
+}
+
+#closeBanner:hover {
+    background: #e65c00;
+}
+
+#fireworksCanvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw !important;
+    height: 100vh !important;
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* Bottom Message */
+#bottomMessage {
+    font-size: 1.2em;
+    margin-bottom: 1em;
+    color: #cccccc;
+    z-index: 2;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+
+
+@keyframes lightningFlash {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.2;
+    }
+}
+
+#diwaliBanner.lightning-effect {
+    animation: lightningFlash 0.2s linear;
+}
+
+
+
+.diwali-banner-content h1 {
+    font-size: 2rem;
+}
+
+@media (min-width: 480px) {
+    .diwali-banner-content h1 {
+        font-size: 2.5rem;
+    }
+}
+
+@media (min-width: 768px) {
+    .diwali-banner-content h1 {
+        font-size: 3rem;
+    }
+}
+
+
+/* .diwali-banner-content h1 {
+    font-size: clamp(1.5rem, 5vw, 3rem);
+    color: #ffcc00;
+    text-shadow: 2px 2px #ff6600;
+    margin: 0.5em 0;
+    animation: pulse 2s infinite;
+} */
