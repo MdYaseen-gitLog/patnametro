@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Patna Metro — Passenger Live Tracker</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+<style>
+body{margin:0;padding:0;font-family:Inter,system-ui;background:#081222;color:#eaf2ff;text-align:center;}
+header{background:rgba(255,255,255,0.05);padding:12px;display:flex;align-items:center;justify-content:space-between;}
+h1{font-size:16px;margin:0;text-transform:uppercase;}
+#status-indicator{display:flex;align-items:center;gap:6px;font-size:13px;}
+#circle{width:10px;height:10px;border-radius:50%;background:red;box-shadow:0 0 8px rgba(255,0,0,0.4);}
+#circle.live{background:#00ff80;box-shadow:0 0 10px rgba(0,255,100,0.6);}
+#modeSwitch{margin:8px auto;display:flex;justify-content:center;gap:10px;}
+button{background:#0b64ff;color:#fff;border:none;padding:8px 16px;border-radius:8px;cursor:pointer;font-weight:600;}
+button.active{background:#00ff80;color:#062a1a;}
+#map{height:400px;display:none;margin:10px;border-radius:12px;}
+.container{max-width:900px;margin:auto;padding:10px;}
+.station{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;margin:10px 0;background:rgba(255,255,255,0.03);border-radius:12px;padding:10px;}
+.name{font-weight:600;}
+.badge{min-width:140px;padding:6px 10px;border-radius:8px;font-size:13px;font-weight:600;}
+.green-glow{background:#c9ffd9;color:#064022;border:2px solid #00ff88;box-shadow:0 0 12px 4px rgba(0,255,100,0.5);animation:glowPulse 1.5s ease-in-out infinite;}
+@keyframes glowPulse{0%{box-shadow:0 0 4px 2px rgba(0,255,100,0.3);}50%{box-shadow:0 0 14px 6px rgba(0,255,100,0.6);}100%{box-shadow:0 0 4px 2px rgba(0,255,100,0.3);}}
+.muted{background:rgba(255,255,255,0.05);color:#aaa;}
+@media(max-width:600px){#map{height:300px;}button{padding:6px 12px;font-size:13px;}}
+</style>
+</head>
+<body>
+<header>
+  <h1>🚇 Passenger Live Tracker</h1>
+  <div id="status-indicator"><div id="circle"></div><span id="gps-status">Offline</span></div>
+</header>
+
+<div id="modeSwitch">
+  <button id="listBtn" class="active">List View</button>
+  <button id="mapBtn">Map View</button>
+</div>
+
+<div class="container">
+  <div id="map"></div>
+  <div id="list"></div>
+</div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script>
+/* ---------- Data ---------- */
+const BUFFER_KM = 5; // 500m buffer zone
+let STATIONS = [];
+let map, marker, gpsActive=false, watchId=null;
+const ARRIVE_S = 30, DEPART_S = 15;
+const TRAVEL_MIN = 5, START="04:00", END="23:00";
+const travelMap = [
+  { from:"New ISBT", to:"Zero Mile", minutes:5 },
+  { from:"Zero Mile", to:"Bhootnath", minutes:5 },
+  { from:"Bhootnath", to:"Zero Mile", minutes:5 },
+  { from:"Zero Mile", to:"New ISBT", minutes:5 }
+];
+
+/* ---------- Helpers ---------- */
+function getDistance(lat1, lon1, lat2, lon2) {
+  const R=6371; const dLat=(lat2-lat1)*Math.PI/180; const dLon=(lon2-lon1)*Math.PI/180;
+  const a=Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
+  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+}
+function toDate(hm){const [h,m]=hm.split(":").map(Number);const n=new Date();return new Date(n.getFullYear(),n.getMonth(),n.getDate(),h,m,0,0);}
+function addMin(d,m){return new Date(d.getTime()+m*60000);}
+function addSec(d,s){return new Date(d.getTime()+s*1000);}
+function fmt(t){return t.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});}
+function hhmmss(ms){if(ms<0)ms=0;const s=Math.floor(ms/1000),m=Math.floor(s/60)%60,h=Math.floor(s/3600);return (h>0?h.toString().padStart(2,"0")+":":"")+String(m).padStart(2,"0")+":"+String(s%60).padStart(2,"0");}
+
+/* ---------- Time Simulation ---------- */
+function buildLoopTimes(){
+  const map={}; STATIONS.forEach(s=>map[s.name]=[]);
+  let start=toDate(START), end=toDate(END);
+  while(start<=end){
+    let t=new Date(start);
+    for(const seg of travelMap){
+      t=addMin(t, seg.minutes);
+      if(map[seg.to]) map[seg.to].push(new Date(t));
+    }
+    const total=travelMap.reduce((a,b)=>a+b.minutes,0);
+    start=addMin(start,total);
+  }
+  return map;
+}
+
+/* ---------- UI Rendering ---------- */
+function renderList(){
+  const wrap=document.getElementById("list");
+  wrap.innerHTML="";
+  STATIONS.forEach(s=>{
+    const div=document.createElement("div");
+    div.className="station";
+    div.innerHTML=`<div class="name">${s.name}</div>
+    <div class="badge muted" id="b_${s.name.replace(/\s/g,"_")}">--</div>`;
+    wrap.appendChild(div);
+  });
+}
+function updateGPSStatus(active){
+  const c=document.getElementById("circle"), s=document.getElementById("gps-status");
+  if(active){c.classList.add("live");s.textContent="Live";} else {c.classList.remove("live");s.textContent="Offline";}
+}
+
+/* ---------- Map ---------- */
+function initMap(){
+  map=L.map('map').setView([25.6,85.16],13);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap'}).addTo(map);
+  STATIONS.forEach(s=>L.circleMarker([s.lat,s.lon],{radius:5,color:'#00bfff'}).addTo(map).bindPopup(s.name));
+}
+function updateMap(lat,lon){
+  if(!map) initMap();
+  if(marker) marker.setLatLng([lat,lon]); else marker=L.marker([lat,lon]).addTo(map).bindPopup("You are here");
+  map.setView([lat,lon],map.getZoom());
+}
+
+/* ---------- GPS Tracking ---------- */
+function startTracking(times){
+  if(!navigator.geolocation){alert("Geolocation not supported!");return;}
+  watchId=navigator.geolocation.watchPosition(pos=>{
+    gpsActive=true; updateGPSStatus(true);
+    const {latitude:lat,longitude:lon,speed}=pos.coords;
+    const kmh=speed?(speed*3.6).toFixed(1):"0.0";
+    const nearest=STATIONS.map(s=>({name:s.name,dist:getDistance(lat,lon,s.lat,s.lon)})).sort((a,b)=>a.dist-b.dist)[0];
+    updateMap(lat,lon);
+
+    // Within metro buffer?
+    if(nearest.dist<=BUFFER_KM){
+      STATIONS.forEach(s=>{
+        const el=document.getElementById("b_"+s.name.replace(/\s/g,"_"));
+        if(!el) return;
+        if(s.name===nearest.name){
+          el.className="badge green-glow";
+          el.innerHTML=`Live near <b>${s.name}</b><br>Dist ${(nearest.dist*1000).toFixed(0)} m<br>Speed ${kmh} km/h`;
+        } else {el.className="badge muted"; el.innerHTML="—";}
+      });
+    } else {
+      gpsActive=false;
+      updateGPSStatus(false);
+      updateSchedule(times);
+    }
+  }, err=>{
+    gpsActive=false; updateGPSStatus(false);
+    updateSchedule(times);
+    console.error("GPS error:",err);
+  }, {enableHighAccuracy:true,maximumAge:0,timeout:10000});
+}
+
+/* ---------- Schedule Update ---------- */
+function updateSchedule(times){
+  const now=new Date();
+  const nextArrivals=[];
+  STATIONS.forEach(s=>{
+    const arr=times[s.name]; let prev=null,next=null;
+    for(let i=arr.length-1;i>=0;i--){if(arr[i]<=now){prev=arr[i];break;}}
+    for(const t of arr){if(t>=now){next=t;break;}}
+    nextArrivals.push({station:s.name,prev,next});
+  });
+
+  const active=nextArrivals.filter(e=>e.next);
+  let minStation=null;
+  if(active.length>0){
+    minStation=active.reduce((a,b)=>(a.next-now<b.next-now?a:b)).station;
+  }
+
+  nextArrivals.forEach(({station:s,prev,next})=>{
+    const el=document.getElementById("b_"+s.replace(/\s/g,"_"));
+    if(!el) return;
+    let cls="muted",text="";
+    if(prev && now<addSec(prev,ARRIVE_S)){
+      cls="green-glow"; text=`Arrived<br>${fmt(prev)}`;
+    } else if(prev && now<addSec(prev,ARRIVE_S+DEPART_S)){
+      cls="muted"; text=`Departed<br>${fmt(prev)}`;
+    } else if(next){
+      const countdown=hhmmss(next-now);
+      const arrivalTime=fmt(next);
+      cls=(s===minStation)?"green-glow":"muted";
+      text=`Next Train<br>${arrivalTime}<br>in ${countdown}`;
+    } else {text="Service Closed";}
+    el.className="badge "+cls; el.innerHTML=text;
+  });
+}
+
+/* ---------- View Toggle ---------- */
+document.getElementById("listBtn").addEventListener("click",()=>{
+  document.getElementById("listBtn").classList.add("active");
+  document.getElementById("mapBtn").classList.remove("active");
+  document.getElementById("list").style.display="block";
+  document.getElementById("map").style.display="none";
+});
+document.getElementById("mapBtn").addEventListener("click",()=>{
+  document.getElementById("mapBtn").classList.add("active");
+  document.getElementById("listBtn").classList.remove("active");
+  document.getElementById("list").style.display="none";
+  document.getElementById("map").style.display="block";
+  if(!map) initMap();
+});
+
+/* ---------- Initialization ---------- */
+window.addEventListener("load", async ()=>{
+  const res=await fetch("data/station.geojson");
+  const geo=await res.json();
+  STATIONS=geo.features.map(f=>({
+    name:f.properties.station_name || f.properties.Name,
+    lat:f.geometry.coordinates[1],
+    lon:f.geometry.coordinates[0]
+  }));
+  renderList();
+  const times=buildLoopTimes();
+  updateSchedule(times);
+  setInterval(()=>{if(!gpsActive)updateSchedule(times);},1000);
+  startTracking(times);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,504 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Patna Metro — Countdown-Based Loop Animation</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Inter, system-ui;
+            background: #081222;
+            color: #eaf2ff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin: 0 0 15px;
+            text-align: center;
+        }
+
+        #clock {
+            width: 74px;
+            height: 74px;
+            border-radius: 50%;
+            background: #ffffff;
+            color: #000000;
+            font-size: 12px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px auto;
+            text-align: center;
+            white-space: nowrap;
+            user-select: none;
+            box-shadow: 0 0 12px rgba(0, 128, 255, 0.6);
+            transition: box-shadow 0.3s ease;
+        }
+
+        /* --- Horizontal Map View CSS --- */
+        .metro-map {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            padding: 40px 0;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+        }
+
+        .metro-line {
+            position: absolute;
+            top: 50%;
+            left: 20px;
+            right: 20px;
+            height: 10px;
+            background: linear-gradient(90deg, #0b64ff, #3c14b4);
+            transform: translateY(-50%);
+            border-radius: 5px;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .station-container {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 1;
+        }
+
+        .station-dot {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #fff;
+            border: 4px solid #081222;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+            margin-bottom: 10px;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .station-name {
+            font-size: 14px;
+            font-weight: 600;
+            text-align: center;
+            width: 100px;
+            margin-top: 5px;
+        }
+
+        /* The Moving Train Dot - CRITICAL FOR ANIMATION */
+        #moving-train-dot {
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #ffd700;
+            border: 3px solid #000;
+            box-shadow: 0 0 10px 5px rgba(255, 215, 0, 0.7);
+            top: 50%;
+            transform: translate(-50%, -50%);
+            /* Smooth transition is necessary for continuous updates */
+            transition: left 0.07s linear;
+            z-index: 2;
+        }
+
+        /* Status Badges */
+        .status-badge {
+            min-width: 150px;
+            padding: 8px 10px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 13px;
+            margin-top: 20px;
+            background: rgba(255, 255, 255, .05);
+            color: #aaa
+        }
+
+        .green {
+            background: #c9ffd9;
+            color: #064022;
+            box-shadow: 0 0 12px rgba(0, 255, 100, .3)
+        }
+
+        .red {
+            background: #ffcfcf;
+            color: #5a0a0a;
+            box-shadow: 0 0 12px rgba(255, 80, 80, .3)
+        }
+
+        .yellow {
+            background: #fff3c1;
+            color: #5a3d00;
+            box-shadow: 0 0 12px rgba(255, 200, 0, .3)
+        }
+
+        .green-glow {
+            background: #c9ffd9;
+            color: #064022;
+            border: 2px solid #00ff88;
+            box-shadow: 0 0 15px 4px rgba(0, 255, 100, 0.5);
+            animation: glowPulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes glowPulse {
+            0% {
+                box-shadow: 0 0 5px 2px rgba(0, 255, 100, 0.4);
+            }
+
+            50% {
+                box-shadow: 0 0 15px 6px rgba(0, 255, 100, 0.6);
+            }
+
+            100% {
+                box-shadow: 0 0 5px 2px rgba(0, 255, 100, 0.4);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .metro-map {
+                padding: 40px 5px;
+            }
+
+            .station-name {
+                width: 70px;
+                font-size: 12px;
+            }
+
+            .status-badge {
+                font-size: 11px;
+                min-width: 120px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Patna Metro Live Tracker 🚇 (Countdown Logic)</h1>
+        <p id="clock"></p>
+
+        <div class="metro-map" id="metro-map">
+            <div class="metro-line"></div>
+            <div id="moving-train-dot"></div>
+        </div>
+
+        <div class="line-wrap" id="status-list" style="margin-top: 30px;">
+        </div>
+
+    </div>
+
+    <script>
+        // --- Core Parameters ---
+        const STATIONS = ["New ISBT", "Zero Mile", "Bhootnath"];
+        const travelMap = [
+            { from: "New ISBT", to: "Zero Mile", minutes: 5 },
+            { from: "Zero Mile", to: "Bhootnath", minutes: 5 },
+            { from: "Bhootnath", to: "Zero Mile", minutes: 5 },
+            { from: "Zero Mile", to: "New ISBT", minutes: 5 }
+        ];
+
+        const START = "04:00", END = "23:00";
+        const ARRIVE_S = 15, DEPART_S = 30;
+        // The total duration of one full cycle (all travel + all dwell times) in seconds
+        const TOTAL_CYCLE_TIME_S = (5 * 4 * 60) + (4 * (ARRIVE_S + DEPART_S));
+        const SEGMENT_DURATION_S = 300; // 5 minutes travel time
+
+        // --- Utility Functions (Retained) ---
+        function toDate(hm) { const [h, m] = hm.split(":").map(Number); const n = new Date(); return new Date(n.getFullYear(), n.getMonth(), n.getDate(), h, m, 0, 0); }
+        function addMin(d, m) { return new Date(d.getTime() + m * 60000); }
+        function addSec(d, s) { return new Date(d.getTime() + s * 1000); }
+        function fmt(t) { return t.toLocaleTimeString(); }
+        function hhmmss(ms) { if (ms < 0) ms = 0; const s = Math.floor(ms / 1000), m = Math.floor(s / 60) % 60, h = Math.floor(s / 3600); return (h > 0 ? h.toString().padStart(2, "0") + ":" : "") + String(m).padStart(2, "0") + ":" + String(s % 60).padStart(2, "0"); }
+
+        // --- Schedule Generation (Retained) ---
+        function buildLoopTimes() {
+            const map = {};
+            STATIONS.forEach(s => map[s] = []);
+            let start = toDate(START), end = toDate(END);
+            const segmentDetails = [];
+
+            while (start <= end) {
+                let t = new Date(start);
+                let currentDepartureTime = new Date(start);
+
+                for (const seg of travelMap) {
+                    const departureTime = new Date(currentDepartureTime);
+                    t = addMin(t, seg.minutes);
+                    const arrivalTime = new Date(t);
+
+                    if (!map[seg.to]) map[seg.to] = [];
+                    map[seg.to].push(arrivalTime);
+
+                    segmentDetails.push({
+                        from: seg.from,
+                        to: seg.to,
+                        departure: departureTime,
+                        arrival: arrivalTime,
+                        durationMs: seg.minutes * 60000,
+                        durationS: seg.minutes * 60,
+                    });
+
+                    t = addSec(t, ARRIVE_S + DEPART_S);
+                    currentDepartureTime = new Date(t);
+                }
+
+                start = addSec(start, TOTAL_CYCLE_TIME_S);
+            }
+            return { arrivalTimes: map, segments: segmentDetails };
+        }
+        const { arrivalTimes, segments } = buildLoopTimes();
+
+        // --- DOM Setup (Retained) ---
+        const metroMapEl = document.getElementById("metro-map");
+        const statusListEl = document.getElementById("status-list");
+        const dotEl = document.getElementById("moving-train-dot");
+
+        STATIONS.forEach((s) => {
+            const stationDiv = document.createElement("div");
+            stationDiv.className = "station-container";
+            stationDiv.innerHTML = `
+            <div class="station-dot" id="station_dot_${s.replace(/\s/g, "_")}"></div>
+            <div class="station-name">${s}</div>
+        `;
+            metroMapEl.appendChild(stationDiv);
+        });
+
+        STATIONS.forEach((s) => {
+            const badgeDiv = document.createElement("div");
+            badgeDiv.className = "station";
+            badgeDiv.style.display = 'flex';
+            badgeDiv.style.justifyContent = 'space-between';
+            badgeDiv.style.alignItems = 'center';
+            badgeDiv.style.padding = '10px 0';
+            badgeDiv.innerHTML = `
+            <div class="name">${s}</div>
+            <div class="status-badge muted" id="b_${s.replace(/\s/g, "_")}">--</div>
+        `;
+            statusListEl.appendChild(badgeDiv);
+        });
+
+
+        // --- Update Function with Countdown-Based Movement Logic (FIXED) ---
+        function update() {
+            const now = new Date();
+            document.getElementById("clock").textContent = fmt(now);
+
+            let minCountdownMs = Infinity;
+            let nextArrival = null;
+            let nextDestination = null;
+            let currentSegment = null;
+            let isDwell = false; // <-- DEFINED HERE
+
+            // 1. Find the Next Arrival and the Next Destination
+            STATIONS.forEach(s => {
+                const arr = arrivalTimes[s];
+                let next = null;
+
+                // Find the next arrival time for this station
+                for (const t of arr) {
+                    if (t.getTime() >= now.getTime() - (ARRIVE_S * 1000) - (DEPART_S * 1000)) {
+                        next = t;
+                        break;
+                    }
+                }
+
+                if (next) {
+                    const countdownMs = next.getTime() - now.getTime();
+                    if (countdownMs < minCountdownMs) {
+                        minCountdownMs = countdownMs;
+                        nextArrival = next;
+                        nextDestination = s;
+                    }
+                }
+            });
+
+            // 2. Identify the Active Segment based on Next Destination
+            if (nextDestination) {
+                // Find the segment that leads to this next arrival time
+                for (const seg of segments) {
+                    if (seg.to === nextDestination && seg.arrival.getTime() === nextArrival.getTime()) {
+                        currentSegment = seg;
+
+                        // The train is dwelling if the current time is AT the station (arrival + dwell time)
+                        if (now.getTime() >= seg.arrival.getTime() &&
+                            now.getTime() <= addSec(seg.arrival, ARRIVE_S + DEPART_S).getTime()) {
+                            isDwell = true;
+                        }
+                        break;
+                    }
+                }
+            }
+
+            // 3. Calculate Map Position
+            let mapPosition = 0;
+            let trainVisible = false;
+
+            if (currentSegment) {
+
+                const segmentFrom = currentSegment.from;
+                const segmentTo = currentSegment.to;
+
+                let timeElapsedMs = 0;
+                let travelDurationMs = currentSegment.durationMs;
+
+                if (now.getTime() < currentSegment.arrival.getTime()) {
+                    // Train is IN TRANSIT
+                    timeElapsedMs = now.getTime() - currentSegment.departure.getTime();
+                    trainVisible = true;
+                } else if (isDwell) {
+                    // Train is ARRIVED / DWELLING at the destination station
+                    timeElapsedMs = currentSegment.durationMs; // 100% of travel completed
+                    trainVisible = true;
+                } else {
+                    // Train has departed for the next segment (and we should be tracking the *next* segment)
+                    // If it's not currently dwelling, it's not on this segment anymore.
+                    trainVisible = false;
+                }
+
+                // Calculate progress within the segment
+                let segmentProgress = timeElapsedMs / travelDurationMs;
+                segmentProgress = Math.max(0, Math.min(1, segmentProgress)); // Clamp to 0-1
+
+                // Map the segment progress to the 0-100% visual track
+                if (trainVisible) {
+                    if (segmentFrom === 'New ISBT' && segmentTo === 'Zero Mile') {
+                        // ISBT (0%) -> ZM (50%)
+                        mapPosition = segmentProgress * 50;
+                    } else if (segmentFrom === 'Zero Mile' && segmentTo === 'Bhootnath') {
+                        // ZM (50%) -> BH (100%)
+                        mapPosition = 50 + segmentProgress * 50;
+                    } else if (segmentFrom === 'Bhootnath' && segmentTo === 'Zero Mile') {
+                        // BH (100%) -> ZM (50%) - Reversing
+                        mapPosition = 100 - segmentProgress * 50;
+                    } else if (segmentFrom === 'Zero Mile' && segmentTo === 'New ISBT') {
+                        // ZM (50%) -> ISBT (0%) - Reversing
+                        mapPosition = 50 - segmentProgress * 50;
+                    }
+
+                    // If dwelling, keep the dot fixed at the destination station
+                    if (isDwell) {
+                        if (segmentTo === 'Zero Mile') mapPosition = 50; // Fixed at ZM
+                        if (segmentTo === 'Bhootnath') mapPosition = 100; // Fixed at BH
+                        if (segmentTo === 'New ISBT') mapPosition = 0; // Fixed at ISBT
+                    }
+
+                }
+            }
+
+
+            // --- 4. Apply Position to Dot ---
+            dotEl.style.visibility = trainVisible ? 'visible' : 'hidden';
+
+            if (trainVisible) {
+                const mapWidth = metroMapEl.clientWidth;
+                const padding = 20;
+                const innerMapWidth = mapWidth - 2 * padding;
+
+                const clampedPosition = Math.max(0, Math.min(100, mapPosition));
+                const leftPx = padding + (innerMapWidth * clampedPosition / 100);
+
+                dotEl.style.left = `${leftPx}px`;
+            }
+
+            // --- 5. Update Status Badges (FIXED isDwell usage) ---
+            let minBadgeCountdownMs = Infinity;
+            let minStation = null;
+
+            STATIONS.forEach(s => {
+                const arr = arrivalTimes[s];
+                const elBadge = document.getElementById("b_" + s.replace(/\s/g, "_"));
+                let text = "";
+                let cls = "muted";
+                let next = null;
+
+                // Find the soonest next arrival time for this station
+                for (const t of arr) {
+                    if (t >= now) { next = t; break; }
+                }
+
+                if (next) {
+                    const countdownMs = next.getTime() - now.getTime();
+                    const countdown = hhmmss(countdownMs);
+                    const arrivalTime = next.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+                    // --- Status Check ---
+                    // Is the train currently AT this station? (Need to re-check if this station is the one being dwelt at)
+                    let isCurrentDwellStation = false;
+                    if (currentSegment && currentSegment.to === s && trainVisible) {
+                        // Check if current time is within the dwell period of this specific station
+                        if (now.getTime() >= currentSegment.arrival.getTime() &&
+                            now.getTime() <= addSec(currentSegment.arrival, ARRIVE_S + DEPART_S).getTime()) {
+                            isCurrentDwellStation = true;
+                        }
+                    }
+
+                    if (isCurrentDwellStation) {
+                        // Check if Arrived (first 30s of dwell) or Departing (last 15s of dwell)
+                        const timeSinceArrival = now.getTime() - currentSegment.arrival.getTime();
+
+                        if (timeSinceArrival <= ARRIVE_S * 1000) {
+                            cls = "green";
+                            text = `Arrived<br>${fmt(currentSegment.arrival)}`;
+                        } else {
+                            cls = "red";
+                            const departTime = addSec(currentSegment.arrival, ARRIVE_S + DEPART_S);
+                            text = `Departing<br>${fmt(departTime)}`;
+                        }
+                    }
+                    // Is the train currently traveling towards this station?
+                    else if (currentSegment && currentSegment.to === s && trainVisible && !isDwell) {
+                        // The train is currently moving toward this station (currentSegment.to)
+                        cls = "yellow";
+                        text = `Arriving in ${countdown}<br>at ${arrivalTime}`;
+                    }
+                    // Default/Other Stations
+                    else {
+                        cls = "yellow";
+                        text = `Next Train at <b>${arrivalTime}</b><br>in ${countdown}`;
+                    }
+
+                    if (countdownMs < minBadgeCountdownMs) {
+                        minBadgeCountdownMs = countdownMs;
+                        minStation = s;
+                    }
+                } else {
+                    text = "Service Closed";
+                }
+
+                elBadge.className = "status-badge " + cls;
+                elBadge.innerHTML = text;
+
+                // Final check to apply the 'green-glow' to the station with the soonest arrival
+                if (s === minStation && !elBadge.classList.contains('green') && !elBadge.classList.contains('red')) {
+                    elBadge.classList.add('green-glow');
+                    elBadge.classList.remove('yellow');
+                }
+            });
+        }
+
+        // Run the update immediately and then set the interval
+        update();
+        // Set update frequency to 70ms for very smooth animation
+        setInterval(update, 70);
+        // Also run update on window resize to fix horizontal dot position
+        window.addEventListener('resize', update);
+    </script>
+</body>
+
+</html>
