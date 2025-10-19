@@ -3,7 +3,7 @@
     banner.id = "diwaliBanner";
     banner.innerHTML = `
         <div class="diwali-banner-content">
-            <img src="icon-192.png" alt="Logo" />
+            <img src="data/icons/icon-192.png" alt="Logo" />
             <div>
                 <h1>🎆 Happy Diwali! 🎇</h1>
                 <p>Wishing you joy, light, and prosperity.</p>
@@ -100,7 +100,7 @@
     // Optional: auto-close after 10 seconds
     setTimeout(() => {
         document.getElementById("diwaliBanner").style.display = "none";
-    }, 80000);
+    }, 30000);
 
     const btn = document.getElementById("closeBanner");
     btn.innerText = "Please wait...";
@@ -113,7 +113,7 @@
         btn.innerText = "Close & Celebrate!";
         btn.style.opacity = "1";
         btn.style.cursor = "pointer";
-    }, 15000);
+    }, 10000);
 
 })();
 
