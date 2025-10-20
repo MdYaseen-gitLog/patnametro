@@ -1,0 +1,521 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Patna Metro — Accurate Live Loop</title>
+    <style>
+        /* CSS from original file remains the same for styling */
+        body {
+            margin: 0;
+            padding: 16px;
+            font-family: Inter, system-ui;
+            background: #081222;
+            color: #eaf2ff
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto
+        }
+
+        h1 {
+            font-size: 18px;
+            margin: 0 0 8px;
+            text-align: center;
+        }
+
+        .line-wrap {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 16px;
+            border-radius: 12px;
+            margin-top: 10px
+        }
+
+        .station {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            margin: 10px 0
+        }
+
+        .name {
+            width: 120px;
+            font-weight: 600;
+            margin-top: 20px;
+            margin-bottom: 20px
+        }
+
+        .line {
+            flex: 1;
+            height: 8px;
+            background: linear-gradient(90deg, #0b64ff, #3c14b4);
+            border-radius: 4px;
+            position: relative
+        }
+
+        .dot {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #fff
+        }
+
+        .badge {
+            min-width: 150px;
+            padding: 8px 10px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 13px;
+            margin-left: 4px;
+            margin-top: 20px;
+            margin-bottom: 20px
+        }
+
+        .green {
+            background: #c9ffd9;
+            color: #064022;
+            box-shadow: 0 0 12px rgba(0, 255, 100, .3)
+        }
+
+        .green-glow {
+            background: #c9ffd9;
+            color: #064022;
+            border: 2px solid #00ff88;
+            box-shadow: 0 0 15px 4px rgba(0, 255, 100, 0.5);
+            animation: glowPulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes glowPulse {
+            0% {
+                box-shadow: 0 0 5px 2px rgba(0, 255, 100, 0.4);
+            }
+
+            50% {
+                box-shadow: 0 0 15px 6px rgba(0, 255, 100, 0.6);
+            }
+
+            100% {
+                box-shadow: 0 0 5px 2px rgba(0, 255, 100, 0.4);
+            }
+        }
+
+        .red {
+            background: #ffcfcf;
+            color: #5a0a0a;
+            box-shadow: 0 0 12px rgba(255, 80, 80, .3)
+        }
+
+        .yellow {
+            background: #fff3c1;
+            color: #5a3d00;
+            box-shadow: 0 0 12px rgba(255, 200, 0, .3)
+        }
+
+        .muted {
+            background: rgba(255, 255, 255, .05);
+            color: #aaa
+        }
+
+        #clock {
+            width: 74px;
+            height: 74px;
+            border-radius: 50%;
+            background: #ffffff;
+            color: #000000;
+            font-size: 12px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px auto;
+            text-align: center;
+            white-space: nowrap;
+            user-select: none;
+            box-shadow: 0 0 12px rgba(0, 128, 255, 0.6);
+            transition: box-shadow 0.3s ease;
+        }
+
+        #clock:hover {
+            box-shadow: 0 0 20px rgba(0, 128, 255, 0.8);
+        }
+
+        #nearest_info {
+            padding: 10px 0;
+            text-align: center;
+            font-size: 15px;
+            font-weight: 600;
+            color: #00ff88;
+            text-shadow: 0 0 5px rgba(0, 255, 100, 0.5);
+        }
+
+        @media (max-width: 600px) {
+            .station {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+
+            .line {
+                flex: none;
+                width: 8px;
+                height: 100px;
+                background: linear-gradient(to bottom, #0b64ff, #3c14b4);
+                margin: 8px 0;
+            }
+
+            .dot {
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+            }
+
+            .badge {
+                margin-top: 12px;
+                margin-left: 0;
+            }
+
+            .name {
+                width: auto;
+                margin-bottom: 8px;
+            }
+
+            #clock {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                font-size: 10px
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Patna Metro Live Status &amp; GPS Validation</h1>
+        <p id="clock" style="text-align: center;"></p>
+        <div id="nearest_info">Fetching GPS location and GeoJSON...</div>
+        <div class="line-wrap" id="list"></div>
+    </div>
+
+    <script>
+        // --- CONSTANTS ---
+        const GEOJSON_FILE = 'data/station.geojson';
+        const travelMap = [
+            { from: "New ISBT", to: "Zero Mile", minutes: 5 },
+            { from: "Zero Mile", to: "Bhootnath", minutes: 5 },
+            { from: "Bhootnath", to: "Zero Mile", minutes: 5 },
+            { from: "Zero Mile", to: "New ISBT", minutes: 5 }
+        ];
+
+        const TRAVEL_MIN = 5, CYCLE_MIN = 20, START = "04:00", END = "23:00";
+        const ARRIVE_S = 30, DEPART_S = 15;
+
+        // --- GLOBAL STATE ---
+        let STATION_COORDS = {}; // Map station name to its coordinates
+        let STATION_NAMES = [];  // List of station names for iteration
+        let USER_LOCATION = null; // Stores {lat, lon} of the user
+        let NEAREST_STATION_INFO = null; // Stores {station, distance_km, distance_text}
+        let SIMULATED_DELAYS = {}; // Stores random delays for each arrival
+
+        // --- UTILITY FUNCTIONS ---
+        function toDate(hm) { const [h, m] = hm.split(":").map(Number); const n = new Date(); return new Date(n.getFullYear(), n.getMonth(), n.getDate(), h, m, 0, 0); }
+        function addMin(d, m) { return new Date(d.getTime() + m * 60000); }
+        function addSec(d, s) { return new Date(d.getTime() + s * 1000); }
+        function fmt(t) { return t.toLocaleTimeString(); }
+        function hhmmss(ms) { if (ms < 0) ms = 0; const s = Math.floor(ms / 1000), m = Math.floor(s / 60) % 60, h = Math.floor(s / 3600); return (h > 0 ? h.toString().padStart(2, "0") + ":" : "") + String(m).padStart(2, "0") + ":" + String(s % 60).padStart(2, "0"); }
+        function toRad(degrees) { return degrees * (Math.PI / 180); }
+
+        /**
+         * @function haversine
+         * @description Calculates distance between two lat/lon points (km).
+         */
+        function haversine(lat1, lon1, lat2, lon2) {
+            const R = 6371; // Earth radius in kilometers
+            const dLat = toRad(lat2 - lat1);
+            const dLon = toRad(lon2 - lon1);
+            const a =
+                Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            return R * c; // Distance in km
+        }
+
+        // --- CORE LOGIC FUNCTIONS ---
+
+        /**
+         * @function loadGeoJSON
+         * @description Fetches GeoJSON, populates STATION_COORDS, and initializes STATIONS_NAMES.
+         */
+        async function loadGeoJSON() {
+            try {
+                const response = await fetch(GEOJSON_FILE);
+                const geojsonData = await response.json();
+                const features = geojsonData.features;
+
+                features.forEach(feature => {
+                    const name = feature.properties.station_name;
+                    // GeoJSON coordinates are [longitude, latitude]
+                    const [lng, lat] = feature.geometry.coordinates; 
+
+                    STATION_COORDS[name] = { lat, lng };
+                    STATION_NAMES.push(name);
+                });
+
+                console.log("GeoJSON loaded. Stations:", STATION_NAMES);
+                return true;
+
+            } catch (error) {
+                console.error("Error loading GeoJSON. Using hardcoded stations.", error);
+                // Fallback to hardcoded names if file load fails
+                STATION_NAMES = ["New ISBT", "Zero Mile", "Bhootnath"]; 
+                return false;
+            }
+        }
+
+        /**
+         * @function getUserLocation
+         * @description Prompts user for GPS location and sets USER_LOCATION.
+         */
+        function getUserLocation() {
+            return new Promise((resolve, reject) => {
+                const infoEl = document.getElementById("nearest_info");
+                infoEl.innerHTML = 'Awaiting GPS permission...';
+
+                if (!navigator.geolocation) {
+                    infoEl.innerHTML = 'GPS not supported by your browser.';
+                    return reject(new Error("Geolocation not supported."));
+                }
+
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        USER_LOCATION = {
+                            lat: position.coords.latitude,
+                            lon: position.coords.longitude
+                        };
+                        console.log("GPS located:", USER_LOCATION);
+                        resolve();
+                    },
+                    (error) => {
+                        infoEl.innerHTML = 'Location permission denied or error: ' + error.message;
+                        console.error("GPS Error:", error.message);
+                        reject(error);
+                    },
+                    // Options for high accuracy
+                    { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+                );
+            });
+        }
+
+        /**
+         * @function findNearestStation
+         * @description Finds the closest station to the user's location, handles NaN, 
+         * and selects the best unit (m or km) for display.
+         */
+        function findNearestStation() {
+            // Exit if location data is missing
+            if (!USER_LOCATION || Object.keys(STATION_COORDS).length === 0) return;
+
+            let nearest = null;
+            let minDistance = Infinity; // This distance is in KM
+
+            for (const name in STATION_COORDS) {
+                const { lat, lng } = STATION_COORDS[name];
+                const distance = haversine(USER_LOCATION.lat, USER_LOCATION.lon, lat, lng);
+
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    nearest = name;
+                }
+            }
+            
+            // 1. Check for NaN and store the raw numeric distance in KM
+            const distanceKm = isNaN(minDistance) ? 0 : minDistance; 
+
+            let distanceText;
+            
+            // 2. Format the distance for display based on magnitude
+            if (distanceKm === 0) {
+                distanceText = 'Distance Error / N/A';
+            } else if (distanceKm < 1) { 
+                // Display in meters (m) if less than 1 km
+                distanceText = (distanceKm * 1000).toFixed(0) + 'm';
+            } else { 
+                // Display in kilometers (km)
+                distanceText = distanceKm.toFixed(2) + 'km';
+            }
+
+            // --- CRITICAL FIX: Store the formatted string in the global object ---
+            NEAREST_STATION_INFO = { 
+                station: nearest, 
+                distance_km: distanceKm,
+                distance_text: distanceText
+            };
+            // --------------------------------------------------------------------
+
+            // 3. Update the nearest info element safely
+            document.getElementById("nearest_info").innerHTML = 
+                `Nearest Station: <b>${NEAREST_STATION_INFO.station}</b> (${NEAREST_STATION_INFO.distance_text} away)`;
+        }
+
+        /**
+         * @function buildLoopTimes
+         * @description Generates the fixed loop schedule.
+         */
+        function buildLoopTimes() {
+            const map = {};
+            STATION_NAMES.forEach(s => map[s] = []);
+            let start = toDate(START), end = toDate(END);
+
+            while (start <= end) {
+                let t = new Date(start);
+                // step through the travel map sequence
+                for (const seg of travelMap) {
+                    // Only record times for stations that were loaded from GeoJSON
+                    if (!map[seg.to]) continue; 
+
+                    t = addMin(t, seg.minutes);
+                    
+                    // Generate a simulated delay for this specific scheduled arrival (0 to 120 seconds)
+                    const delaySeconds = Math.floor(Math.random() * 120); 
+                    const delayedTime = addSec(t, delaySeconds);
+                    
+                    map[seg.to].push({
+                        scheduled: new Date(t),
+                        delayed: delayedTime,
+                        delaySec: delaySeconds
+                    });
+                }
+                // repeat next loop cycle
+                const total = travelMap.reduce((a, b) => a + b.minutes, 0);
+                start = addMin(start, total);
+            }
+            return map;
+        }
+
+        // --- INITIALIZATION ---
+        const init = async () => {
+            await loadGeoJSON();
+            
+            // Render the station list based on the loaded names
+            const wrap = document.getElementById("list");
+            STATION_NAMES.forEach(s => {
+                const div = document.createElement("div");
+                div.className = "station";
+                div.innerHTML = `<div class="name">${s}</div><div class="line"><div class="dot"></div></div><div class="badge muted" id="b_${s.replace(/\s/g, "_")}">--</div>`;
+                wrap.appendChild(div);
+            });
+
+            // Build the schedule after stations are loaded
+            const times = buildLoopTimes();
+            
+            // Get user location and find nearest station (asynchronously)
+            try {
+                await getUserLocation();
+                findNearestStation();
+            } catch (e) {
+                console.warn("Continuing without GPS location.");
+                document.getElementById("nearest_info").innerHTML = 'GPS not available. Showing schedule only.';
+            }
+
+
+            // Start the update loop
+            const update = () => {
+                const now = new Date();
+                document.getElementById("clock").textContent = fmt(now);
+
+                const nextArrivals = [];
+
+                // First pass: gather prev/next times per station
+                STATION_NAMES.forEach(s => {
+                    const arr = times[s];
+                    let prev = null, next = null;
+
+                    for (let i = arr.length - 1; i >= 0; i--) {
+                        // Check against the *scheduled* time for finding prev/next
+                        if (arr[i].scheduled <= now) { prev = arr[i]; break; }
+                    }
+                    for (const t of arr) {
+                        if (t.scheduled >= now) { next = t; break; }
+                    }
+                    nextArrivals.push({ station: s, prev, next });
+                });
+
+                // Find the station with the nearest next train (minimum countdown based on *delayed* time)
+                const activeArrivals = nextArrivals.filter(e => e.next);
+                let minStation = null;
+
+                if (activeArrivals.length > 0) {
+                    minStation = activeArrivals.reduce((a, b) =>
+                        (a.next.delayed - now < b.next.delayed - now ? a : b)
+                    ).station;
+                }
+
+                // Second pass: render each station's badge
+                nextArrivals.forEach(({ station: s, prev, next }) => {
+                    const el = document.getElementById("b_" + s.replace(/\s/g, "_"));
+                    let text = "";
+                    let cls = "muted";
+
+                    // Determine current status based on the *delayed* time
+                    if (prev && now < addSec(prev.delayed, ARRIVE_S)) {
+                        cls = "green";
+                        text = `Arrived<br>${fmt(prev.delayed)}`;
+
+                    } else if (prev && now < addSec(prev.delayed, ARRIVE_S + DEPART_S)) {
+                        cls = "red";
+                        text = `Departed<br>${fmt(prev.delayed)}`;
+
+                    } else if (next) {
+                        const countdown = hhmmss(next.delayed - now);
+                        const arrivalTime = next.delayed.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                        const scheduledTime = next.scheduled.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                        const delayMin = Math.round(next.delaySec / 60);
+
+                        // Calculate delay display
+                        let delayText = "";
+                        if (delayMin > 0) {
+                             delayText = `(${delayMin} min delay)`;
+                        } else {
+                             delayText = "(On Time)";
+                        }
+
+                        // Highlight the soonest train (based on delayed time)
+                        cls = (s === minStation) ? "green-glow" : "yellow";
+                        
+                        // Show nearest station info on the badge if it's the nearest one
+                        if (NEAREST_STATION_INFO && s === NEAREST_STATION_INFO.station) {
+                             // --- CRITICAL FIX: Use distance_text here ---
+                             text = `<b>YOU ARE HERE</b> (${NEAREST_STATION_INFO.distance_text})<hr style="margin: 4px 0; border-color: rgba(0,0,0,0.1)">Next: <b>${arrivalTime}</b> ${delayText}<br>in ${countdown}`;
+                        } else {
+                            text = `Next Train: <b>${arrivalTime}</b> ${delayText}<br>in ${countdown}`;
+                        }
+
+                    } else {
+                        text = "Service Closed";
+                    }
+
+                    el.className = "badge " + cls;
+                    el.innerHTML = text;
+                });
+            };
+
+            update(); 
+            // Update frequently for countdown accuracy
+            setInterval(update, 700);
+        };
+
+        // Start the process
+        init();
+    </script>
+</body>
+
+</html>
