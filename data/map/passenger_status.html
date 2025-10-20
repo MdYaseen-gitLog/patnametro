@@ -45,7 +45,7 @@ button.active{background:#00ff80;color:#062a1a;}
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script>
 /* ---------- Data ---------- */
-const BUFFER_KM = 5; // 500m buffer zone
+const BUFFER_KM = 5000; // 500m buffer zone
 let STATIONS = [];
 let map, marker, gpsActive=false, watchId=null;
 const ARRIVE_S = 30, DEPART_S = 15;
@@ -214,3 +214,4 @@ window.addEventListener("load", async ()=>{
 </script>
 </body>
 </html>
+
