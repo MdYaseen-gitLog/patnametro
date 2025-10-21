@@ -72,38 +72,46 @@ window.addEventListener('DOMContentLoaded', () => {
 
   const checkbox = document.getElementById('enableLocation');
   if (!checkbox) return;
+  // Call for checkbox
+  showTooltipOnceWhenVisible('enableLocation', 'Tip: Check this to find the nearest station to you!');
 
-  // Delay 10 seconds
+  // Call for swap button
+  showTooltipOnceWhenVisible('btnSwap', 'Tip: Click to swap origin and destination!');
+
+
+});
+
+function showTooltipOnceWhenVisible(elementId, tooltipContent, delay = 10000, duration = 15000) {
+  const el = document.getElementById(elementId);
+  if (!el) return;
+
   setTimeout(() => {
-    // Start observing visibility
     const observer = new IntersectionObserver((entries, observer) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
-          // Tooltip logic
-          tippy(checkbox, {
-            content: 'Tip: Check this to find the nearest station to you!',
+          tippy(el, {
+            content: tooltipContent,
             arrow: true,
             placement: 'top',
             theme: 'leaflet-dark',
             trigger: 'manual',
           });
 
-          checkbox._tippy.show();
+          if (el._tippy) {
+            el._tippy.show();
 
-          // Hide tooltip after 15 seconds
-          setTimeout(() => {
-            checkbox._tippy.hide();
-          }, 24000);
+            setTimeout(() => {
+              el._tippy.hide();
+            }, duration);
+          }
 
-          // Stop observing after first appearance
-          observer.unobserve(checkbox);
+          observer.unobserve(el);
         }
       });
     }, {
-      threshold: 1.0 // Fully in view (you can set to 0.5 if partial is ok)
+      threshold: 1.0 // Only when fully in view
     });
 
-    observer.observe(checkbox);
-  }, 3000); // 10s delay
-
-});
+    observer.observe(el);
+  }, delay);
+}

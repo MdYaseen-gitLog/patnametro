@@ -359,11 +359,11 @@
 
 <body>
     <!-- Diwali Banner JS -->
-    <link rel="stylesheet" href="diwali-banner.css">
-    <script src="diwali-banner.js"></script>
-    <!-- <script src="banner.js"></script> -->
+    <!-- <link rel="stylesheet" href="diwali-banner.css"> -->
+    <!-- <script src="diwali-banner.js"></script> -->
+    <script src="banner.js"></script>
     <!-- <script src="data/install-popup.js"></script> -->
-    <!-- <script src="usertips.js"></script> -->
+    <script src="usertips.js"></script>
     <div id="aqi-alert" class="alert" role="alert"><i class="fas fa-head-side-mask"></i></div>
     <button id="installBtn">
         📲 Install App
@@ -1980,7 +1980,7 @@
             if (aqiValue >= 4) return 'alert-danger';     // Poor or Very Poor
         }
 
-        /* window.addEventListener('load', () => {
+         window.addEventListener('load', () => {
              setTimeout(() => {
                  getAQIDescription(lat, lon, apiKey).then(aqi => {
                      const alertBox = document.getElementById('aqi-alert');
@@ -2001,12 +2001,12 @@
                      // Auto-hide after 5 seconds (5000 ms)
                      setTimeout(() => {
                          alertBox.style.display = 'none';
-                     }, 10000);
+                     }, 15000);
 
                  });
              }, 25000); // Show alert after 10 seconds
 
-         });*/
+         });
 
         // aqi alert end 
     </script>
