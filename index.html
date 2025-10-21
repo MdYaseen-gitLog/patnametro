@@ -1989,7 +1989,7 @@
                          const alertClass = getBootstrapAlertClass(aqi.value);
                          alertBox.className = `alert ${alertClass}`;
                          alertBox.innerHTML = `
-         <strong>Air Quality Alert:</strong> The air quality is <strong>${aqi.label}</strong> ${aqi}. Please take precautions.
+         <strong>Air Quality Alert:</strong> The air quality is <strong>${aqi.label}</strong> ${aqi.value}. Please take precautions.
        `;
                      } else {
                          alertBox.className = 'alert alert-secondary';

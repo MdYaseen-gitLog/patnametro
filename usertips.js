@@ -76,7 +76,7 @@ window.addEventListener('DOMContentLoaded', () => {
   showTooltipOnceWhenVisible('enableLocation', 'Tip: Check this to find the nearest station to you!');
 
   // Call for swap button
-  showTooltipOnceWhenVisible('btnSwap', 'Tip: Click to swap origin and destination!');
+  showTooltipOnceWhenVisible('btnSwap', 'Tip: Click to swap source and destination!');
 
 
 });
