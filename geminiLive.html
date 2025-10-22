@@ -393,14 +393,14 @@
             const nearestStationElement = document.getElementById("nearestStation");
             const widgetContainer = document.getElementById('station-widget');
 
-            if (nearestStationElement) {
-                nearestStationElement.style.color = "red";
-                nearestStationElement.textContent = "Location Error: " + e.message;
-            }
+            // if (nearestStationElement) {
+            //     nearestStationElement.style.color = "red";
+            //     nearestStationElement.textContent = "Location Error: " + e.message;
+            // }
            // if (widgetContainer) widgetContainer.style.display = 'none';
 
-            if (nearestStationCircle) map.removeLayer(nearestStationCircle);
-            if (previousStationCircle) map.removeLayer(previousStationCircle);
+            // if (nearestStationCircle) map.removeLayer(nearestStationCircle);
+            // if (previousStationCircle) map.removeLayer(previousStationCircle);
 
             // Reset speed tracking variables on error
             lastLatLng = null;
