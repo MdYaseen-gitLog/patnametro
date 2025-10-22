@@ -440,7 +440,7 @@
                 lastTimestamp = null;
 
                 updateLocation();
-                intervalId = setInterval(updateLocation, 5000);
+                intervalId = setInterval(updateLocation, 7000);
 
             } else {
                 document.getElementById("nearestStation").textContent = "";
@@ -469,7 +469,7 @@
                 // Reset speed tracking variables on resume to avoid jump errors
                 lastLatLng = null;
                 lastTimestamp = null;
-                intervalId = setInterval(updateLocation, 30000);
+                intervalId = setInterval(updateLocation, 15000);
             }
         });
 
