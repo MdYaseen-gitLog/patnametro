@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Train Nearest Station Tracker</title>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+    <script src='https://unpkg.com/@turf/turf@6/turf.min.js'></script>
+
+    <style>
+        /* General Body and Map Styling */
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+        }
+
+        #map {
+            height: 100vh;
+            width: 100vw;
+        }
+
+        /* -------------------------------------- */
+        /* UI WIDGET AND CONTROLS STYLES */
+        /* -------------------------------------- */
+
+        /* Controls Container (Top Right) */
+        #controls {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            z-index: 1001;
+            background-color: rgba(0, 0, 0, 0.75);
+            padding: 10px 15px;
+            border-radius: 8px;
+            color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            min-width: 150px;
+        }
+
+        /* Station Widget Container (Top Left) */
+        #station-widget {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            z-index: 1000;
+            background-color: rgba(0, 0, 0, 0.75);
+            padding: 15px;
+            border-radius: 8px;
+            color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+            width: 200px;
+            display: none;
+            /* Initially hidden */
+        }
+
+        .station-item {
+            padding: 8px;
+            margin-bottom: 5px;
+            border-radius: 4px;
+            background-color: #333;
+            color: white;
+            transition: all 0.3s ease-in-out;
+            border: 2px solid #555;
+            min-height: 40px;
+        }
+
+        .station-item strong {
+            font-size: 1.1em;
+        }
+
+        /* -------------------------------------- */
+        /* MARKER & GLOW STYLES */
+        /* -------------------------------------- */
+
+        /* Base class for static marker structure */
+        /* Used on L.circleMarker's SVG element */
+        .glowing-marker {
+            transform: scale(1) !important;
+            /* Ensure the marker does not scale */
+        }
+
+        /* Green Glow for Nearest Station */
+        .glow-green {
+            border-color: limegreen !important;
+            background-color: rgba(50, 205, 50, 0.6) !important;
+        }
+
+        /* Yellow Glow for Previous Station */
+        .glow-yellow {
+            border-color: gold !important;
+            background-color: rgba(255, 215, 0, 0.6) !important;
+        }
+
+        /* Keyframes for GREEN external pulsing glow */
+        @keyframes simple-glow-pulse-green {
+            0% {
+                box-shadow: 0 0 10px 0px rgba(50, 205, 50, 0.7);
+            }
+
+            100% {
+                box-shadow: 0 0 25px 15px rgba(50, 205, 50, 0.0);
+            }
+        }
+
+        /* Keyframes for YELLOW external pulsing glow */
+        @keyframes simple-glow-pulse-yellow {
+            0% {
+                box-shadow: 0 0 10px 0px rgba(255, 215, 0, 0.7);
+            }
+
+            100% {
+                box-shadow: 0 0 25px 15px rgba(255, 215, 0, 0.0);
+            }
+        }
+
+        /* Apply specific animations */
+        .glowing-marker.glow-green {
+            animation: simple-glow-pulse-green 2s infinite ease-out;
+        }
+
+        .glowing-marker.glow-yellow {
+            animation: simple-glow-pulse-yellow 2s infinite ease-out;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="map"></div>
+
+    <div id="controls">
+        <label for="insideTrain">
+            <input type="checkbox" id="insideTrain">
+            <strong>Inside Train 🚂</strong>
+        </label>
+        <div id="loadingSpinner" style="display:none; color: #ADD8E6;">🔍 Searching...</div>
+        <div id="nearestStation" style="color: white; font-weight: bold; font-size: 0.9em;"></div>
+    </div>
+
+    <div id="station-widget">
+        <h4 style="margin-top: 0; margin-bottom: 10px; border-bottom: 1px solid #444; padding-bottom: 5px;">Live Status
+        </h4>
+        <div id="previousStationWidget" class="station-item"></div>
+        <div id="nearestStationWidget" class="station-item"></div>
+        <div id="nextStationWidget" class="station-item"></div>
+    </div>
+
+    <select id="sourceStation" style="display:none;">
+        <option value="0" disabled selected>Select Source</option>
+        <option value="1">Mumbai CSMT</option>
+        <option value="2">Byculla</option>
+        <option value="3">Dadar</option>
+    </select>
+
+    <script>
+        // Global variables for map layers and data
+        var nearestStationCircle, previousStationCircle;
+        let stationDataCache = null;
+        let lastNearestStation = null;
+        var intervalId;
+
+        // NEW GLOBAL VARIABLES FOR SPEED CALCULATION
+        let lastLatLng = null;      // Stores {lat, lng} of the previous location
+        let lastTimestamp = null;   // Stores the timestamp of the previous location update
+
+        // Ensure your HTML has a <div id="map"></div>
+        // Initialize the map centered somewhere and add a tile layer
+        const map = L.map('map').setView([19.0760, 72.8777], 12); // Use a default center
+
+        // L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        //     attribution: '© OpenStreetMap contributors'
+        // }).addTo(map);
+
+        // Your custom code starts here:
+        // map.on('locationfound', onLocationFound); // This line is failing
+        // ----------------------------------------------------------------------------------
+        // DATA LOADING (Remains the same)
+        // ----------------------------------------------------------------------------------
+        fetch('data/Stations.geojson')
+            .then(response => {
+                if (!response.ok) throw new Error("Network response failed.");
+                return response.json();
+            })
+            .then(data => {
+                stationDataCache = data;
+                console.log("Station data loaded successfully.");
+            })
+            .catch(error => {
+                alert("Failed to load station data. Check console for details.");
+                console.error("Error loading GeoJSON:", error);
+            });
+
+        // ----------------------------------------------------------------------------------
+        // NEW: Speed Calculation Function (km/h)
+        // ----------------------------------------------------------------------------------
+        function calculateSpeed(currentE) {
+            const currentLatLng = currentE.latlng;
+            const currentTimestamp = Date.now();
+            let speedKmH = 0;
+
+            if (lastLatLng && lastTimestamp) {
+                // 1. Calculate Distance (in kilometers) using Turf.js
+                const distanceKm = turf.distance(
+                    turf.point([lastLatLng.lng, lastLatLng.lat]),
+                    turf.point([currentLatLng.lng, currentLatLng.lat]),
+                    { units: 'kilometers' }
+                );
+
+                // 2. Calculate Time Elapsed (in hours)
+                const timeElapsedMs = currentTimestamp - lastTimestamp;
+                const timeElapsedHours = timeElapsedMs / (1000 * 60 * 60); // Convert milliseconds to hours
+
+                // 3. Calculate Speed (km/h)
+                if (timeElapsedHours > 0) {
+                    speedKmH = distanceKm / timeElapsedHours;
+                }
+            }
+
+            // Update previous state for next iteration
+            lastLatLng = currentLatLng;
+            lastTimestamp = currentTimestamp;
+
+            return speedKmH;
+        }
+
+
+        // ----------------------------------------------------------------------------------
+        // MODIFIED: GEOLOCATION SUCCESS HANDLER (Now includes Speed)
+        // ----------------------------------------------------------------------------------
+        function onLocationFound(e) {
+            if (!stationDataCache || !document.getElementById("insideTrain").checked) {
+                document.getElementById("loadingSpinner").style.display = "none";
+                return;
+            }
+
+            // --- 1. Calculate Speed ---
+            const currentSpeed = calculateSpeed(e);
+            const speedDisplay = currentSpeed.toFixed(0) + ' km/h';
+
+            const userLat = e.latlng.lat;
+            const userLng = e.latlng.lng;
+            const userPoint = turf.point([userLng, userLat]);
+
+            const nearest = turf.nearestPoint(userPoint, stationDataCache);
+
+            const nearestCoords = nearest.geometry.coordinates;
+            const distanceKm = turf.distance(userPoint, turf.point(nearestCoords), { units: 'kilometers' });
+
+            const currentNearestSTN_ID = nearest.properties.STN_ID;
+
+            if (distanceKm <= 5) {
+
+                // 2. Check if the nearest station has changed
+                if (lastNearestStation && lastNearestStation.properties.STN_ID !== currentNearestSTN_ID) {
+                    // No need to pass previous distance, but we need to update the widget
+                    highlightPreviousStation(lastNearestStation);
+                    updateStationWidget(lastNearestStation, 'previous', speedDisplay); // Pass speed
+                }
+
+                // 3. Highlight current nearest station (GREEN)
+                highlightNearestStation(nearest, distanceKm);
+                updateStationWidget(nearest, 'nearest', speedDisplay); // Pass speed
+
+                lastNearestStation = nearest;
+                map.setView([nearestCoords[1], nearestCoords[0]], 14, {
+                    animate: true,
+                    duration: 5  // in seconds
+                });
+                // map.flyTo([nearestCoords[1], nearestCoords[0]], 14);
+
+            } else {
+                document.getElementById("nearestStation").textContent = "No station nearby (> 5 km). Speed: " + speedDisplay;
+            }
+
+            document.getElementById("loadingSpinner").style.display = "none";
+        }
+
+
+        // ----------------------------------------------------------------------------------
+        // HIGHLIGHT FUNCTIONS (Only distance removed from popup)
+        // ----------------------------------------------------------------------------------
+
+        function highlightNearestStation(feature, distanceKm) {
+            const coords = feature.geometry.coordinates;
+            const props = feature.properties;
+
+            if (nearestStationCircle) map.removeLayer(nearestStationCircle);
+
+            nearestStationCircle = L.circleMarker([coords[1], coords[0]], {
+                radius: 15,
+                color: 'limegreen',
+                fillColor: 'rgba(50, 205, 50, 0.6)',
+                fillOpacity: 1,
+                weight: 3,
+                className: 'glowing-marker glow-green',
+            }).addTo(map);
+
+            const source = document.getElementById("sourceStation");
+            document.getElementById("nearestStation").style.color = "limegreen";
+            document.getElementById("nearestStation").textContent = props.station_name + " (" + distanceKm.toFixed(2) + ' km)'; // Still show distance here
+            if (source) {
+                selectOptionByText("sourceStation", props.station_name);
+                source.dispatchEvent(new Event('change'));
+            }
+
+            nearestStationCircle.bindPopup(`
+        <strong>Next Station</strong><br>
+        ${props.station_name}<br>
+        ${distanceKm.toFixed(2)} km away.
+    `);
+        }
+
+        function highlightPreviousStation(feature) {
+            const coords = feature.geometry.coordinates;
+            if (previousStationCircle) map.removeLayer(previousStationCircle);
+
+            previousStationCircle = L.circleMarker([coords[1], coords[0]], {
+                radius: 15,
+                color: 'gold',
+                fillColor: 'rgba(255, 215, 0, 0.8)',
+                fillOpacity: 1,
+                weight: 3,
+                className: 'glowing-marker glow-yellow',
+            }).addTo(map);
+        }
+
+
+        // ----------------------------------------------------------------------------------
+        // MODIFIED: WIDGET FUNCTION (Now displays Speed)
+        // ----------------------------------------------------------------------------------
+
+        function updateStationWidget(feature, type, speedDisplay) {
+            const props = feature.properties;
+            const color = props.station_color;
+            const stnName = props.station_name;
+
+            let widgetId;
+            let title;
+            let extraClass = '';
+
+            if (type === 'nearest') {
+                widgetId = 'nearestStationWidget';
+                title = 'Nearest (Next)';
+                extraClass = 'glow-green';
+                const prevWidget = document.getElementById('previousStationWidget');
+                if (prevWidget) prevWidget.classList.remove('glow-green');
+            } else if (type === 'previous') {
+                widgetId = 'previousStationWidget';
+                title = 'Previous (Passed)';
+                extraClass = 'glow-yellow';
+            } else {
+                return;
+            }
+
+            const widget = document.getElementById(widgetId);
+            if (!widget) return;
+
+            widget.className = `station-item ${extraClass}`;
+            widget.style.backgroundColor = color || '#333';
+
+            // Display Speed instead of Distance/STN_ID
+            widget.innerHTML = `
+        <strong>${title}</strong><br>
+        Name: ${stnName}<br>
+        Speed: ${speedDisplay}
+    `;
+        }
+
+        // ----------------------------------------------------------------------------------
+        // HELPER FUNCTIONS (Remains the same)
+        // ----------------------------------------------------------------------------------
+
+        function updateLocation() {
+            if (document.getElementById("insideTrain") && document.getElementById("insideTrain").checked) {
+                document.getElementById("loadingSpinner").style.display = "block";
+                map.locate({ setView: true, maxZoom: 14 });
+            }
+        }
+
+        function onLocationError(e) {
+            document.getElementById("loadingSpinner").style.display = "none";
+            const nearestStationElement = document.getElementById("nearestStation");
+            const widgetContainer = document.getElementById('station-widget');
+
+            if (nearestStationElement) {
+                nearestStationElement.style.color = "red";
+                nearestStationElement.textContent = "Location Error: " + e.message;
+            }
+           // if (widgetContainer) widgetContainer.style.display = 'none';
+
+            if (nearestStationCircle) map.removeLayer(nearestStationCircle);
+            if (previousStationCircle) map.removeLayer(previousStationCircle);
+
+            // Reset speed tracking variables on error
+            lastLatLng = null;
+            lastTimestamp = null;
+        }
+
+        function selectOptionByText(selectId, searchText) {
+            const select = document.getElementById(selectId);
+            if (!select) return;
+            const options = Array.from(select.options);
+            for (let option of options) {
+                if (option.text.includes(searchText)) {
+                    select.value = option.value;
+                    return option;
+                }
+            }
+            return null;
+        }
+
+
+        // ----------------------------------------------------------------------------------
+        // EVENT LISTENERS (Updated to reset speed variables)
+        // ----------------------------------------------------------------------------------
+        map.on('locationfound', onLocationFound);
+        map.on('locationerror', onLocationError);
+
+        document.getElementById('insideTrain').addEventListener('change', function () {
+            const isChecked = this.checked;
+            const widgetContainer = document.getElementById('station-widget');
+
+            if (isChecked) {
+                document.getElementById("nearestStation").textContent = "searching....";
+                if (widgetContainer) widgetContainer.style.display = 'block';
+
+                // Reset speed tracking variables when starting
+                lastLatLng = null;
+                lastTimestamp = null;
+
+                updateLocation();
+                intervalId = setInterval(updateLocation, 5000);
+
+            } else {
+                document.getElementById("nearestStation").textContent = "";
+                if (widgetContainer) widgetContainer.style.display = 'none';
+
+                clearInterval(intervalId);
+                lastNearestStation = null;
+                lastLatLng = null; // Clear speed tracking variables
+                lastTimestamp = null;
+
+                if (nearestStationCircle) map.removeLayer(nearestStationCircle);
+                if (previousStationCircle) map.removeLayer(previousStationCircle);
+
+                document.getElementById('previousStationWidget').innerHTML = '';
+                document.getElementById('nearestStationWidget').innerHTML = '';
+                document.getElementById('nextStationWidget').innerHTML = '';
+            }
+        });
+
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                clearInterval(intervalId);
+            }
+            else if (document.getElementById('insideTrain').checked) {
+                updateLocation();
+                // Reset speed tracking variables on resume to avoid jump errors
+                lastLatLng = null;
+                lastTimestamp = null;
+                intervalId = setInterval(updateLocation, 30000);
+            }
+        });
+
+        let imageOverlay;
+        function addRaster() {
+
+            if (imageOverlay) {
+                map.removeLayer(imageOverlay);
+                // console.log("Removed Overlay");
+            }
+            // Your provided bounding box coordinates
+            const southwest = [25.5383985732398635, 85.0335540771484375];  // Southwest corner (lat, lng)
+            const northeast = [25.6661224365234375, 85.1988511505604009];  // Northeast corner (lat, lng)
+
+            // Image URL (replace with the actual path to your .tif image)
+            const imageUrl = 'data/icons/PatnaMetro_Gray_Label_300_New - Copy.png';  // Replace with your GeoTIFF image URL or path
+            const imageBounds = [southwest, northeast];
+
+            // Add the georeferenced image to the map using your bounds
+            imageOverlay = L.imageOverlay(imageUrl, imageBounds).addTo(map);
+
+            // Optionally, fit the map to the image bounds
+            map.fitBounds(imageBounds);
+        }
+        addRaster();
+    </script>
+</body>
+
+</html>
