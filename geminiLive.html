@@ -187,7 +187,7 @@
         // ----------------------------------------------------------------------------------
         // DATA LOADING (Remains the same)
         // ----------------------------------------------------------------------------------
-        fetch('data/Stations.geojson')
+        fetch('data/map/tempStations.geojson')
             .then(response => {
                 if (!response.ok) throw new Error("Network response failed.");
                 return response.json();

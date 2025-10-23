@@ -207,7 +207,7 @@
 
     <script>
         // --- CONSTANTS ---
-        const GEOJSON_FILE = 'data/station.geojson';
+        const GEOJSON_FILE = 'data/map/tempStations.geojson';
         const travelMap = [
             { from: "New ISBT", to: "Zero Mile", minutes: 5 },
             { from: "Zero Mile", to: "Bhootnath", minutes: 5 },
@@ -215,8 +215,8 @@
             { from: "Zero Mile", to: "New ISBT", minutes: 5 }
         ];
 
-        const TRAVEL_MIN = 5, CYCLE_MIN = 20, START = "04:00", END = "23:00";
-        const ARRIVE_S = 30, DEPART_S = 15;
+        const TRAVEL_MIN = 5, CYCLE_MIN = 20, START = "08:00", END = "23:00";
+        const ARRIVE_S = 15, DEPART_S = 30;
 
         // --- GLOBAL STATE ---
         let STATION_COORDS = {}; // Map station name to its coordinates

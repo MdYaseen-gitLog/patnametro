@@ -225,7 +225,7 @@
         ];
 
         const TRAVEL_MIN = 5, CYCLE_MIN = 20, START = "08:00", END = "23:00";
-        const ARRIVE_S = 30, DEPART_S = 15;
+        const ARRIVE_S = 15, DEPART_S = 30;
 
         function toDate(hm) { const [h, m] = hm.split(":").map(Number); const n = new Date(); return new Date(n.getFullYear(), n.getMonth(), n.getDate(), h, m, 0, 0); }
         function addMin(d, m) { return new Date(d.getTime() + m * 60000); }
@@ -340,6 +340,10 @@
 
         update(); setInterval(update, 700);
     </script>
+    <a href="nexttrain2.html">Next train</a>
+    <a href="passenger_status.html">Passenger Status</a>
+    <a href="multipleStatus.html">multipleStatus-GPS</a>
+    <a href="statusDelay.html">Next train</a>
     <a href="nexttrain2.html">Next train</a>
 </body>
 

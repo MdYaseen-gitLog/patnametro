@@ -48,8 +48,8 @@ button.active{background:#00ff80;color:#062a1a;}
 const BUFFER_KM = 5000; // 500m buffer zone
 let STATIONS = [];
 let map, marker, gpsActive=false, watchId=null;
-const ARRIVE_S = 30, DEPART_S = 15;
-const TRAVEL_MIN = 5, START="04:00", END="23:00";
+const ARRIVE_S = 15, DEPART_S = 30;
+const TRAVEL_MIN = 5, START="08:00", END="23:00";
 const travelMap = [
   { from:"New ISBT", to:"Zero Mile", minutes:5 },
   { from:"Zero Mile", to:"Bhootnath", minutes:5 },
@@ -198,7 +198,7 @@ document.getElementById("mapBtn").addEventListener("click",()=>{
 
 /* ---------- Initialization ---------- */
 window.addEventListener("load", async ()=>{
-  const res=await fetch("data/station.geojson");
+  const res=await fetch("data/map/tempStations.geojson");
   const geo=await res.json();
   STATIONS=geo.features.map(f=>({
     name:f.properties.station_name || f.properties.Name,
