@@ -198,7 +198,7 @@ document.getElementById("mapBtn").addEventListener("click",()=>{
 
 /* ---------- Initialization ---------- */
 window.addEventListener("load", async ()=>{
-  const res=await fetch("data/map/tempStations.geojson");
+  const res=await fetch("tempStations.geojson");
   const geo=await res.json();
   STATIONS=geo.features.map(f=>({
     name:f.properties.station_name || f.properties.Name,
