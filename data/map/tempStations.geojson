@@ -1,10 +1,78 @@
 {
-"type": "FeatureCollection",
-"name": "Stations",
-"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
-"features": [
-{ "type": "Feature", "properties": { "station_name": "Bhootnath Station", "descriptio": null, "station_color": "Blue", "station_type": "STN", "station_layout": "ELEVATED", "STN_ID": 9, "ROUTE_ID": 0, "Lat": 25.604592542933929, "Lng": 85.221270769661928, "location": null }, "geometry": { "type": "Point", "coordinates": [ 85.221270769661928, 25.604592542933929 ] } },
-{ "type": "Feature", "properties": { "station_name": "Zero Mile Station", "descriptio": null, "station_color": "Blue", "station_type": "STN", "station_layout": "ELEVATED", "STN_ID": 10, "ROUTE_ID": 0, "Lat": 25.609973115366166, "Lng": 85.2105360646501, "location": null }, "geometry": { "type": "Point", "coordinates": [ 85.2105360646501, 25.609973115366166 ] } },
-{ "type": "Feature", "properties": { "station_name": "New ISBT Station", "descriptio": null, "station_color": "Blue", "station_type": "STN", "station_layout": "ELEVATED", "STN_ID": 11, "ROUTE_ID": 0, "Lat": 25.609077492450496, "Lng": 85.206672504298538, "location": null }, "geometry": { "type": "Point", "coordinates": [ 85.206672504298538, 25.609077492450496 ] } }
-]
+    "type": "FeatureCollection",
+    "name": "Stations",
+    "crs": {
+        "type": "name",
+        "properties": {
+            "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+        }
+    },
+    "features": [
+        {
+            "type": "Feature",
+            "properties": {
+                "station_name": "New ISBT Station",
+                "descriptio": null,
+                "station_color": "Blue",
+                "station_type": "STN",
+                "station_layout": "ELEVATED",
+                "STN_ID": 11,
+                "ROUTE_ID": 0,
+                "Lat": 25.609077492450496,
+                "Lng": 85.206672504298538,
+                "location": null
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    85.206672504298538,
+                    25.609077492450496
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "station_name": "Zero Mile Station",
+                "descriptio": null,
+                "station_color": "Blue",
+                "station_type": "STN",
+                "station_layout": "ELEVATED",
+                "STN_ID": 10,
+                "ROUTE_ID": 0,
+                "Lat": 25.609973115366166,
+                "Lng": 85.2105360646501,
+                "location": null
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    85.2105360646501,
+                    25.609973115366166
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "station_name": "Bhootnath Station",
+                "descriptio": null,
+                "station_color": "Blue",
+                "station_type": "STN",
+                "station_layout": "ELEVATED",
+                "STN_ID": 9,
+                "ROUTE_ID": 0,
+                "Lat": 25.604592542933929,
+                "Lng": 85.221270769661928,
+                "location": null
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    85.221270769661928,
+                    25.604592542933929
+                ]
+            }
+        }
+    ]
 }
