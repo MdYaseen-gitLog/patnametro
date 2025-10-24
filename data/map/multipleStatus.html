@@ -204,6 +204,19 @@
     </div>
 
     <script>
+        // Load GeoJSON data
+        Promise.all([
+            fetch('data/map/data/station.geojson').then(res => res.json())
+   
+        ]).then(([stationsData, linesData]) => {
+            stations = stationsData;
+
+
+            L.geoJSON(stations, { onEachFeature: (f, l) => l.bindPopup(f.properties.name) }).addTo(map);
+   
+
+            // checkUserLocation();
+        });
         // --- Core Parameters ---
         const STATIONS = ["New ISBT", "Zero Mile", "Bhootnath"];
         const travelMap = [
