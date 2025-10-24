@@ -204,19 +204,16 @@
     </div>
 
     <script>
-        // Load GeoJSON data
-        Promise.all([
-            fetch('data/map/data/station.geojson').then(res => res.json())
-   
-        ]).then(([stationsData]) => {
-            stations = stationsData;
+        fetch('data/map/tempStations.geojson')
+            .then(res => res.json())
+            .then(data => {
+                L.geoJSON(data, {
+                    onEachFeature: (f, l) => l.bindPopup(f.properties.station_name)
+                }).addTo(map);
+            })
+            .catch(err => console.error('Failed to load GeoJSON:', err));
 
 
-            L.geoJSON(stations, { onEachFeature: (f, l) => l.bindPopup(f.properties.name) }).addTo(map);
-   
-
-            // checkUserLocation();
-        });
         // --- Core Parameters ---
         const STATIONS = ["New ISBT", "Zero Mile", "Bhootnath"];
         const travelMap = [
