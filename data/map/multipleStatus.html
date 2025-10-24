@@ -204,16 +204,6 @@
     </div>
 
     <script>
-        fetch('data/map/tempStations.geojson')
-            .then(res => res.json())
-            .then(data => {
-                L.geoJSON(data, {
-                    onEachFeature: (f, l) => l.bindPopup(f.properties.station_name)
-                }).addTo(map);
-            })
-            .catch(err => console.error('Failed to load GeoJSON:', err));
-
-
         // --- Core Parameters ---
         const STATIONS = ["New ISBT", "Zero Mile", "Bhootnath"];
         const travelMap = [
