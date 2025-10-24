@@ -11,7 +11,7 @@
         {
             "type": "Feature",
             "properties": {
-                "station_name": "New ISBT Station",
+                "station_name": "New ISBT",
                 "descriptio": null,
                 "station_color": "Blue",
                 "station_type": "STN",
@@ -33,7 +33,7 @@
         {
             "type": "Feature",
             "properties": {
-                "station_name": "Zero Mile Station",
+                "station_name": "Zero Mile",
                 "descriptio": null,
                 "station_color": "Blue",
                 "station_type": "STN",
@@ -55,7 +55,7 @@
         {
             "type": "Feature",
             "properties": {
-                "station_name": "Bhootnath Station",
+                "station_name": "Bhootnath",
                 "descriptio": null,
                 "station_color": "Blue",
                 "station_type": "STN",
