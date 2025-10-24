@@ -208,7 +208,7 @@
         Promise.all([
             fetch('data/map/data/station.geojson').then(res => res.json())
    
-        ]).then(([stationsData, linesData]) => {
+        ]).then(([stationsData]) => {
             stations = stationsData;
 
 
