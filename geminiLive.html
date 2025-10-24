@@ -198,11 +198,31 @@
             .then(data => {
                 stationDataCache = data;
                 console.log("Station data loaded successfully.");
+
+                // Add GeoJSON data to the map
+                L.geoJSON(data, {
+                    onEachFeature: function (feature, layer) {
+                        if (feature.properties && feature.properties.name) {
+                            layer.bindPopup(`<strong>${feature.properties.name}</strong>`);
+                        }
+                    },
+                    pointToLayer: function (feature, latlng) {
+                        return L.circleMarker(latlng, {
+                            radius: 6,
+                            fillColor: "#3388ff",
+                            color: "#000",
+                            weight: 1,
+                            opacity: 1,
+                            fillOpacity: 0.8
+                        });
+                    }
+                }).addTo(map);
             })
             .catch(error => {
                 alert("Failed to load station data. Check console for details.");
                 console.error("Error loading GeoJSON:", error);
             });
+
 
         // ----------------------------------------------------------------------------------
         // NEW: Speed Calculation Function (km/h)
