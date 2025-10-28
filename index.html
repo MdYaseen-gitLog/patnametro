@@ -745,7 +745,7 @@
 
 
         let stationMarkers = [];
-
+            const allCoords = [];
         function drawStationsOnRoute(segments, fromKey, toKey) {
 
             // Remove previously added station markers
@@ -801,7 +801,7 @@
                 return true;
             });
 
-            const allCoords = [];
+
             fullRoute.forEach(st => {
                 const isConnecting = connectingNames.includes(st.name);
                 //const icon = st.color.toLowerCase() === 'red' ? redIcon : blueIcon;
