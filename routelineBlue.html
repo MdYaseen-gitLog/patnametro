@@ -414,16 +414,7 @@
         setLabelSize();
 
     </script>
-    <script>
-        let appVersion = '';
-        const appVersionID = document.getElementById("appVersion");
-        fetch('version.json')
-            .then(res => res.json())
-            .then(data => {
-                appVersion = data.version;
-                appVersionID.textContent = appVersion;
-            });
-    </script>
+
     <!-- Footer with legal links -->
     <footer class="bg-dark text-light py-4 mt-auto">
         <div class="container">
@@ -453,6 +444,16 @@
             </div>
         </div>
     </footer>
+    <script>
+        let appVersion = '';
+        const appVersionID = document.getElementById("appVersion");
+        fetch('version.json')
+            .then(res => res.json())
+            .then(data => {
+                appVersion = data.version;
+                appVersionID.textContent = appVersion;
+            });
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
