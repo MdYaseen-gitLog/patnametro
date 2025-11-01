@@ -1,0 +1,35 @@
+/* CSS */
+#feature-banner {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 300px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #1976d2;
+    opacity: 0.3;
+    border-radius: 10px;
+    color: white;
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    z-index: 9999;
+}
+
+#feature-banner.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+#feature-banner img {
+    max-width: 100%;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+#feature-banner h3 {
+    margin: 0;
+    text-align: center;
+}
