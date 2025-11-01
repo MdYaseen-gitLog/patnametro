@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", function () {
   banner.innerHTML = `
     <button class="close-btn" aria-label="Close">&times;</button>
     <div class="banner-content">
-      <img src="icon-192.png" alt="PMet App Icon" class="icon">
+      <img src="data/icons/icon-192.png" alt="PMet App Icon" class="icon">
       <div class="banner-text">
         <h3>Get the PMet App</h3>
         <p>Install our WebApp for fast loading(~1MB), offline access, and a native app feel!</p>
