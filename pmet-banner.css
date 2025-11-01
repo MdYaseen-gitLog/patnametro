@@ -1,0 +1,90 @@
+/* PMet App Banner Styles */
+#pmet-banner {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 400px;
+    background: #ffffff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    border-radius: 10px;
+    padding: 16px;
+    z-index: 9999;
+    font-family: "Segoe UI", Tahoma, sans-serif;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, 20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+}
+
+#pmet-banner h3 {
+    margin: 0 0 8px 0;
+    font-size: 1.2em;
+    color: #333;
+}
+
+#pmet-banner p {
+    margin: 0 0 12px 0;
+    font-size: 0.9em;
+    color: #555;
+}
+
+#pmet-banner button {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9em;
+}
+
+#pmet-banner button:hover {
+    background: #0056b3;
+}
+
+#pmet-banner .close-btn {
+    background: transparent;
+    border: none;
+    font-size: 18px;
+    color: #888;
+    cursor: pointer;
+    position: absolute;
+    top: 8px;
+    right: 10px;
+}
+
+#pmet-banner .icon {
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+    border-radius: 10px;
+    margin-right: 12px;
+}
+
+#pmet-banner .banner-content {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#pmet-banner .banner-text {
+    flex: 1;
+}
+
+@media (max-width: 500px) {
+    #pmet-banner p {
+        font-size: 0.85em;
+    }
+}
