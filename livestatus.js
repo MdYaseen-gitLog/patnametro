@@ -20,7 +20,7 @@ let stationDataCacheLive = null, metroCache = null;
 let departedCircle, arrivedCircle, nearestCircle, nextCircle, trainMarker;
 let lastNearest = null, lastArrived = null;
 let lastLatLng = null, lastTimestamp = null, updateCount = 0;
-let intervalId, metroLayer, interchangeMarkers = L.layerGroup();
+let intervalIdLive, metroLayer, interchangeMarkers = L.layerGroup();
 let speedBuffer = [];
 
 /* ---------- MAP INIT ---------- */
@@ -242,11 +242,11 @@ document.getElementById('insideTrain').addEventListener('change',function(){
         [departedCircle,arrivedCircle,nearestCircle,nextCircle,trainMarker].forEach(removeIfExists);
         ['departedWidget','arrivedWidget','nearestWidget','nextWidget'].forEach(resetWidget);
         updateLocation();
-        intervalId = setInterval(updateLocation, CONFIG.UPDATE_MS);
+        intervalIdLive = setInterval(updateLocation, CONFIG.UPDATE_MS);
     }else{
         document.getElementById('nearestStation').textContent='';
         widget.style.display='none';
-        clearInterval(intervalId);
+        clearInterval(intervalIdLive);
         [departedCircle,arrivedCircle,nearestCircle,nextCircle,trainMarker].forEach(removeIfExists);
         ['departedWidget','arrivedWidget','nearestWidget','nextWidget'].forEach(resetWidget);
         lastNearest=null; lastArrived=null; lastLatLng=null; lastTimestamp=null; updateCount=0; speedBuffer=[];
@@ -274,10 +274,10 @@ return {
 
 /* ---------- VISIBILITY ---------- */
 document.addEventListener('visibilitychange',()=>{ 
-    if(document.hidden) clearInterval(intervalId);
+    if(document.hidden) clearInterval(intervalIdLive);
     else if(document.getElementById('insideTrain').checked){
         lastLatLng=null; lastTimestamp=null; updateLocation();
-        intervalId = setInterval(updateLocation, CONFIG.UPDATE_MS);
+        intervalIdLive = setInterval(updateLocation, CONFIG.UPDATE_MS);
     }
 });
 
