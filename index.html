@@ -362,9 +362,9 @@
     <!-- <link rel="stylesheet" href="diwali-banner.css"> -->
     <!-- <script src="diwali-banner.js"></script> -->
     <!-- <script src="banner.js"></script> -->
-    <script src="notifications.js"></script>
+    <!-- <script src="notifications.js"></script> -->
     <!-- <script src="data/install-popup.js"></script> -->
-    <script src="usertips.js"></script>
+    <!-- <script src="usertips.js"></script> -->
     <div id="aqi-alert" class="alert" role="alert"><i class="fas fa-head-side-mask"></i></div>
     <button id="installBtn">
         📲 Install App
@@ -1960,7 +1960,7 @@
                         const alertClass = getBootstrapAlertClass(aqi.value);
                         alertBox.className = `alert ${alertClass}`;
                         alertBox.innerHTML = `
-         <strong>Air Quality Alert:</strong> The air quality is <strong>${aqi.label}</strong> ${aqi.value}. Please take precautions.
+         <strong>Air Quality Alert:</strong> AQI Index <strong>${aqi.label}</strong> ${aqi.value}. Please take precautions.
        `;
                     } else {
                         alertBox.className = 'alert alert-secondary';
