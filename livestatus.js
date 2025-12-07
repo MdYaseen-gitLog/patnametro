@@ -2,7 +2,7 @@
 const CONFIG = {
     ARRIVE_DIST: 0.15,      // km
     MAX_DIST:    3,         // km
-    UPDATE_MS:   8000000,      // 8 s
+    UPDATE_MS:   8000,      // 8 s
     MIN_HRS:     0.0003,
     GEOJSON_STATIONS: 'data/Stations.geojson',
     GEOJSON_METRO:    'data/metro_track.geojson',
