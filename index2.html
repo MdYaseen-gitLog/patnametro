@@ -335,46 +335,188 @@
             color: #333 !important;
         }
     </style>
-<style>
-    #controls{position:fixed;top:10px;right:10px;z-index:1001;background:rgba(0,0,0,.75);padding:10px 15px;border-radius:8px;color:#fff;box-shadow:0 4px 8px rgba(0,0,0,.4);display:flex;flex-direction:column;gap:5px;min-width:150px}
-    #station-widget{position:fixed;top:10px;left:10px;z-index:1000;background:rgba(0,0,0,.75);padding:15px;border-radius:8px;color:#fff;box-shadow:0 4px 8px rgba(0,0,0,.4);width:230px;display:none}
-    .station-item{padding:8px;margin-bottom:5px;border-radius:4px;background:#333;color:#fff;transition:all .3s ease;border:2px solid #555;min-height:40px}
-    .station-item strong{font-size:1.1em}
+    <style>
+        #controls {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            z-index: 1001;
+            background: rgba(0, 0, 0, .75);
+            padding: 10px 15px;
+            border-radius: 8px;
+            color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, .4);
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            min-width: 150px
+        }
 
-    /* ----- GLOW ANIMATIONS ----- */
-    .glowing-marker{transform:scale(1)!important}
-    .glow-yellow{animation:pulse-yellow 2s infinite ease-out}
-    .glow-red{animation:pulse-red 2s infinite ease-out}
-    .glow-green{animation:pulse-green 2s infinite ease-out}
-    .glow-cyan{animation:pulse-cyan 2s infinite ease-out}
-/* ---------- SVG FILTERS FOR METRO GLOW ---------- */
-#map svg defs {
-    display: none;   /* keep the <defs> hidden */
-}
-.metro-glow-red   path { filter: url(#glow-red); }
-.metro-glow-blue  path { filter: url(#glow-blue); }
+        #station-widget {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            z-index: 1000;
+            background: rgba(0, 0, 0, .75);
+            padding: 15px;
+            border-radius: 8px;
+            color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, .4);
+            width: 230px;
+            display: none
+        }
 
-@keyframes pulse-red {
-    0%   { filter: url(#glow-red-0); }
-    100% { filter: url(#glow-red-100); }
-}
-@keyframes pulse-blue {
-    0%   { filter: url(#glow-blue-0); }
-    100% { filter: url(#glow-blue-100); }
-}
-    @keyframes pulse-yellow{0%{box-shadow:0 0 10px 0px rgba(255,215,0,.7)}100%{box-shadow:0 0 25px 15px rgba(255,215,0,0)}}
-    @keyframes pulse-red{0%{box-shadow:0 0 10px 0px rgba(255,68,68,.7)}100%{box-shadow:0 0 25px 15px rgba(255,68,68,0)}}
-    @keyframes pulse-green{0%{box-shadow:0 0 10px 0px rgba(68,255,68,.7)}100%{box-shadow:0 0 25px 15px rgba(68,255,68,0)}}
-    @keyframes pulse-cyan{0%{box-shadow:0 0 10px 0px rgba(0,206,209,.7)}100%{box-shadow:0 0 25px 15px rgba(0,206,209,0)}}
-    @keyframes pulse-blue{0%{box-shadow:0 0 10px 0px rgba(0,0,255,.7)}100%{box-shadow:0 0 25px 15px rgba(0,0,255,0)}}
+        .station-item {
+            padding: 8px;
+            margin-bottom: 5px;
+            border-radius: 4px;
+            background: #333;
+            color: #fff;
+            transition: all .3s ease;
+            border: 2px solid #555;
+            min-height: 40px
+        }
 
-    .train-icon{background:#ff4500;color:#fff;font-weight:bold;text-align:center;border-radius:50%;width:30px;height:30px;line-height:30px;font-size:12px;border:2px solid #fff}
-    .interchange-icon{background:#ffff00;border-radius:50%;border:2px solid #000;text-align:center;line-height:20px;font-weight:bold;font-size:14px}
+        .station-item strong {
+            font-size: 1.1em
+        }
 
-    @media (max-width:600px){
-        #station-widget{left:50%;transform:translateX(-50%);width:90vw;}
-    }
-</style>
+        /* ----- GLOW ANIMATIONS ----- */
+        .glowing-marker {
+            transform: scale(1) !important
+        }
+
+        .glow-yellow {
+            animation: pulse-yellow 2s infinite ease-out
+        }
+
+        .glow-red {
+            animation: pulse-red 2s infinite ease-out
+        }
+
+        .glow-green {
+            animation: pulse-green 2s infinite ease-out
+        }
+
+        .glow-cyan {
+            animation: pulse-cyan 2s infinite ease-out
+        }
+
+        /* ---------- SVG FILTERS FOR METRO GLOW ---------- */
+        #map svg defs {
+            display: none;
+            /* keep the <defs> hidden */
+        }
+
+        .metro-glow-red path {
+            filter: url(#glow-red);
+        }
+
+        .metro-glow-blue path {
+            filter: url(#glow-blue);
+        }
+
+        @keyframes pulse-red {
+            0% {
+                filter: url(#glow-red-0);
+            }
+
+            100% {
+                filter: url(#glow-red-100);
+            }
+        }
+
+        @keyframes pulse-blue {
+            0% {
+                filter: url(#glow-blue-0);
+            }
+
+            100% {
+                filter: url(#glow-blue-100);
+            }
+        }
+
+        @keyframes pulse-yellow {
+            0% {
+                box-shadow: 0 0 10px 0px rgba(255, 215, 0, .7)
+            }
+
+            100% {
+                box-shadow: 0 0 25px 15px rgba(255, 215, 0, 0)
+            }
+        }
+
+        @keyframes pulse-red {
+            0% {
+                box-shadow: 0 0 10px 0px rgba(255, 68, 68, .7)
+            }
+
+            100% {
+                box-shadow: 0 0 25px 15px rgba(255, 68, 68, 0)
+            }
+        }
+
+        @keyframes pulse-green {
+            0% {
+                box-shadow: 0 0 10px 0px rgba(68, 255, 68, .7)
+            }
+
+            100% {
+                box-shadow: 0 0 25px 15px rgba(68, 255, 68, 0)
+            }
+        }
+
+        @keyframes pulse-cyan {
+            0% {
+                box-shadow: 0 0 10px 0px rgba(0, 206, 209, .7)
+            }
+
+            100% {
+                box-shadow: 0 0 25px 15px rgba(0, 206, 209, 0)
+            }
+        }
+
+        @keyframes pulse-blue {
+            0% {
+                box-shadow: 0 0 10px 0px rgba(0, 0, 255, .7)
+            }
+
+            100% {
+                box-shadow: 0 0 25px 15px rgba(0, 0, 255, 0)
+            }
+        }
+
+        .train-icon {
+            background: #ff4500;
+            color: #fff;
+            font-weight: bold;
+            text-align: center;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            line-height: 30px;
+            font-size: 12px;
+            border: 2px solid #fff
+        }
+
+        .interchange-icon {
+            background: #ffff00;
+            border-radius: 50%;
+            border: 2px solid #000;
+            text-align: center;
+            line-height: 20px;
+            font-weight: bold;
+            font-size: 14px
+        }
+
+        @media (max-width:600px) {
+            #station-widget {
+                left: 50%;
+                transform: translateX(-50%);
+                width: 90vw;
+            }
+        }
+    </style>
 
 </head>
 
@@ -1273,13 +1415,18 @@
                 const source = document.getElementById("sourceStation");
                 document.getElementById("nearestStation").style.color = "green";
                 document.getElementById("nearestStation").textContent = props.station_name + "(" + distance.toFixed(2) + 'km)';
-                selectOptionByText("sourceStation", props.station_name);
-                source.dispatchEvent(new Event('change'));//update destination when changing source station.
+                // selectOptionByText("sourceStation", props.station_name);
+                // source.dispatchEvent(new Event('change'));//update destination when changing source station.
+                // Clean the station name
+                const cleanStationName = props.station_name.replace(/Station.*/, '').trim();
+
+                // Bind the popup
                 nearestStationCircle.bindPopup(`
-        <strong>Nearest Station</strong><br>
-        ${props.station_name}<br>
-       ${distance.toFixed(2)} km from your current location.
-      `).openPopup();
+  <strong>Nearest Station</strong><br>
+  ${cleanStationName}<br>
+  ${distance.toFixed(2)} km from your current location.
+`).openPopup();
+
             }
 
 
