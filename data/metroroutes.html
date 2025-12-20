@@ -32,10 +32,10 @@
       data.forEach(r => {
         const div = document.createElement("div");
         div.innerHTML = `
-          <b>ID:</b> ${r.id} 
-          <b>Color:</b> <input value="${r.color}" id="color_${r.id}">
-          <b>Travel Time:</b> <input type="number" value="${r.travel_time}" id="time_${r.id}">
-          <button onclick="update('${r.id}')">Update</button>
+          <b>ID:</b> ${r.route_id} 
+          <b>Color:</b> <input value="${r.color}" id="color_${r.route_id}">
+          <b>Travel Time:</b> <input type="number" value="${r.travel_time}" id="time_${r.route_id}">
+          <button onclick="update('${r.route_id}')">Update</button>
         `;
         container.appendChild(div);
       });
