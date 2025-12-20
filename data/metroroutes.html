@@ -1,58 +1,52 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Metro Update</title>
+  <title>Metro Routes Bulk Update</title>
 </head>
 <body>
-  <h1>Update Metro Routes</h1>
+  <h1>Metro Routes Bulk Update</h1>
 
-  <label>Color:
-    <input type="text" id="color" value="red">
-  </label>
-  <label>ROUTE_ID:
-    <input type="text" id="route_id" value="RED">
-  </label>
-  <button id="load">Load Records</button>
+  <label>Color: <input type="text" id="color" value="RED"></label>
+  <label>ROUTE_ID: <input type="number" id="route_id" value="1"></label><br><br>
 
-  <div id="records"></div>
+  <label>FROM_STN: <input type="text" id="from_stn"></label>
+  <label>TO_STN: <input type="text" id="to_stn"></label>
+  <label>Travel Time: <input type="number" id="trav_time"></label><br><br>
+
+  <button id="update">Update All Matching Records</button>
+
+  <div id="result"></div>
 
   <script>
     const API = "https://metroroutewrk.yaseenmd965.workers.dev";
 
-    document.getElementById("load").addEventListener("click", async () => {
-      const color = document.getElementById("color").value;
-      const route_id = document.getElementById("route_id").value;
+    document.getElementById("update").addEventListener("click", async () => {
+      const Color = document.getElementById("color").value;
+      const ROUTE_ID = document.getElementById("route_id").value;
+      const FROM_STN = document.getElementById("from_stn").value;
+      const TO_STN = document.getElementById("to_stn").value;
+      const trav_time = document.getElementById("trav_time").value;
 
-      const res = await fetch(`${API}/api/routes?color=${color}&route_id=${route_id}`);
-      const data = await res.json();
+      if (!Color || !ROUTE_ID || !FROM_STN || !TO_STN || !trav_time) {
+        alert("Please fill all fields");
+        return;
+      }
 
-      const container = document.getElementById("records");
-      container.innerHTML = "";
-
-      data.forEach(r => {
-        const div = document.createElement("div");
-        div.innerHTML = `
-          <b>ID:</b> ${r.route_id} 
-          <b>Color:</b> <input value="${r.color}" id="color_${r.route_id}">
-          <b>Travel Time:</b> <input type="number" value="${r.travel_time}" id="time_${r.route_id}">
-          <button onclick="update('${r.route_id}')">Update</button>
-        `;
-        container.appendChild(div);
-      });
-    });
-
-    async function update(id) {
-      const newColor = document.getElementById(`color_${id}`).value;
-      const newTravelTime = Number(document.getElementById(`time_${id}`).value);
-
-      await fetch(`${API}/api/routes/update`, {
+      const res = await fetch(`${API}/api/routes/update`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, newColor, newTravelTime })
+        body: JSON.stringify({ Color, ROUTE_ID, FROM_STN, TO_STN, trav_time })
       });
 
-      alert("Updated!");
-    }
+      const result = await res.json();
+      const container = document.getElementById("result");
+
+      if (result.success) {
+        container.innerHTML = `<p style="color:green;">All matching records updated successfully!</p>`;
+      } else {
+        container.innerHTML = `<p style="color:red;">Update failed: ${JSON.stringify(result)}</p>`;
+      }
+    });
   </script>
 </body>
 </html>
