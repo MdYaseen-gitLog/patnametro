@@ -88,7 +88,7 @@ function updateWidget(f, type, speedStr){
     if(!cfg) return;
     const el=document.getElementById(cfg.id); if(!el) return;
     el.className='station-item'; if(cfg.cls) el.classList.add(cfg.cls);
-    el.style.backgroundColor = cfg.bg;
+    //el.style.backgroundColor = cfg.bg;
     el.innerHTML = `<strong>${cfg.title}</strong><br>${p.station_name}<br>${speedStr}`;
 }
 
