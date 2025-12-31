@@ -125,7 +125,7 @@ const NY_TEST_MODE = true; // ← false in production
   <div class="ny-bg-logo"></div>
 
     <div class="ny-card">
-      <div class="ny-title">Happy New Year 2025</div>
+      <div class="ny-title">Happy New Year 2026</div>
       <div class="ny-sub">A new year. New journeys. Endless destinations.</div>
       🎆
       <div class="ny-msg">
@@ -170,3 +170,4 @@ const NY_TEST_MODE = true; // ← false in production
     setTimeout(()=>c.remove(),7000);
   }, 600);
 })();
+
