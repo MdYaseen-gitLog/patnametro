@@ -358,7 +358,39 @@
 </head>
 
 <body>
-    
+    <link rel="stylesheet" href="republicday.css">
+    <div id="republic-day-banner">
+        <div class="marquee">
+            <div class="marquee-track">
+                <span>
+                    Happy Republic Day! Celebrating the spirit of India — Justice • Liberty • Equality • Fraternity
+                </span>
+                <span>
+                    Happy Republic Day! Celebrating the spirit of India — Justice • Liberty • Equality • Fraternity
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            const banner = document.getElementById("republic-day-banner");
+            if (!banner) return;
+
+            // Get current date in IST
+            const now = new Date();
+            const istOffset = 5.5 * 60 * 60 * 1000;
+            const istTime = new Date(now.getTime() + istOffset);
+
+            const year = istTime.getFullYear();
+            const republicDayEnd = new Date(year, 0, 26, 23, 59, 59); // Jan 26, 11:59:59 PM IST
+
+            if (istTime > republicDayEnd) {
+                banner.style.display = "none";
+                document.body.style.paddingTop = "0";
+            }
+        })();
+    </script>
     <!-- <script src="banner.js"></script> -->
     <!-- <script src="notifications.js"></script> -->
     <!-- <script src="data/install-popup.js"></script> -->
@@ -743,7 +775,7 @@
 
 
         let stationMarkers = [];
-            const allCoords = [];
+        const allCoords = [];
         function drawStationsOnRoute(segments, fromKey, toKey) {
 
             // Remove previously added station markers
@@ -1117,7 +1149,7 @@
                 });
                 //  addTrackToMap();//top of the selected route line
                 drawRouteBetween(from, to);
-               // addRaster();
+                // addRaster();
                 showStationOnRoute();
                 document.getElementById('infoTowards').textContent = getTowardsStationDirect();
                 document.getElementById("enableLocation").checked = false;
@@ -1986,34 +2018,34 @@
         experience for all passengers.
     </div>
     <!-- Footer with legal links -->
-  <footer class="bg-dark text-light py-4 mt-auto">
-    <div class="container">
-      <div class="row">
-        <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
-          <small>© 2025 www.patnametroroute.in (<span id="appVersion"></span>). All rights
-            reserved.</small>
-          <p>
-            <a href="https://www.youtube.com/@patnametroroute" target="_blank" class="text-danger"
-              style="text-decoration: none;">
-              <i class="fab fa-youtube"></i> Watch us on YouTube
-            </a>
-            <a href="#" target="_blank" class="text-primary mx-2" style="font-size: 1.5rem;">
-              <i class="fab fa-facebook"></i>
-            </a>
-            <a href="#" target="_blank" class="text-info mx-2" style="font-size: 1.5rem;">
-              <i class="fab fa-twitter"></i>
-            </a>
-          </p>
+    <footer class="bg-dark text-light py-4 mt-auto">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
+                    <small>© 2025 www.patnametroroute.in (<span id="appVersion"></span>). All rights
+                        reserved.</small>
+                    <p>
+                        <a href="https://www.youtube.com/@patnametroroute" target="_blank" class="text-danger"
+                            style="text-decoration: none;">
+                            <i class="fab fa-youtube"></i> Watch us on YouTube
+                        </a>
+                        <a href="#" target="_blank" class="text-primary mx-2" style="font-size: 1.5rem;">
+                            <i class="fab fa-facebook"></i>
+                        </a>
+                        <a href="#" target="_blank" class="text-info mx-2" style="font-size: 1.5rem;">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                    </p>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <a href="privacy-policy.html" class="text-light text-decoration-none me-3">Privacy Policy</a>
+                    <a href="terms.html" class="text-light text-decoration-none me-3">Terms of Service</a>
+                    <a href="contact.html" class="text-light text-decoration-none me-3">Contact Us</a>
+                    <a href="disclaimer.html" class="text-light text-decoration-none">Disclaimer</a>
+                </div>
+            </div>
         </div>
-        <div class="col-md-6 text-center text-md-end">
-          <a href="privacy-policy.html" class="text-light text-decoration-none me-3">Privacy Policy</a>
-          <a href="terms.html" class="text-light text-decoration-none me-3">Terms of Service</a>
-          <a href="contact.html" class="text-light text-decoration-none me-3">Contact Us</a>
-          <a href="disclaimer.html" class="text-light text-decoration-none">Disclaimer</a>
-        </div>
-      </div>
-    </div>
-  </footer>
+    </footer>
 
 
     <script>
@@ -2123,7 +2155,7 @@
         }
 
     </script>
-   
+
 </body>
 
 </html>

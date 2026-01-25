@@ -206,10 +206,42 @@
 </head>
 
 <body>
-  <script src="pmet-banner.js" defer></script>
+  <!-- <script src="pmet-banner.js" defer></script> -->
   <!-- <script src="banner.js"></script> -->
-  <script src="notifications.js"></script>
+  <!-- <script src="notifications.js"></script> -->
+    <link rel="stylesheet" href="republicday.css">
+<div id="republic-day-banner">
+  <div class="marquee">
+    <div class="marquee-track">
+      <span>
+        Happy Republic Day! Celebrating the spirit of India — Justice • Liberty • Equality • Fraternity
+      </span>
+      <span>
+        Happy Republic Day! Celebrating the spirit of India — Justice • Liberty • Equality • Fraternity
+      </span>
+    </div>
+  </div>
+</div>
 
+<script>
+(function () {
+  const banner = document.getElementById("republic-day-banner");
+  if (!banner) return;
+
+  // Get current date in IST
+  const now = new Date();
+  const istOffset = 5.5 * 60 * 60 * 1000;
+  const istTime = new Date(now.getTime() + istOffset);
+
+  const year = istTime.getFullYear();
+  const republicDayEnd = new Date(year, 0, 26, 23, 59, 59); // Jan 26, 11:59:59 PM IST
+
+  if (istTime > republicDayEnd) {
+    banner.style.display = "none";
+    document.body.style.paddingTop = "0";
+  }
+})();
+</script>
   <button id="installBtn"
     style="display:block;position:fixed;bottom:20px;right:20px;padding:10px 20px;font-size:16px;border:none;border-radius:8px;background-color:#1976d2;color:white;box-shadow:0 4px 6px rgba(0,0,0,0.2);z-index:1000;"
     onclick="goToPageHref()">

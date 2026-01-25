@@ -113,6 +113,39 @@
 </head>
 
 <body>
+        <link rel="stylesheet" href="republicday.css">
+<div id="republic-day-banner">
+  <div class="marquee">
+    <div class="marquee-track">
+      <span>
+        Happy Republic Day! Celebrating the spirit of India — Justice • Liberty • Equality • Fraternity
+      </span>
+      <span>
+        Happy Republic Day! Celebrating the spirit of India — Justice • Liberty • Equality • Fraternity
+      </span>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  const banner = document.getElementById("republic-day-banner");
+  if (!banner) return;
+
+  // Get current date in IST
+  const now = new Date();
+  const istOffset = 5.5 * 60 * 60 * 1000;
+  const istTime = new Date(now.getTime() + istOffset);
+
+  const year = istTime.getFullYear();
+  const republicDayEnd = new Date(year, 0, 26, 23, 59, 59); // Jan 26, 11:59:59 PM IST
+
+  if (istTime > republicDayEnd) {
+    banner.style.display = "none";
+    document.body.style.paddingTop = "0";
+  }
+})();
+</script>
     <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
         <div class="container-fluid">
