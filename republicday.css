@@ -1,0 +1,72 @@
+#republic-day-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 9999;
+  background: linear-gradient(
+    90deg,
+    #FF9933,
+    #FFFFFF,
+    #138808
+  );
+  overflow: hidden;
+  border-bottom: 2px solid rgba(0,0,0,0.1);
+}
+
+.marquee {
+  width: 100%;
+  overflow: hidden;
+}
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: scroll 18s linear infinite;
+}
+
+.marquee-track span {
+  white-space: nowrap;
+  padding: 10px 40px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #000;
+}
+
+/* Smooth infinite scroll */
+@keyframes scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+/* Prevent overlap with page content */
+body {
+  padding-top: 48px;
+}
+
+/* Republic Day glowing text */
+.marquee-track span {
+  white-space: nowrap;
+  padding: 10px 40px;
+  font-size: 16px;
+  font-weight: 700;
+  color:white; /* Deep Ashoka blue */
+  text-shadow:
+    0 0 4px rgba(25, 90, 211, 0.8),
+    0 0 8px rgba(19, 136, 8, 0.4),
+    0 0 12px rgba(255, 153, 51, 0.35);
+  letter-spacing: 0.6px;
+}
+
+
+/* Slightly smaller text on mobile */
+@media (max-width: 600px) {
+  .marquee-track span {
+    font-size: 14px;
+    padding: 8px 30px;
+  }
+}
