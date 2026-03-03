@@ -24,12 +24,15 @@ const metroMore = [
   "Check your destination from System Map",
   "Take Care of your Valuables"
 ];
-
+const newsInfo = [
+  "🚇 Plan your route in advance using the Metro app."
+];
 // --- Combine All Notifications ---
+// const notifications = [...metroSecurity, ...metroTips, ...metroMore];
 const notifications = [...metroSecurity, ...metroTips, ...metroMore];
 
 // --- Settings ---
-let currentIndex = 2;
+let currentIndex = 3;
 const delayBetween = 6000;     // Time between messages (ms)
 const autoHideDelay = 6000;     // Time each message is visible (ms)
 const startDelay = 9000;        // Time after page load to start (ms)
